@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
 import { Bebas_Neue, Oswald } from 'next/font/google';
-import { headers } from 'next/headers';
 import { Suspense } from 'react';
 import { CartDrawer } from '@/components/cart/CartDrawer';
 import { CartProvider } from '@/components/cart/CartProvider';
-import { getPageMetadata, getSite } from '@/lib/api.server';
+import { getSite } from '@/lib/api.server';
 import '@/styles/css/app.css';
 
 const oswald = Oswald({
@@ -47,13 +46,9 @@ export default function RootLayout({
 }
 
 async function DeferredSiteScripts() {
-  const pageKey = pageKeyFromPath(headers().get('x-current-path') || '/');
-  const [site, pageMetadata] = await Promise.all([
-    getSite().catch(() => null),
-    pageKey ? getPageMetadata(pageKey).catch(() => null) : Promise.resolve(null),
-  ]);
+  const site = await getSite().catch(() => null);
   const gtmIds = site?.seo?.gtm_container_ids ?? [];
-  const customHeadHtml = [site?.seo?.custom_head_script, pageMetadata?.other_meta_tags].filter(Boolean).join('\n');
+  const customHeadHtml = site?.seo?.custom_head_script ?? null;
   const customBodyHtml = site?.seo?.custom_body_script ?? null;
 
   return (
@@ -100,22 +95,4 @@ function safeHtmlForScript(html: string): string {
 
 function escapeJavaScriptString(value: string): string {
   return value.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-}
-
-function pageKeyFromPath(path: string): string | null {
-  const cleanPath = path.split('?')[0].replace(/\/+$/, '') || '/';
-
-  if (cleanPath === '/') {
-    return 'home';
-  }
-
-  const firstSegment = cleanPath.split('/').filter(Boolean)[0];
-  const pageAliases: Record<string, string> = {
-    'privacy-policy': 'privacy',
-    'terms-and-conditions': 'terms',
-  };
-  const pageKeys = new Set(['about', 'contact', 'offers', 'menu', 'privacy', 'terms']);
-  const pageKey = pageAliases[firstSegment] ?? firstSegment;
-
-  return pageKeys.has(pageKey) ? pageKey : null;
 }
