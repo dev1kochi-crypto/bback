@@ -1,0 +1,272 @@
+.site-footer {
+  position: relative;
+  background: #0b1011;
+  color: #fff;
+  font-family: var(--font-display);
+
+  &__top-border,
+  &__bottom-border {
+    border-top: 1px solid rgba(255, 122, 0, 0.7);
+  }
+
+  &__top-border {
+    border-color: rgba(255, 122, 0, 0.25);
+  }
+
+  &__inner,
+  &__bottom-inner {
+    max-width: 1600px;
+    margin-inline: auto;
+    padding-inline: clamp(1.5rem, 5vw, 5.625rem);
+  }
+
+  &__inner {
+    padding-block: clamp(3.5rem, 8vw, 5.125rem) clamp(3.75rem, 8vw, 4.5rem);
+  }
+
+  &__brand-row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: clamp(1rem, 4vw, 2rem);
+    margin-bottom: clamp(2.5rem, 7vw, 3.625rem);
+  }
+
+  &__brand-line {
+    height: 1px;
+    flex: 1;
+    background: rgba(255, 122, 0, 0.6);
+  }
+
+  &__logo {
+    width: auto;
+    height: clamp(4rem, 9vw, 5.125rem);
+    object-fit: contain;
+  }
+
+  &__grid {
+    display: grid;
+    width: 100%;
+    gap: clamp(2rem, 5vw, 5.75rem);
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (min-width: 1280px) {
+      grid-template-columns: minmax(9rem, 180px) minmax(9rem, 190px) minmax(14rem, 280px) minmax(22rem, 1fr);
+      justify-content: space-between;
+    }
+  }
+
+  &__heading {
+    color: #fff;
+    font-size: clamp(1.15rem, 3.6vw, 1.375rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.04em;
+  }
+
+  &__heading--spaced {
+    margin-top: clamp(2rem, 6vw, 3.375rem);
+  }
+
+  &__list {
+    margin-top: 1.5rem;
+    display: grid;
+    gap: 1rem;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: clamp(0.95rem, 3vw, 1.125rem);
+    font-weight: 400;
+    line-height: 1.1;
+  }
+
+  &__link {
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $ember;
+    }
+  }
+
+  &__contact-list {
+    margin-top: 1.25rem;
+    display: grid;
+    gap: 1rem;
+    font-size: clamp(0.95rem, 3vw, 1.125rem);
+    font-weight: 400;
+  }
+
+  &__contact-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $ember;
+    }
+  }
+
+  &__contact-icon,
+  &__social-icon {
+    width: 1.375rem;
+    height: 1.375rem;
+    object-fit: contain;
+  }
+
+  &__contact-icon {
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+  }
+
+  &__contact-text {
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.6;
+  }
+
+  &__newsletter-copy {
+    margin-top: 1.5rem;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  &__socials {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  &__social-link {
+    display: inline-flex;
+    min-width: 2rem;
+    height: 2rem;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.7);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $ember;
+    }
+  }
+
+  &__social-icon {
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &__divider {
+    max-width: 1600px;
+    margin-inline: auto;
+    padding-inline: clamp(1.5rem, 5vw, 5.625rem);
+  }
+
+  &__bottom-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-block: clamp(1.5rem, 5vw, 2.375rem);
+    color: rgba(255, 255, 255, 0.45);
+    font-size: clamp(0.85rem, 2.8vw, 1.25rem);
+    font-weight: 400;
+
+    @media (min-width: 640px) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+}
+
+.footer-newsletter {
+  margin-top: 1rem;
+
+  &__field {
+    display: flex;
+    height: 3.25rem;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: #0d1011;
+  }
+
+  &__icon {
+    display: flex;
+    width: 3rem;
+    height: 3rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__input {
+    min-width: 0;
+    height: 100%;
+    flex: 1;
+    background: transparent;
+    padding-inline: 0.5rem;
+    color: #fff;
+    font-size: clamp(0.95rem, 3vw, 1rem);
+    outline: none;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.35);
+    }
+  }
+
+  &__button {
+    display: flex;
+    width: 3rem;
+    height: 3rem;
+    align-items: center;
+    justify-content: center;
+    color: $ember;
+    font-size: 0;
+    transition: color 0.2s ease, opacity 0.2s ease;
+
+    &:hover {
+      color: #fff;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  &__arrow {
+    font-size: 1.125rem;
+    line-height: 1;
+  }
+
+  &__spinner {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 122, 0, 0.3);
+    border-top-color: $ember;
+    border-radius: 999px;
+    animation: spin 1s linear infinite;
+  }
+
+  &__message {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: $ember;
+
+    &--error {
+      color: #f87171;
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

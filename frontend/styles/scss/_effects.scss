@@ -1,0 +1,43 @@
+.cinematic-noise {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.04), transparent 16%),
+    radial-gradient(circle at 80% 30%, rgba(255, 122, 0, 0.08), transparent 14%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px);
+  background-size: 42rem 42rem, 38rem 38rem, 3px 3px;
+  opacity: 0.18;
+}
+
+.hero-main-word {
+  color: #ffffff;
+  opacity: 1;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.42),
+    0 8px 18px rgba(0, 0, 0, 0.18),
+    0 22px 46px rgba(0, 0, 0, 0.54);
+}
+
+.hero-outline-word {
+  -webkit-text-stroke: 4px #fff;
+  color: transparent;
+  opacity: 1;
+  text-shadow: 0 0 16px rgba(255, 255, 255, 0.09);
+}
+
+.hero-light-word {
+  background: linear-gradient(90deg, transparent 14%, rgba(255, 255, 255, 0.34) 46%, transparent 74%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  mix-blend-mode: screen;
+  opacity: 0.18;
+}
+
+.hero-back-word {
+  color: #6a6a6a;
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.82));
+  opacity: 0.98;
+}
+
+.brush-panel {
+  clip-path: polygon(12% 0, 88% 0, 100% 11%, 92% 100%, 9% 96%, 0 8%);
+}

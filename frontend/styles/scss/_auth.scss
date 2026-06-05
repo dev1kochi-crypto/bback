@@ -1,0 +1,33 @@
+@keyframes auth-float {
+  0%,
+  100% {
+    box-shadow: 0 42px 140px rgba(0, 0, 0, 0.84), 0 0 0 rgba(255, 122, 0, 0);
+  }
+
+  50% {
+    box-shadow: 0 48px 150px rgba(0, 0, 0, 0.86), 0 0 42px rgba(255, 122, 0, 0.12);
+  }
+}
+
+@keyframes auth-scan {
+  0% {
+    transform: translateX(-120%) rotate(16deg);
+  }
+
+  100% {
+    transform: translateX(160%) rotate(16deg);
+  }
+}
+
+.auth-float {
+  animation: auth-float 7s ease-in-out infinite;
+}
+
+.auth-scan::after {
+  content: '';
+  position: absolute;
+  inset: -35% auto -35% -28%;
+  width: 26%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: auth-scan 6s ease-in-out infinite;
+}

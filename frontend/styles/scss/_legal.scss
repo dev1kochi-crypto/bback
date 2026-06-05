@@ -1,0 +1,35 @@
+.legal-content {
+  h1,
+  h2,
+  h3 {
+    margin: 1.75rem 0 0.85rem;
+    color: #fff;
+    font-weight: 500;
+    line-height: 1.05;
+    text-transform: uppercase;
+  }
+
+  p {
+    margin: 0 0 1rem;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 1.25rem 1.2rem;
+    padding: 0;
+  }
+
+  li {
+    margin-bottom: 0.75rem;
+    padding-left: 0.25rem;
+
+    &::marker {
+      color: $ember;
+    }
+  }
+
+  a {
+    color: $ember;
+    text-decoration: underline;
+  }
+}

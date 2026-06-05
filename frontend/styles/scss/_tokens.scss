@@ -1,0 +1,12 @@
+$font-display: 'Oswald', 'Arial Narrow', Arial, sans-serif;
+$font-title: 'Bebas Neue', 'Arial Narrow', Arial, sans-serif;
+$page-bg: #050809;
+$text-warm: #fff3df;
+$ember: #ff7a00;
+
+:root {
+  --font-display: #{$font-display};
+  --font-title: #{$font-title};
+  --font-body: var(--font-display);
+  color-scheme: dark;
+}
