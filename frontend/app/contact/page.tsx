@@ -5,8 +5,9 @@ import { ContactThreeScene } from '@/components/contact/ContactThreeScene';
 import { SiteShell } from '@/components/layout/SiteShell';
 import { getContact } from '@/lib/api.server';
 import { buildPageMetadata } from '@/lib/pageMetadata';
+import { REVALIDATE_SECONDS } from '@/lib/cache';
 
-export const revalidate = 120;
+export const revalidate = REVALIDATE_SECONDS;
 
 export async function generateMetadata() {
   return buildPageMetadata('contact', {

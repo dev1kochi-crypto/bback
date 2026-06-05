@@ -19,8 +19,7 @@ import {
   defaultSitePayload,
   defaultTestimonialsPayload,
 } from '@/lib/api';
-
-const REVALIDATE_SECONDS = 120;
+import { REVALIDATE_SECONDS } from '@/lib/cache';
 
 const defaultContactPayload: ContactPayload = {
   site: defaultSitePayload,
@@ -46,7 +45,7 @@ function cachedQuery<T>(key: string, fetcher: () => Promise<T>, fallback: T): ()
     } catch {
       return fallback;
     }
-  }, [key], { revalidate: REVALIDATE_SECONDS });
+  }, [key], { revalidate: REVALIDATE_SECONDS, tags: [key, 'cms-data'] });
 }
 
 const fetchSite = cachedQuery('api-site', async () => {
@@ -127,6 +126,6 @@ export const getPageMetadata = cache(async (pageKey: string): Promise<PageMetada
       }
     },
     ['api-metadata', pageKey],
-    { revalidate: REVALIDATE_SECONDS },
+    { revalidate: REVALIDATE_SECONDS, tags: ['api-metadata', `api-metadata-${pageKey}`, 'cms-data'] },
   )();
 });

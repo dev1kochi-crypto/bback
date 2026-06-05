@@ -66,4 +66,9 @@ return [
         'test_enabled' => env('PHONE_OTP_TEST_ENABLED', false),
         'test_code' => env('PHONE_OTP_TEST_CODE', '1234'),
     ],
+
+    'frontend' => [
+        'url' => env('FRONTEND_URL'),
+        'revalidate_secret' => env('FRONTEND_REVALIDATE_SECRET'),
+    ],
 ];

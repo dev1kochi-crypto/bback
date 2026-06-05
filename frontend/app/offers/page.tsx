@@ -1,9 +1,10 @@
 import { SiteShell } from '@/components/layout/SiteShell';
 import { getOffers } from '@/lib/api.server';
 import { buildPageMetadata } from '@/lib/pageMetadata';
+import { REVALIDATE_SECONDS } from '@/lib/cache';
 import Image from 'next/image';
 
-export const revalidate = 120;
+export const revalidate = REVALIDATE_SECONDS;
 
 export async function generateMetadata() {
   return buildPageMetadata('offers', {
