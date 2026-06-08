@@ -84,7 +84,9 @@ function FooterNewsletter() {
           {status === 'loading' ? (
             <span aria-hidden className="footer-newsletter__spinner" />
           ) : (
-            <span aria-hidden className="footer-newsletter__arrow">&rarr;</span>
+            <span aria-hidden className="footer-newsletter__arrow"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M4.9997 12.001L4.3957 6.56397C4.2227 5.00797 5.8247 3.86497 7.2397 4.53597L19.1837 10.194C20.7087 10.916 20.7087 13.086 19.1837 13.808L7.2397 19.467C5.8247 20.137 4.2227 18.995 4.3957 17.439L4.9997 12.001ZM4.9997 12.001H11.9997" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg></span>
           )}
         </button>
       </div>
@@ -112,7 +114,11 @@ const socialIcons: Record<string, string> = {
 
 function SocialLink({ name, url }: { name: string; url: string }) {
   const icon = socialIcons[name];
-  const iconSrc = icon ? absoluteAssetUrl(icon) ?? icon : null;
+  if (!icon) {
+    return null;
+  }
+
+  const iconSrc = absoluteAssetUrl(icon) ?? icon;
 
   return (
     <a
@@ -122,11 +128,7 @@ function SocialLink({ name, url }: { name: string; url: string }) {
       aria-label={socialLabels[name] ?? name}
       className="site-footer__social-link"
     >
-      {iconSrc ? (
-        <Image src={iconSrc} alt="" width={22} height={22} className="site-footer__social-icon" />
-      ) : (
-        socialLabels[name]?.slice(0, 2) ?? name.slice(0, 2)
-      )}
+      <Image src={iconSrc} alt="" width={22} height={22} className="site-footer__social-icon" />
     </a>
   );
 }
@@ -251,7 +253,17 @@ export function SiteFooter({ site }: SiteFooterProps) {
           <p>
             Copyright &copy; {year} All Rights Reserved. {site.company_name ?? 'B.back'}
           </p>
-          <p>Designed by : MightyWarners Technologies LLC</p>
+          <p>
+            Designed by :{' '}
+            <a
+              href="https://mightywarner.ae/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="site-footer__link"
+            >
+              MightyWarners Technologies LLC
+            </a>
+          </p>
         </div>
       </div>
     </footer>

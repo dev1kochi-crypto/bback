@@ -6,6 +6,7 @@ use App\Models\CmsKit\Language;
 use App\Models\CmsKit\MenuCategory;
 use App\Models\CmsKit\MenuItem;
 use App\Models\CmsKit\MenuSignatureItem;
+use App\Models\CmsKit\Offer;
 use App\Models\CmsKit\SectionLabel;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -181,7 +182,7 @@ class MenuController extends Controller
     public function items(Request $request)
     {
         if ($request->ajax()) {
-            return DataTables::of(MenuItem::query()->with('category')->orderBy('sort_order')->orderBy('id'))
+            return DataTables::of(MenuItem::query()->with(['category', 'signatureItem', 'offers'])->orderBy('sort_order')->orderBy('id'))
                 ->addIndexColumn()
                 ->addColumn('image_preview', fn (MenuItem $item) => $item->image
                     ? '<img src="' . asset('storage/' . $item->image) . '" class="img-thumbnail" style="height:42px;">'
@@ -190,13 +191,14 @@ class MenuController extends Controller
                 ->addColumn('category_text', fn (MenuItem $item) => e($item->category?->getTranslation('name') ?? '-'))
                 ->addColumn('food_type_text', fn (MenuItem $item) => $item->food_type === 'non_veg' ? 'Non Veg' : 'Veg')
                 ->addColumn('spicy_text', fn (MenuItem $item) => $item->spicy ? 'Yes' : 'No')
+                ->addColumn('connections_text', fn (MenuItem $item) => $this->formatMenuItemConnections($item))
                 ->addColumn('status', fn (MenuItem $item) => '<div class="form-check form-switch"><input class="form-check-input toggle-status" type="checkbox" data-id="' . $item->id . '" ' . ($item->status ? 'checked' : '') . '></div>')
                 ->addColumn('order', fn (MenuItem $item) => '<input type="number" min="1" class="form-control form-control-sm reorder-input" data-id="' . $item->id . '" value="' . $item->sort_order . '" style="width:80px;">')
                 ->addColumn('action', fn (MenuItem $item) => '<div class="btn-group">'
                     . '<a href="' . route('cms.menus.items.edit', $item->id) . '" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>'
                     . '<button type="button" class="btn btn-sm btn-outline-danger delete-item" data-id="' . $item->id . '"><i class="fas fa-trash"></i></button>'
                     . '</div>')
-                ->rawColumns(['image_preview', 'status', 'order', 'action'])
+                ->rawColumns(['image_preview', 'connections_text', 'status', 'order', 'action'])
                 ->make(true);
         }
 
@@ -215,6 +217,7 @@ class MenuController extends Controller
     public function storeItem(Request $request)
     {
         $this->validateItem($request);
+        $this->ensureSignatureConnectionAvailable($request);
         $translations = $request->input('translations', []);
         $defaultLanguage = $this->defaultLanguageCode();
         $order = $this->resolveOrderForCreate(MenuItem::class, $request->integer('sort_order') ?: null);
@@ -239,7 +242,8 @@ class MenuController extends Controller
             $payload['image'] = $request->file('image')->store('menus/items', 'public');
         }
 
-        MenuItem::create($payload);
+        $item = MenuItem::create($payload);
+        $this->syncMenuItemConnections($item, $request);
 
         return redirect()->route('cms.menus.items.index')->with('success', 'Menu item created successfully.');
     }
@@ -257,6 +261,7 @@ class MenuController extends Controller
     {
         $item = MenuItem::findOrFail($id);
         $this->validateItem($request);
+        $this->ensureSignatureConnectionAvailable($request, $item);
         $translations = $request->input('translations', []);
         $defaultLanguage = $this->defaultLanguageCode();
 
@@ -284,6 +289,7 @@ class MenuController extends Controller
         }
 
         $item->update($payload);
+        $this->syncMenuItemConnections($item->refresh(), $request);
 
         return redirect()->route('cms.menus.items.index')->with('success', 'Menu item updated successfully.');
     }
@@ -322,12 +328,16 @@ class MenuController extends Controller
         ]);
 
         if ($request->ajax()) {
-            return DataTables::of(MenuSignatureItem::query()->orderBy('sort_order')->orderBy('id'))
+            return DataTables::of(MenuSignatureItem::query()->with('menuItem')->orderBy('sort_order')->orderBy('id'))
                 ->addIndexColumn()
                 ->addColumn('image_preview', fn (MenuSignatureItem $item) => $item->image
                     ? '<img src="' . asset('storage/' . $item->image) . '" class="img-thumbnail" style="height:42px;">'
-                    : '-')
-                ->addColumn('title_text', fn (MenuSignatureItem $item) => $this->formatSignatureTitleForListing($item->getTranslation('title')))
+                    : ($item->menuItem?->image
+                        ? '<img src="' . asset('storage/' . $item->menuItem->image) . '" class="img-thumbnail" style="height:42px;">'
+                        : '-'))
+                ->addColumn('title_text', fn (MenuSignatureItem $item) => $this->formatSignatureTitleForListing($item->getTranslation('title') ?? $item->menuItem?->getTranslation('name')))
+                ->addColumn('menu_item_text', fn (MenuSignatureItem $item) => e($item->menuItem?->getTranslation('name') ?? '-'))
+                ->addColumn('alt_text_value', fn (MenuSignatureItem $item) => e($item->getTranslation('image_alt') ?? $item->image_alt ?? $item->menuItem?->getTranslation('image_alt') ?? $item->menuItem?->image_alt ?? '-'))
                 ->addColumn('status', fn (MenuSignatureItem $item) => '<div class="form-check form-switch"><input class="form-check-input toggle-status" type="checkbox" data-id="' . $item->id . '" ' . ($item->status ? 'checked' : '') . '></div>')
                 ->addColumn('order', fn (MenuSignatureItem $item) => '<input type="number" min="1" class="form-control form-control-sm reorder-input" data-id="' . $item->id . '" value="' . $item->sort_order . '" style="width:80px;">')
                 ->addColumn('action', fn (MenuSignatureItem $item) => '<div class="btn-group">'
@@ -374,9 +384,10 @@ class MenuController extends Controller
         }
 
         $languages = Language::active()->get();
+        $menuItems = MenuItem::active()->with('category')->orderBy('sort_order')->orderBy('id')->get();
         $nextOrder = (MenuSignatureItem::max('sort_order') ?? 0) + 1;
 
-        return view('cms-kit::menus.signature-items.create', compact('languages', 'nextOrder'));
+        return view('cms-kit::menus.signature-items.create', compact('languages', 'menuItems', 'nextOrder'));
     }
 
     public function storeSignatureItem(Request $request)
@@ -393,6 +404,7 @@ class MenuController extends Controller
         MenuSignatureItem::where('sort_order', '>=', $order)->increment('sort_order');
 
         $payload = [
+            'menu_item_id' => $request->input('menu_item_id'),
             'image_alt' => data_get($translations, "{$defaultLanguage}.image_alt"),
             'title' => data_get($translations, "{$defaultLanguage}.title"),
             'translations' => $translations,
@@ -414,8 +426,9 @@ class MenuController extends Controller
     {
         $item = MenuSignatureItem::findOrFail($id);
         $languages = Language::active()->get();
+        $menuItems = MenuItem::active()->with('category')->orderBy('sort_order')->orderBy('id')->get();
 
-        return view('cms-kit::menus.signature-items.edit', compact('item', 'languages'));
+        return view('cms-kit::menus.signature-items.edit', compact('item', 'languages', 'menuItems'));
     }
 
     public function updateSignatureItem(Request $request, int $id)
@@ -426,6 +439,7 @@ class MenuController extends Controller
         $defaultLanguage = $this->defaultLanguageCode();
 
         $payload = [
+            'menu_item_id' => $request->input('menu_item_id'),
             'image_alt' => data_get($translations, "{$defaultLanguage}.image_alt"),
             'title' => data_get($translations, "{$defaultLanguage}.title"),
             'translations' => $translations,
@@ -467,6 +481,10 @@ class MenuController extends Controller
     public function toggleSignatureItemStatus(int $id)
     {
         $item = MenuSignatureItem::findOrFail($id);
+        if (! $item->status && $this->signatureItemLimitReached()) {
+            return response()->json(['message' => 'Already ' . $this->maxSignatureItems() . ' signature items selected.'], 422);
+        }
+
         $item->update(['status' => !$item->status]);
 
         return response()->json(['success' => true]);
@@ -499,6 +517,14 @@ class MenuController extends Controller
             'menu_category_id' => ['nullable', 'exists:menu_categories,id'],
             'image' => $this->imageRules('menus.item_image', ['nullable', 'image']),
             'remove_image' => ['nullable', 'boolean'],
+            'is_signature_item' => ['nullable', 'boolean'],
+            'signature_image' => $this->imageRules('menus.signature_item_image', ['nullable', 'image']),
+            'remove_signature_image' => ['nullable', 'boolean'],
+            'has_offer' => ['nullable', 'boolean'],
+            'offer_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'offer_price' => ['nullable', 'numeric', 'min:0'],
+            'offer_image' => $this->imageRules('offers.image', ['nullable', 'image']),
+            'remove_offer_image' => ['nullable', 'boolean'],
             'spicy' => ['nullable', 'boolean'],
             'food_type' => ['required', 'in:veg,non_veg'],
             'price' => ['required', 'numeric', 'min:0'],
@@ -509,6 +535,8 @@ class MenuController extends Controller
             $rules["translations.{$language->code}.name"] = ['nullable', 'string', 'max:255'];
             $rules["translations.{$language->code}.description"] = ['nullable', 'string'];
             $rules["translations.{$language->code}.image_alt"] = ['nullable', 'string', 'max:255'];
+            $rules["signature_translations.{$language->code}.title"] = ['nullable', 'string', 'max:255'];
+            $rules["signature_translations.{$language->code}.image_alt"] = ['nullable', 'string', 'max:255'];
         }
 
         return $request->validate($rules);
@@ -517,6 +545,7 @@ class MenuController extends Controller
     protected function validateSignatureItem(Request $request): array
     {
         $rules = [
+            'menu_item_id' => ['required', 'exists:menu_items,id'],
             'image' => $this->imageRules('menus.signature_item_image', ['nullable', 'image']),
             'remove_image' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:1'],
@@ -564,7 +593,123 @@ class MenuController extends Controller
     {
         $maxItems = (int) config('cms-kit.database.menus.signature_items.max_items', 4);
 
-        return $maxItems > 0 && MenuSignatureItem::count() >= $maxItems;
+        return $maxItems > 0 && MenuSignatureItem::where('status', true)->count() >= $maxItems;
+    }
+
+    protected function maxSignatureItems(): int
+    {
+        return (int) config('cms-kit.database.menus.signature_items.max_items', 4);
+    }
+
+    protected function ensureSignatureConnectionAvailable(Request $request, ?MenuItem $item = null): void
+    {
+        if (! $request->boolean('is_signature_item')) {
+            return;
+        }
+
+        if ($item && MenuSignatureItem::withTrashed()->where('menu_item_id', $item->id)->exists()) {
+            return;
+        }
+
+        if ($this->signatureItemLimitReached()) {
+            throw ValidationException::withMessages(['is_signature_item' => 'Already ' . $this->maxSignatureItems() . ' signature items selected.']);
+        }
+    }
+
+    protected function formatMenuItemConnections(MenuItem $item): string
+    {
+        $badges = [];
+
+        if ($item->signatureItem?->status) {
+            $badges[] = '<span class="badge bg-warning text-dark">Signature</span>';
+        }
+
+        if ($item->offers->where('status', true)->isNotEmpty()) {
+            $badges[] = '<span class="badge bg-success">Offer</span>';
+        }
+
+        return $badges ? implode(' ', $badges) : '-';
+    }
+
+    protected function syncMenuItemConnections(MenuItem $item, Request $request): void
+    {
+        if ($request->boolean('is_signature_item')) {
+            $signatureItem = MenuSignatureItem::withTrashed()->firstOrNew(['menu_item_id' => $item->id]);
+
+            if (! $signatureItem->exists) {
+                $signatureItem->sort_order = (MenuSignatureItem::max('sort_order') ?? 0) + 1;
+            }
+
+            $signatureTranslations = $this->filledSignatureTranslations($request);
+            $defaultLanguage = $this->defaultLanguageCode();
+            $signatureItem->title = data_get($signatureTranslations, "{$defaultLanguage}.title");
+            $signatureItem->image_alt = data_get($signatureTranslations, "{$defaultLanguage}.image_alt");
+            $signatureItem->translations = $signatureTranslations;
+
+            if ($request->hasFile('signature_image')) {
+                $this->validateImageWithinLimits($request, 'signature_image', config('cms-kit.images.menus.signature_item_image', []), 'Signature item image');
+                if ($signatureItem->image) {
+                    Storage::disk('public')->delete($signatureItem->image);
+                }
+                $signatureItem->image = $request->file('signature_image')->store('menus/signature-items', 'public');
+            } elseif ($request->boolean('remove_signature_image') && $signatureItem->image) {
+                Storage::disk('public')->delete($signatureItem->image);
+                $signatureItem->image = null;
+            }
+
+            $signatureItem->status = true;
+            if ($signatureItem->trashed()) {
+                $signatureItem->restore();
+            }
+            $signatureItem->save();
+        } elseif ($item->signatureItem) {
+            $item->signatureItem->update(['status' => false]);
+        }
+
+        if ($request->boolean('has_offer')) {
+            $offer = Offer::withTrashed()->firstOrNew(['menu_item_id' => $item->id]);
+
+            if (! $offer->exists) {
+                $offer->sort_order = (Offer::max('sort_order') ?? 0) + 1;
+                $offer->alt_text = null;
+                $offer->translations = [];
+            }
+
+            $offer->offer_percent = $request->input('offer_percent');
+            $offer->offer_price = $request->input('offer_price');
+
+            if ($request->hasFile('offer_image')) {
+                $this->validateImageWithinLimits($request, 'offer_image', config('cms-kit.images.offers.image', []), 'Offer image');
+                if ($offer->image) {
+                    Storage::disk('public')->delete($offer->image);
+                }
+                $offer->image = $request->file('offer_image')->store('offers', 'public');
+            } elseif ($request->boolean('remove_offer_image') && $offer->image) {
+                Storage::disk('public')->delete($offer->image);
+                $offer->image = null;
+            }
+
+            $offer->status = true;
+            if ($offer->trashed()) {
+                $offer->restore();
+            }
+            $offer->save();
+        } else {
+            $item->offers()->update(['status' => false]);
+        }
+    }
+
+    protected function filledSignatureTranslations(Request $request): array
+    {
+        return collect($request->input('signature_translations', []))
+            ->map(function (array $translation) {
+                return collect($translation)
+                    ->only(['title', 'image_alt'])
+                    ->filter(fn ($value) => filled($value))
+                    ->all();
+            })
+            ->filter()
+            ->all();
     }
 
     protected function defaultLanguageCode(): string

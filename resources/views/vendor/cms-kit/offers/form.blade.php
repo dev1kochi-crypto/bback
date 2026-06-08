@@ -23,9 +23,29 @@
                 </ul>
             @endif
 
-            <div class="{{ $showLanguageUi ? 'tab-content' : '' }} mb-4">
-                <div class="col-6">
-                    <label class="form-label fw-bold">Image</label>
+            <div class="row g-4 mb-4">
+                <div class="col-lg-6">
+                    <label class="form-label fw-bold">Connected Menu Item</label>
+                    <select name="menu_item_id" class="form-select">
+                        <option value="">No linked menu item</option>
+                        @foreach($menuItems as $menuItem)
+                            <option value="{{ $menuItem->id }}" @selected(old('menu_item_id', $offer?->menu_item_id) == $menuItem->id)>
+                                {{ $menuItem->getTranslation('name') }}{{ $menuItem->category ? ' - ' . $menuItem->category->getTranslation('name') : '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <small class="text-muted">Used to connect this offer back to the exact menu item customers order.</small>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label fw-bold">Offer %</label>
+                    <input type="number" step="0.01" min="0" max="100" name="offer_percent" class="form-control" value="{{ old('offer_percent', $offer?->offer_percent) }}">
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <label class="form-label fw-bold">Offer Price</label>
+                    <input type="number" step="0.01" min="0" name="offer_price" class="form-control" value="{{ old('offer_price', $offer?->offer_price) }}">
+                </div>
+                <div class="col-lg-6">
+                    <label class="form-label fw-bold">Offer Page Image</label>
                     @if($offer?->image)
                         <div class="mb-2"><img src="{{ asset('storage/' . $offer->image) }}" class="img-thumbnail" style="height:100px;"></div>
                         <div class="form-check mb-2"><input class="form-check-input" type="checkbox" name="remove_image" value="1" id="removeOfferImage"><label class="form-check-label" for="removeOfferImage">Remove current image</label></div>
@@ -33,6 +53,9 @@
                     <input type="file" name="image" class="form-control" accept="{{ $imageConfig['accept'] ?? '' }}">
                     <small class="text-muted">Recommended: {{ $imageConfig['width'] ?? 900 }}x{{ $imageConfig['height'] ?? 520 }}px. Max {{ $imageConfig['max_size'] ?? 2048 }} KB.</small>
                 </div>
+            </div>
+
+            <div class="{{ $showLanguageUi ? 'tab-content' : '' }} mb-4">
                 @foreach($visibleLanguages as $lang)
                 @php $trans = $translations[$lang->code] ?? []; @endphp
                 <div class="col-6 {{ $showLanguageUi ? 'tab-pane fade ' . ($loop->first ? 'show active' : '') : '' }}" id="offer-{{ $lang->code }}">

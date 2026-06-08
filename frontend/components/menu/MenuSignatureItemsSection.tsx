@@ -1,9 +1,10 @@
 'use client';
 
 import type { MenuSignatureItem, MenuSignatureSection } from '@/types/menu';
+import { useCart } from '@/components/cart/CartProvider';
 import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface MenuSignatureItemsSectionProps {
   section: MenuSignatureSection | null;
@@ -24,7 +25,7 @@ export function MenuSignatureItemsSection({ section, items }: MenuSignatureItems
   }
 
   return (
-    <section className="relative overflow-hidden bg-[#050505] px-6 pb-[126px] pt-[104px] text-white sm:px-10 lg:px-12 lg:pb-[156px] lg:pt-[132px]">
+    <section className="cta-home relative overflow-hidden bg-[#050505] px-6 pb-[126px] pt-[104px] text-white sm:px-10 lg:px-12 lg:pb-[156px] lg:pt-[132px]">
       <div className="pointer-events-none absolute inset-0 bg-[url('/app/images/Mask group (18).jpg')] bg-cover bg-center opacity-20" />
       <div className="pointer-events-none absolute bottom-[-28px] left-[-14px] font-title text-[clamp(8rem,16vw,18.5rem)] font-normal uppercase leading-none text-white/[0.08]">
         Signature Items
@@ -72,9 +73,70 @@ export function MenuSignatureItemsSection({ section, items }: MenuSignatureItems
 
 function SignatureCard({ item, light = false, index }: { item: MenuSignatureItem; light?: boolean; index: number }) {
   const prefersReducedMotion = useReducedMotion();
+  const router = useRouter();
+  const { addItem } = useCart();
   const titleHtml = item.title ? signatureTitleHtml(item.title) : null;
   const titleText = item.title ? plainSignatureTitle(item.title) : null;
-  const config = signatureCardConfig(index, light);
+  const config = signatureCardConfig(index);
+
+  const handleOrderNow = () => {
+    if (item.menu_item) {
+      addItem(item.menu_item);
+    }
+
+    router.push('/cart');
+  };
+
+  if (light) {
+    return (
+      <motion.article
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 34, rotateX: 6, filter: 'blur(10px)' }}
+        whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: [0, -5, 0], rotateX: 0, filter: 'blur(0px)' }}
+        whileHover={prefersReducedMotion ? undefined : { y: -8, scale: 1.012 }}
+        viewport={{ once: false, amount: 0.28 }}
+        transition={{
+          opacity: { duration: 0.7, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] },
+          y: { duration: 5.4, repeat: Infinity, ease: 'easeInOut', delay: index * 0.35 },
+          rotateX: { duration: 0.7, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] },
+          filter: { duration: 0.7, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] },
+        }}
+        className="group relative aspect-[373/493] w-full max-w-[373px] overflow-hidden rounded-[20px] bg-[#FFEAC4] shadow-[0_24px_70px_rgba(0,0,0,0.42)]"
+        style={{ transformPerspective: 1000, transformStyle: 'preserve-3d' }}
+      >
+        {titleHtml ? (
+          <div className="relative z-20 px-6 pt-6 sm:px-7 sm:pt-7">
+            <h3
+              className="font-title text-[clamp(2.35rem,2.15vw,3.05rem)] font-normal uppercase leading-[0.92] text-[#993D00]"
+              dangerouslySetInnerHTML={{ __html: titleHtml }}
+            />
+          </div>
+        ) : null}
+
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-[62%] bg-[linear-gradient(180deg,rgba(255,234,196,0)_0%,rgba(255,176,88,0.28)_58%,rgba(255,122,0,0.22)_100%)]" />
+
+        {item.image ? (
+          <div className="absolute inset-x-[-4%] bottom-[-2%] top-[18%] z-10">
+            <Image
+              src={item.image}
+              alt={item.image_alt || titleText || 'Signature item'}
+              fill
+              sizes="(min-width: 1024px) 373px, 100vw"
+              className="object-contain object-bottom transition duration-700 group-hover:scale-[1.04]"
+            />
+          </div>
+        ) : null}
+
+        <button
+          type="button"
+          onClick={handleOrderNow}
+          className="oder-btn absolute bottom-6 left-6 z-30 inline-flex h-[38px] items-center justify-center gap-2 rounded-none bg-[#050505] px-4 font-display text-[12px] font-medium uppercase tracking-normal text-white transition hover:bg-ember sm:bottom-7 sm:left-7"
+        >
+          <Image src={whatsappIcon} alt="" width={15} height={15} className="h-[15px] w-[15px] object-contain" unoptimized />
+          Order Now
+        </button>
+      </motion.article>
+    );
+  }
 
   return (
     <motion.article
@@ -97,14 +159,14 @@ function SignatureCard({ item, light = false, index }: { item: MenuSignatureItem
             className={`font-title ${config.titleSize} font-normal uppercase leading-none`}
             dangerouslySetInnerHTML={{ __html: titleHtml }}
           />
-          <Link
-            href="/contact"
-            className={`oder-btn  mt-5 inline-flex h-[38px] items-center justify-center gap-2 px-4 font-display text-[12px] font-medium uppercase tracking-normal transition ${light ? 'bg-[#050505] text-white hover:bg-ember' : 'bg-ember text-white hover:bg-white hover:text-ember'
-              }`}
+          <button
+            type="button"
+            onClick={handleOrderNow}
+            className="oder-btn mt-5 inline-flex h-[38px] items-center justify-center gap-2 rounded-none px-4 font-display text-[12px] font-medium uppercase tracking-normal transition bg-ember text-white hover:bg-white hover:text-ember"
           >
             <Image src={whatsappIcon} alt="" width={15} height={15} className="h-[15px] w-[15px] object-contain" unoptimized />
             Order Now
-          </Link>
+          </button>
         </div>
       ) : null}
       {item.image ? (
@@ -123,7 +185,7 @@ function SignatureCard({ item, light = false, index }: { item: MenuSignatureItem
   );
 }
 
-function signatureCardConfig(index: number, light: boolean) {
+function signatureCardConfig(index: number) {
   if (index === 0) {
     return {
       aspect: 'aspect-[373/962]',
@@ -165,15 +227,13 @@ function signatureCardConfig(index: number, light: boolean) {
 
   return {
     aspect: 'aspect-[373/493]',
-    background: light ? 'bg-[#FFEAC4]' : 'bg-[#0D0D0D]',
-    titlePanel: light
-      ? 'top-0 h-[170px] bg-[#FFEAC4] text-[#B45400]'
-      : 'top-0 min-h-[34%] bg-gradient-to-b from-[#0D0D0D] via-[#0D0D0D]/92 to-[#0D0D0D]/8 text-white',
+    background: 'bg-[#0D0D0D]',
+    titlePanel: 'top-0 min-h-[34%] bg-gradient-to-b from-[#0D0D0D] via-[#0D0D0D]/92 to-[#0D0D0D]/8 text-white',
     titlePosition: 'top-0',
-    titleSize: light ? 'text-[clamp(2.95rem,2.6vw,3.9rem)]' : 'text-[clamp(2.5rem,2.35vw,3.5rem)]',
-    imageFrame: light ? 'inset-x-0 bottom-0 h-[78%]' : 'inset-0',
-    imageClass: light ? 'object-cover object-[center_72%]' : 'object-cover object-center',
-    overlay: light ? 'bg-gradient-to-b from-transparent via-transparent to-[#FFEAC4]/10' : 'bg-gradient-to-b from-black/20 via-transparent to-black/10',
+    titleSize: 'text-[clamp(2.5rem,2.35vw,3.5rem)]',
+    imageFrame: 'inset-0',
+    imageClass: 'object-cover object-center',
+    overlay: 'bg-gradient-to-b from-black/20 via-transparent to-black/10',
   };
 }
 

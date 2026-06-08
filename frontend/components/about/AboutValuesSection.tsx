@@ -56,27 +56,9 @@ export function AboutValuesSection({ about }: AboutValuesSectionProps) {
 function ValueBadge({ title }: { title: string }) {
   return (
     <div className="relative mx-auto h-[96px] w-[232px] sm:h-[108px] sm:w-[262px] lg:h-[118px] lg:w-[286px]">
-      <svg
-        viewBox="0 0 286 118"
-        aria-hidden="true"
-        className="absolute inset-0 h-full w-full overflow-visible"
-      >
-        <path
-          d="M32 75C21 47 67 20 135 11C203 2 262 20 255 52C247 88 183 110 104 106C62 104 39 94 32 75Z"
-          fill="none"
-          stroke="#ff850f"
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M170 13C198 12 225 19 241 34"
-          fill="none"
-          stroke="#ff850f"
-          strokeWidth="4"
-          strokeLinecap="round"
-        />
-      </svg>
+     <svg xmlns="http://www.w3.org/2000/svg" width="251" height="112" viewBox="0 0 251 112" fill="none">
+  <path d="M178.7 12.3698C197.16 11.7698 227.83 20.9198 241.01 34.1398C265.5 58.7298 222.27 80.3198 203.58 88.2298C158.16 107.43 101.56 113.45 52.8301 106.48C27.4901 102.85 -16.2899 91.2098 11.3201 58.4798C33.4501 32.2198 87.6001 15.1198 120.73 8.69977C154.47 2.15977 190.42 -0.140233 224.03 6.39977L223 8.38977C216.11 7.38977 209.03 5.94977 202.09 5.41977C149.64 1.43977 61.2001 16.9798 21.2701 53.5198C-10.9899 83.0398 17.7501 98.0098 47.9701 103.35C97.1501 112.05 157.84 105.6 203.56 85.2498C229.94 73.4998 266.21 49.5998 224.53 26.7298C210.32 18.9298 197.92 16.5098 182.15 14.3698C180.66 14.1698 179.08 14.2398 178.69 12.3698H178.7Z" fill="#F68B24"/>
+</svg>
       <h3 className="absolute inset-0 flex items-center justify-center pb-1 font-display text-[28px] font-black uppercase leading-none text-white sm:text-[32px] lg:text-[35px]">
         {title}
       </h3>

@@ -32,7 +32,7 @@
                             <div class="col-12">
                                 <label class="form-label fw-bold">Title{{ $showLanguageUi ? ' (' . strtoupper($lang->code) . ')' : '' }}</label>
                                 <input type="text" name="translations[{{ $lang->code }}][title]" class="form-control" value="{{ $trans['title'] ?? $item?->title }}">
-                                <small class="text-muted d-block mt-1">Frontend supports <code>&lt;br&gt;</code> for manual line breaks. Listings will show the saved text exactly.</small>
+                                <small class="text-muted d-block mt-1">HTML like <code>&lt;br&gt;</code> is allowed for manual line breaks. Listings will show the saved text exactly.</small>
                             </div>
                         </div>
                     </div>
@@ -41,6 +41,18 @@
             </div>
 
             <div class="row g-4">
+                <div class="col-12">
+                    <label class="form-label fw-bold">Connected Menu Item</label>
+                    <select name="menu_item_id" class="form-select" required>
+                        <option value="">Select menu item</option>
+                        @foreach($menuItems as $menuItem)
+                            <option value="{{ $menuItem->id }}" @selected(old('menu_item_id', $item?->menu_item_id) == $menuItem->id)>
+                                {{ $menuItem->getTranslation('name') }}{{ $menuItem->category ? ' - ' . $menuItem->category->getTranslation('name') : '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <small class="text-muted">Required. This menu item is used for cart ordering and fallback title/image content.</small>
+                </div>
                 <div class="col-lg-6">
                     <label class="form-label fw-bold">Image</label>
                     @if($item?->image)

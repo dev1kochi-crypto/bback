@@ -28,6 +28,8 @@ export interface MenuItem {
   food_type: 'veg' | 'non_veg';
   spicy: boolean;
   price: string;
+  offer_percent: string | null;
+  offer_price: string | null;
   sort_order: number;
 }
 
@@ -40,9 +42,11 @@ export interface MenuSignatureSection {
 
 export interface MenuSignatureItem {
   id: number;
+  menu_item_id: number | null;
   image: string | null;
   image_alt: string | null;
   title: string | null;
+  menu_item: MenuItem | null;
   sort_order: number;
 }
 

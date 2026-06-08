@@ -39,6 +39,34 @@ export default async function OffersPage() {
                         Offer image missing
                       </div>
                     )}
+                    {(offer.menu_item || offer.offer_percent || offer.offer_price) && (
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/80 to-transparent px-5 pb-5 pt-16">
+                        {offer.offer_percent ? (
+                          <div className="mb-3 inline-flex bg-[#f28c1b] px-3 py-1 text-[14px] font-black uppercase text-black">
+                            {Number(offer.offer_percent).toString()}% Off
+                          </div>
+                        ) : null}
+                        {offer.menu_item?.name ? (
+                          <h2 className="font-display text-[28px] font-black uppercase leading-none text-white">
+                            {offer.menu_item.name}
+                          </h2>
+                        ) : null}
+                        {(offer.offer_price || offer.menu_item?.price) && (
+                          <div className="mt-3 flex flex-wrap items-end gap-3">
+                            {offer.offer_price ? (
+                              <span className="text-[26px] font-black text-[#f28c1b]">
+                                ${Number(offer.offer_price).toFixed(2)}
+                              </span>
+                            ) : null}
+                            {offer.menu_item?.price ? (
+                              <span className={offer.offer_price ? 'text-[16px] font-bold text-white/50 line-through' : 'text-[26px] font-black text-[#f28c1b]'}>
+                                ${Number(offer.menu_item.price).toFixed(2)}
+                              </span>
+                            ) : null}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </article>
                 ))}
               </div>

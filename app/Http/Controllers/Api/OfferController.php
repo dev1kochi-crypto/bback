@@ -15,13 +15,27 @@ class OfferController extends Controller
 
         $offers = Offer::query()
             ->active()
+            ->with('menuItem')
             ->orderBy('sort_order')
             ->orderBy('id')
             ->get()
             ->map(fn (Offer $offer) => [
                 'id' => $offer->id,
-                'image' => $offer->image ? $this->publicStorageUrl($offer->image) : null,
-                'alt_text' => $this->translatedValue($offer->translations ?? [], 'alt_text', $locale, $fallbackLocale, $offer->alt_text),
+                'menu_item_id' => $offer->menu_item_id,
+                'image' => ($offer->image ?: $offer->menuItem?->image) ? $this->publicStorageUrl($offer->image ?: $offer->menuItem->image) : null,
+                'offer_percent' => $offer->offer_percent !== null ? number_format((float) $offer->offer_percent, 2, '.', '') : null,
+                'offer_price' => $offer->offer_price !== null ? number_format((float) $offer->offer_price, 2, '.', '') : null,
+                'alt_text' => $this->translatedValue($offer->translations ?? [], 'alt_text', $locale, $fallbackLocale, $offer->alt_text)
+                    ?? $offer->menuItem?->getTranslation('image_alt')
+                    ?? $offer->menuItem?->getTranslation('name'),
+                'menu_item' => $offer->menuItem ? [
+                    'id' => $offer->menuItem->id,
+                    'name' => $offer->menuItem->getTranslation('name'),
+                    'description' => $offer->menuItem->getTranslation('description'),
+                    'price' => number_format((float) $offer->menuItem->price, 2, '.', ''),
+                    'food_type' => $offer->menuItem->food_type,
+                    'spicy' => $offer->menuItem->spicy,
+                ] : null,
                 'sort_order' => $offer->sort_order,
             ])
             ->values();

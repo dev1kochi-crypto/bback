@@ -32,12 +32,19 @@ class MenuController extends Controller
         $items = MenuItem::query()
             ->active()
             ->whereHas('category', fn ($query) => $query->active())
-            ->with('category')
+            ->with([
+                'category',
+                'offers' => fn ($query) => $query->active()->orderBy('sort_order')->orderBy('id'),
+            ])
             ->orderBy('sort_order')
             ->orderBy('id')
             ->get();
         $signatureItems = MenuSignatureItem::query()
             ->active()
+            ->with([
+                'menuItem.category',
+                'menuItem.offers' => fn ($query) => $query->active()->orderBy('sort_order')->orderBy('id'),
+            ])
             ->orderBy('sort_order')
             ->orderBy('id')
             ->get();
@@ -81,6 +88,8 @@ class MenuController extends Controller
                 'food_type' => $item->food_type,
                 'spicy' => $item->spicy,
                 'price' => number_format((float) $item->price, 2, '.', ''),
+                'offer_percent' => $item->offers->first()?->offer_percent !== null ? number_format((float) $item->offers->first()->offer_percent, 2, '.', '') : null,
+                'offer_price' => $item->offers->first()?->offer_price !== null ? number_format((float) $item->offers->first()->offer_price, 2, '.', '') : null,
                 'sort_order' => $item->sort_order,
             ])->values(),
             'signature_section' => $this->formatSignatureSection($signatureSection),
@@ -106,9 +115,25 @@ class MenuController extends Controller
     {
         return $items->map(fn (MenuSignatureItem $item) => [
             'id' => $item->id,
-            'image' => $item->image ? $this->publicStorageUrl($item->image) : null,
-            'image_alt' => $item->getTranslation('image_alt') ?? $item->image_alt,
-            'title' => $item->getTranslation('title'),
+            'menu_item_id' => $item->menu_item_id,
+            'image' => ($item->image ?: $item->menuItem?->image) ? $this->publicStorageUrl($item->image ?: $item->menuItem->image) : null,
+            'image_alt' => $item->getTranslation('image_alt') ?? $item->image_alt ?? $item->menuItem?->getTranslation('image_alt') ?? $item->menuItem?->image_alt,
+            'title' => $item->getTranslation('title') ?? $item->menuItem?->getTranslation('name'),
+            'menu_item' => $item->menuItem ? [
+                'id' => $item->menuItem->id,
+                'category_id' => $item->menuItem->menu_category_id,
+                'category_name' => $item->menuItem->category?->getTranslation('name'),
+                'image' => $item->menuItem->image ? $this->publicStorageUrl($item->menuItem->image) : null,
+                'image_alt' => $item->menuItem->getTranslation('image_alt') ?? $item->menuItem->image_alt,
+                'name' => $item->menuItem->getTranslation('name'),
+                'description' => $item->menuItem->getTranslation('description'),
+                'food_type' => $item->menuItem->food_type,
+                'spicy' => $item->menuItem->spicy,
+                'price' => number_format((float) $item->menuItem->price, 2, '.', ''),
+                'offer_percent' => $item->menuItem->offers->first()?->offer_percent !== null ? number_format((float) $item->menuItem->offers->first()->offer_percent, 2, '.', '') : null,
+                'offer_price' => $item->menuItem->offers->first()?->offer_price !== null ? number_format((float) $item->menuItem->offers->first()->offer_price, 2, '.', '') : null,
+                'sort_order' => $item->menuItem->sort_order,
+            ] : null,
             'sort_order' => $item->sort_order,
         ])->values();
     }

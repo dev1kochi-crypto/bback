@@ -67,6 +67,7 @@ export function SiteHeader({ site, activeNavUrl, fixed = true, hideDesktopLogo =
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
+  const mobileAccountMenuRef = useRef<HTMLDivElement>(null);
   const { openCart, cart } = useCart();
   const bagIcon = absoluteAssetUrl('/app/images/solar_bag-linear.png') ?? '/app/images/solar_bag-linear.png';
   const userIcon = absoluteAssetUrl('/app/images/lucide_user-round.png') ?? '/app/images/lucide_user-round.png';
@@ -122,7 +123,10 @@ export function SiteHeader({ site, activeNavUrl, fixed = true, hideDesktopLogo =
     }
 
     const closeAccount = (event: MouseEvent) => {
-      if (accountMenuRef.current?.contains(event.target as Node)) {
+      if (
+        accountMenuRef.current?.contains(event.target as Node) ||
+        mobileAccountMenuRef.current?.contains(event.target as Node)
+      ) {
         return;
       }
 
@@ -272,6 +276,31 @@ export function SiteHeader({ site, activeNavUrl, fixed = true, hideDesktopLogo =
               <HamburgerIcon onClick={() => setIsMenuOpen((current) => !current)} isOpen={isMenuOpen} />
             </div>
             <div className="relative z-10 flex items-center gap-2 lg:hidden">
+              {isLoggedIn ? (
+                <div ref={mobileAccountMenuRef} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setIsAccountOpen((current) => !current)}
+                    aria-label="Account menu"
+                    aria-expanded={isAccountOpen}
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-ember text-white shadow-[0_16px_32px_rgba(0,0,0,0.24)] transition hover:bg-[#ff8e22]"
+                  >
+                    <Image src={userIcon} alt="" width={21} height={21} className="h-[21px] w-[21px] object-contain brightness-0 invert" />
+                  </button>
+                  <div className={['absolute right-0 top-[calc(100%+12px)] w-44 overflow-hidden rounded-[8px] border border-white/10 bg-[#080d0e] py-2 shadow-[0_22px_48px_rgba(0,0,0,0.42)] transition origin-top-right', isAccountOpen ? 'pointer-events-auto translate-y-0 opacity-100 scale-100' : 'pointer-events-none -translate-y-2 opacity-0 scale-95'].join(' ')}>
+                    <Link href="/orders" onClick={() => setIsAccountOpen(false)} className="block px-4 py-3 font-body text-[13px] font-bold uppercase text-white/74 transition hover:bg-ember hover:text-white">
+                      Your Order
+                    </Link>
+                    <button type="button" onClick={handleLogout} className="block w-full px-4 py-3 text-left font-body text-[13px] font-bold uppercase text-white/74 transition hover:bg-ember hover:text-white">
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <HeaderIconButton href="/login" label="Login">
+                  <LoginIcon />
+                </HeaderIconButton>
+              )}
               <button type="button" onClick={openCart} aria-label="Cart" title="Cart" className="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-white shadow-[0_16px_32px_rgba(0,0,0,0.24)] transition hover:border-ember hover:bg-ember">
                 <Image src={bagIcon} alt="" width={21} height={21} className="h-[21px] w-[21px] object-contain brightness-0 invert" />
                 {cart.items.length ? <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-ember px-1 font-body text-[10px] font-bold text-white">{cart.items.length}</span> : null}
@@ -283,122 +312,122 @@ export function SiteHeader({ site, activeNavUrl, fixed = true, hideDesktopLogo =
       </header>
 
       {isMenuOpen ? (
-      <div className="fixed inset-0 z-[220] bg-[#020405] text-white transition duration-500 opacity-100">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_28%,rgba(255,122,0,0.16),transparent_30%),radial-gradient(circle_at_80%_60%,rgba(255,122,0,0.11),transparent_32%)]" />
-        <div className="absolute inset-0 bg-[url('/app/images/Mask group (18).jpg')] bg-cover bg-center opacity-[0.13]" />
-        <div className="relative z-[2] flex min-h-screen flex-col px-6 py-6 sm:px-10 lg:px-14">
-          <div className="flex items-center justify-between border-b border-white/10 pb-6">
-            <Link href="/" onClick={() => setIsMenuOpen(false)} className="inline-flex items-center">
-              <Image
-                src={absoluteAssetUrl(site.logo ?? '/app/images/logo.svg') ?? '/app/images/logo.svg'}
-                alt={site.logo_alt ?? 'B.back'}
-                width={178}
-                height={76}
-                className="h-[64px] w-auto object-contain"
-              />
-            </Link>
-            <button
-              type="button"
-              onClick={() => setIsMenuOpen(false)}
-              className="inline-flex h-12 items-center gap-3 rounded-full bg-white/10 px-5 font-body text-[13px] font-bold uppercase tracking-[0.02em] text-white transition hover:bg-ember"
-            >
-              Close
-              <CloseIcon />
-            </button>
-          </div>
+        <div className="fixed inset-0 z-[220] overflow-y-auto bg-[#020405] text-white transition duration-500 opacity-100">
+          <div className="fixed inset-0 bg-[radial-gradient(circle_at_16%_28%,rgba(255,122,0,0.16),transparent_30%),radial-gradient(circle_at_80%_60%,rgba(255,122,0,0.11),transparent_32%)] pointer-events-none" />
+          <div className="fixed inset-0 bg-[url('/app/images/Mask group (18).jpg')] bg-cover bg-center opacity-[0.13] pointer-events-none" />
+          <div className="relative z-[2] flex min-h-[100dvh] flex-col px-6 py-6 sm:px-10 lg:px-14">
+            <div className="flex items-center justify-between border-b border-white/10 pb-6">
+              <Link href="/" onClick={() => setIsMenuOpen(false)} className="inline-flex items-center">
+                <Image
+                  src={absoluteAssetUrl(site.logo ?? '/app/images/logo.svg') ?? '/app/images/logo.svg'}
+                  alt={site.logo_alt ?? 'B.back'}
+                  width={178}
+                  height={76}
+                  className="h-[64px] w-auto object-contain"
+                />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setIsMenuOpen(false)}
+                className="inline-flex h-12 items-center gap-3 rounded-full bg-white/10 px-5 font-body text-[13px] font-bold uppercase tracking-[0.02em] text-white transition hover:bg-ember"
+              >
+                Close
+                <CloseIcon />
+              </button>
+            </div>
 
-          <div className="grid flex-1 items-center gap-12 py-10 lg:grid-cols-[0.9fr_1.1fr] lg:py-0">
-            <nav className="space-y-3">
-              {overlayLinks.map((item) => {
-                const isActive = activeNavUrl ? item.url === activeNavUrl : item.url === '/';
+            <div className="grid flex-1 items-center gap-12 py-10 lg:grid-cols-[0.9fr_1.1fr] lg:py-0">
+              <nav className="space-y-3">
+                {overlayLinks.map((item) => {
+                  const isActive = activeNavUrl ? item.url === activeNavUrl : item.url === '/';
 
-                return (
-                  <Link
-                    key={`overlay-${item.label}-${item.url}`}
-                    href={item.url}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={['group flex items-center gap-5 font-display text-[46px] font-medium leading-[1.08] transition sm:text-[58px] lg:text-[68px]', isActive ? 'text-white' : 'text-white/48 hover:text-white'].join(' ')}
-                  >
-                    <span className={['h-3 w-3 rounded-full transition group-hover:bg-ember', isActive ? 'bg-ember' : 'bg-white/0'].join(' ')} />
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
+                  return (
+                    <Link
+                      key={`overlay-${item.label}-${item.url}`}
+                      href={item.url}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={['group flex items-center gap-5 font-display text-[46px] font-medium leading-[1.08] transition sm:text-[58px] lg:text-[68px]', isActive ? 'text-white' : 'text-white/48 hover:text-white'].join(' ')}
+                    >
+                      <span className={['h-3 w-3 rounded-full transition group-hover:bg-ember', isActive ? 'bg-ember' : 'bg-white/0'].join(' ')} />
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </nav>
 
-            <div className="max-w-[700px]">
-              <p className="font-display text-[15px] text-ember">B.back Restaurant</p>
-              <h2 className="mt-4 font-display text-[54px] font-black uppercase leading-[0.95] text-white sm:text-[72px] lg:text-[86px]">
-                Bite Your
-                <span className="block text-ember">Cravings Away</span>
-              </h2>
-              {site.footer.description ? (
-                <p className="mt-7 max-w-[560px] font-body text-[15px] font-semibold leading-[1.7] text-white/62">{site.footer.description}</p>
-              ) : (
-                <p className="mt-7 max-w-[560px] font-body text-[15px] font-semibold leading-[1.7] text-white/62">
-                  Fresh food, signature burgers, loaded wraps, and bold flavors served with the B.back attitude.
-                </p>
-              )}
+              <div className="max-w-[700px]">
+                <p className="font-display text-[15px] text-ember">B.back Restaurant</p>
+                <h2 className="mt-4 font-display text-[54px] font-black uppercase leading-[0.95] text-white sm:text-[72px] lg:text-[86px]">
+                  Bite Your
+                  <span className="block text-ember">Cravings Away</span>
+                </h2>
+                {site.footer.description ? (
+                  <p className="mt-7 max-w-[560px] font-body text-[15px] font-semibold leading-[1.7] text-white/62">{site.footer.description}</p>
+                ) : (
+                  <p className="mt-7 max-w-[560px] font-body text-[15px] font-semibold leading-[1.7] text-white/62">
+                    Fresh food, signature burgers, loaded wraps, and bold flavors served with the B.back attitude.
+                  </p>
+                )}
 
-              <div className="mt-9 grid gap-6 sm:grid-cols-2">
-                {site.phone ? (
-                  <a href={`tel:${site.phone.replace(/\s/g, '')}`} className="group border-t border-white/12 pt-5">
-                    <span className="font-display text-[12px] uppercase tracking-[0.08em] text-white/42">Call Us Now</span>
-                    <span className="mt-2 block font-display text-[26px] text-white transition group-hover:text-ember">{site.phone}</span>
-                  </a>
-                ) : null}
-                {site.email ? (
-                  <a href={`mailto:${site.email}`} className="group border-t border-white/12 pt-5">
-                    <span className="font-display text-[12px] uppercase tracking-[0.08em] text-white/42">Email Us</span>
-                    <span className="mt-2 block font-display text-[26px] text-white transition group-hover:text-ember">{site.email}</span>
-                  </a>
-                ) : null}
-              </div>
+                <div className="mt-9 grid gap-6 sm:grid-cols-2">
+                  {site.phone ? (
+                    <a href={`tel:${site.phone.replace(/\s/g, '')}`} className="group border-t border-white/12 pt-5">
+                      <span className="font-display text-[12px] uppercase tracking-[0.08em] text-white/42">Call Us Now</span>
+                      <span className="mt-2 block font-display text-[26px] text-white transition group-hover:text-ember">{site.phone}</span>
+                    </a>
+                  ) : null}
+                  {site.email ? (
+                    <a href={`mailto:${site.email}`} className="group border-t border-white/12 pt-5">
+                      <span className="font-display text-[12px] uppercase tracking-[0.08em] text-white/42">Email Us</span>
+                      <span className="mt-2 block font-display text-[26px] text-white transition group-hover:text-ember">{site.email}</span>
+                    </a>
+                  ) : null}
+                </div>
 
-              <div className="mt-10 flex flex-wrap gap-3">
-                <button type="button" onClick={() => { setIsMenuOpen(false); openCart(); }} className="inline-flex h-12 items-center gap-3 rounded-full bg-ember px-6 font-body text-[14px] font-bold text-white shadow-glow">
-                  <Image src={bagIcon} alt="" width={19} height={19} className="h-[19px] w-[19px] brightness-0 invert" />
-                  Cart
-                </button>
-                <Link href={isLoggedIn ? '/orders' : '/login'} onClick={() => setIsMenuOpen(false)} className="inline-flex h-12 items-center gap-3 rounded-full border border-white/18 px-6 font-body text-[14px] font-bold text-white transition hover:border-ember hover:bg-ember">
-                  {isLoggedIn ? (
-                    <Image src={userIcon} alt="" width={19} height={19} className="h-[19px] w-[19px] brightness-0 invert" />
-                  ) : (
-                    <LoginIcon />
-                  )}
-                  {isLoggedIn ? 'Your Order' : 'Login'}
-                </Link>
-                {isLoggedIn ? (
-                  <button type="button" onClick={handleLogout} className="inline-flex h-12 items-center rounded-full border border-white/18 px-6 font-body text-[14px] font-bold text-white transition hover:border-ember hover:bg-ember">
-                    Logout
+                <div className="mt-10 flex flex-wrap gap-3">
+                  <button type="button" onClick={() => { setIsMenuOpen(false); openCart(); }} className="inline-flex h-12 items-center gap-3 rounded-full bg-ember px-6 font-body text-[14px] font-bold text-white shadow-glow">
+                    <Image src={bagIcon} alt="" width={19} height={19} className="h-[19px] w-[19px] brightness-0 invert" />
+                    Cart
                   </button>
-                ) : null}
+                  <Link href={isLoggedIn ? '/orders' : '/login'} onClick={() => setIsMenuOpen(false)} className="inline-flex h-12 items-center gap-3 rounded-full border border-white/18 px-6 font-body text-[14px] font-bold text-white transition hover:border-ember hover:bg-ember">
+                    {isLoggedIn ? (
+                      <Image src={userIcon} alt="" width={19} height={19} className="h-[19px] w-[19px] brightness-0 invert" />
+                    ) : (
+                      <LoginIcon />
+                    )}
+                    {isLoggedIn ? 'Your Order' : 'Login'}
+                  </Link>
+                  {isLoggedIn ? (
+                    <button type="button" onClick={handleLogout} className="inline-flex h-12 items-center rounded-full border border-white/18 px-6 font-body text-[14px] font-bold text-white transition hover:border-ember hover:bg-ember">
+                      Logout
+                    </button>
+                  ) : null}
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="border-t border-white/12 pt-6">
-            <div className="flex flex-wrap items-center justify-between gap-6">
-              <div className="flex flex-wrap gap-x-8 gap-y-3 font-body text-[14px] font-semibold text-white/58">
-                {menuLinks.map((item) => (
-                  <Link key={`overlay-menu-${item.label}-${item.url}`} href={menuHref(item.url)} onClick={() => setIsMenuOpen(false)} className="transition hover:text-ember">
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-              {socialLinks.length ? (
-                <div className="flex flex-wrap gap-x-6 gap-y-2 font-body text-[14px] font-semibold text-white/58">
-                  {socialLinks.map(([label, url]) => (
-                    <a key={label} href={url ?? '#'} target="_blank" rel="noreferrer" className="transition hover:text-ember">
-                      {label}
-                    </a>
+            <div className="border-t border-white/12 pt-6">
+              <div className="flex flex-wrap items-center justify-between gap-6">
+                <div className="flex flex-wrap gap-x-8 gap-y-3 font-body text-[14px] font-semibold text-white/58">
+                  {menuLinks.map((item) => (
+                    <Link key={`overlay-menu-${item.label}-${item.url}`} href={menuHref(item.url)} onClick={() => setIsMenuOpen(false)} className="transition hover:text-ember">
+                      {item.label}
+                    </Link>
                   ))}
                 </div>
-              ) : null}
+                {socialLinks.length ? (
+                  <div className="flex flex-wrap gap-x-6 gap-y-2 font-body text-[14px] font-semibold text-white/58">
+                    {socialLinks.map(([label, url]) => (
+                      <a key={label} href={url ?? '#'} target="_blank" rel="noreferrer" className="transition hover:text-ember">
+                        {label}
+                      </a>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
-      </div>
       ) : null}
     </>
   );

@@ -23,6 +23,7 @@
                         <th>Type</th>
                         <th>Spicy</th>
                         <th>Price</th>
+                        <th>Connections</th>
                         <th style="width:90px;">Order</th>
                         <th style="width:90px;" class="text-center">Status</th>
                         <th style="width:110px;" class="text-end pe-4">Actions</th>
@@ -53,6 +54,7 @@ $(function() {
             {data: 'food_type_text', name: 'food_type'},
             {data: 'spicy_text', name: 'spicy'},
             {data: 'price', name: 'price'},
+            {data: 'connections_text', orderable: false, searchable: false},
             {data: 'order', orderable: false, searchable: false},
             {data: 'status', orderable: false, searchable: false, className: 'text-center'},
             {data: 'action', orderable: false, searchable: false, className: 'text-end pe-4'}

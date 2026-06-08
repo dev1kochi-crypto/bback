@@ -11,7 +11,7 @@
     $defaultLanguage = $languages->firstWhere('is_default', true) ?? $languages->first();
     $visibleLanguages = $showLanguageUi ? $languages : collect($defaultLanguage ? [$defaultLanguage] : []);
     $maxItems = config('cms-kit.database.menus.signature_items.max_items', 4);
-    $canAddItem = \App\Models\CmsKit\MenuSignatureItem::count() < $maxItems;
+    $canAddItem = \App\Models\CmsKit\MenuSignatureItem::where('status', true)->count() < $maxItems;
 @endphp
 
 <div class="card mb-4">
@@ -74,7 +74,7 @@
         @if($canAddItem)
             <a href="{{ route('cms.menus.signature-items.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i>Add Signature Item</a>
         @else
-            <span class="badge bg-warning text-dark">Maximum 4 items allowed.</span>
+            <span class="badge bg-warning text-dark">Already 4 signature items selected.</span>
         @endif
     </div>
     <div class="card-body p-4">
@@ -84,7 +84,9 @@
                     <tr>
                         <th style="width:50px;">#</th>
                         <th style="width:90px;">Image</th>
-                        <th>Title</th>
+                        <th>Name</th>
+                        <th>Menu Item</th>
+                        <th>Alt Text</th>
                         <th style="width:90px;">Order</th>
                         <th style="width:90px;" class="text-center">Status</th>
                         <th style="width:110px;" class="text-end pe-4">Actions</th>
@@ -111,6 +113,8 @@ $(function() {
             {data: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'image_preview', orderable: false, searchable: false},
             {data: 'title_text', name: 'title'},
+            {data: 'menu_item_text', orderable: false},
+            {data: 'alt_text_value', orderable: false},
             {data: 'order', orderable: false, searchable: false},
             {data: 'status', orderable: false, searchable: false, className: 'text-center'},
             {data: 'action', orderable: false, searchable: false, className: 'text-end pe-4'}
@@ -118,7 +122,11 @@ $(function() {
     });
 
     $(document).on('change', '#menuSignatureItemsTable .toggle-status', function() {
-        $.post("{{ url(config('cms-kit.common.auth.prefix', 'admin')) }}/signature-items/" + $(this).data('id') + "/toggle-status", {_token: "{{ csrf_token() }}"}).fail(() => table.ajax.reload(null, false));
+        $.post("{{ url(config('cms-kit.common.auth.prefix', 'admin')) }}/signature-items/" + $(this).data('id') + "/toggle-status", {_token: "{{ csrf_token() }}"})
+            .fail((xhr) => {
+                alert(xhr.responseJSON?.message || 'Already 4 signature items selected.');
+                table.ajax.reload(null, false);
+            });
     });
     $(document).on('change', '#menuSignatureItemsTable .reorder-input', function() {
         $.post("{{ route('cms.menus.signature-items.reorder') }}", {id: $(this).data('id'), sort_order: $(this).val(), _token: "{{ csrf_token() }}"}, () => table.ajax.reload(null, false));
