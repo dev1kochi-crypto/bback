@@ -38,8 +38,10 @@ export function CartDrawer() {
       <CommerceDrawer open={isOpen} className="fixed right-0 top-0 z-[250] flex h-screen w-full max-w-[430px] flex-col bg-white text-black shadow-[-24px_0_70px_rgba(0,0,0,0.36)]">
         <header className="flex items-center justify-between border-b border-black/10 px-5 py-5">
           <h2 className="font-display text-[28px] font-medium leading-none">My Cart</h2>
-          <button type="button" onClick={closeCart} aria-label="Close cart" className="grid h-8 w-8 place-items-center rounded-full border border-black/15 text-[18px] leading-none">
-            x
+          <button type="button" onClick={closeCart} aria-label="Close cart" className="grid h-8 w-8 place-items-center rounded-full border border-black/15 text-black/50 transition hover:bg-black/5 hover:text-black">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden>
+              <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
           </button>
         </header>
 
@@ -49,7 +51,7 @@ export function CartDrawer() {
               {cart.items.map((item) => (
                 <CommerceItem key={item.menu_item_id} className="grid grid-cols-[70px_minmax(0,1fr)_auto] items-start gap-4 rounded-[8px] border border-black/10 px-4 py-4">
                   <div className="relative h-[70px] w-[70px] shrink-0">
-                    {item.image ? <Image src={item.image} alt={item.name} fill sizes="70px" className="object-contain" /> : null}
+                    {item.image ? <Image src={item.image} alt={item.name} fill sizes="70px" className="object-contain" unoptimized /> : null}
                   </div>
 
                   <div className="min-w-0 pt-0.5">
@@ -139,16 +141,22 @@ export function CartDrawer() {
             animate={{ opacity: 1, y: 0, x: '-50%' }}
             exit={{ opacity: 0, y: -18, x: '-50%' }}
             transition={{ duration: 0.28 }}
-            className="fixed left-1/2 top-8 z-[260] w-[300px] rounded-[8px] bg-white p-4 text-black shadow-[0_18px_55px_rgba(0,0,0,0.28)]"
+            className="fixed left-1/2 top-20 z-[260] w-[300px] rounded-[8px] bg-white p-4 text-black shadow-[0_18px_55px_rgba(0,0,0,0.28)]"
           >
-            <div className="mb-3 flex items-center justify-center gap-2 bg-[#258d2f] py-2 font-body text-[12px] font-semibold text-white">
-              <span>1 Item add to your cart</span>
+            <div className="mb-3 flex items-center justify-center gap-2 rounded-[4px] bg-[#258d2f] py-2 font-body text-[13px] font-semibold text-white">
+              <span>Item added to your cart</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="relative h-12 w-14">{toast.image ? <Image src={toast.image} alt="" fill sizes="56px" className="object-contain" /> : null}</div>
-              <div>
-                <p className="font-display text-[18px] font-semibold leading-none">{toast.name}</p>
-                <p className="font-body text-[12px] text-black/48">{toast.category_name}</p>
+              <div className="relative h-12 w-14 shrink-0 overflow-hidden rounded-[4px] bg-black/5">
+                {toast.image ? (
+                  <Image src={toast.image} alt="" fill sizes="56px" className="object-contain" unoptimized />
+                ) : (
+                  <div className="grid h-full w-full place-items-center font-display text-[16px] text-ember">B</div>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-display text-[18px] font-semibold leading-none">{toast.name}</p>
+                <p className="truncate font-body text-[13px] text-black/48">{toast.category_name}</p>
               </div>
             </div>
           </motion.div>

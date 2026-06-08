@@ -11,6 +11,89 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Group } from 'three';
 
+const CategoryIcon = ({ name }: { name: string }) => {
+  const n = name.toLowerCase();
+  if (n === 'all') {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-[14px] w-[14px] xl:h-[15px] xl:w-[15px]">
+        <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+        <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+        <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+        <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    );
+  }
+  if (n.includes('sandwich')) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-[14px] w-[14px] xl:h-[15px] xl:w-[15px]">
+        <path d="m2 12 10-5 10 5-10 5Z" />
+        <path d="m2 16 10 5 10-5" />
+      </svg>
+    );
+  }
+  if (n.includes('burger')) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-[14px] w-[14px] xl:h-[15px] xl:w-[15px]">
+        <path d="M4 10a8 8 0 0 1 16 0" />
+        <path d="M4 14h16" />
+        <path d="M4 14c0 2 2 4 8 4s8-2 8-4" />
+        <path d="M3 12h18" />
+      </svg>
+    );
+  }
+  if (n.includes('plate') || n.includes('fries')) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-[14px] w-[14px] xl:h-[15px] xl:w-[15px]">
+        <path d="M4 10h16l-1 10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 10Z"/>
+        <path d="M8 10V5a2 2 0 0 1 4 0v5"/>
+        <path d="M12 10V4a2 2 0 0 1 4 0v6"/>
+      </svg>
+    );
+  }
+  if (n.includes('pizza')) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-[14px] w-[14px] xl:h-[15px] xl:w-[15px]">
+        <path d="M15.4 2.8a2 2 0 0 0-3.3 0L3 15.8a2 2 0 0 0 1.6 3.1h14.8a2 2 0 0 0 1.6-3.1L15.4 2.8Z" />
+        <path d="M12 7.5v.01" />
+        <path d="M10 11.5v.01" />
+        <path d="M14 12.5v.01" />
+        <path d="M12 16.5v.01" />
+      </svg>
+    );
+  }
+  if (n.includes('snack')) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-[14px] w-[14px] xl:h-[15px] xl:w-[15px]">
+        <path d="M4.5 4h15"/>
+        <path d="M5.5 4l2 16a2 2 0 0 0 2 2h5a2 2 0 0 0 2-2l2-16"/>
+        <path d="M8.5 8v8"/>
+        <path d="M15.5 8v8"/>
+      </svg>
+    );
+  }
+  if (n.includes('appetizer') || n.includes('salad')) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-[14px] w-[14px] xl:h-[15px] xl:w-[15px]">
+        <path d="M12 10a4 4 0 0 0-4-4 4 4 0 0 1-4-4c0 3 2 4 4 4 0 4 0 4 4 4Z"/>
+        <path d="M12 10a4 4 0 0 1 4-4 4 4 0 0 0 4-4c0 3-2 4-4 4 0 4 0 4-4 4Z"/>
+        <path d="M4 12h16a8 8 0 0 1-16 0Z"/>
+      </svg>
+    );
+  }
+  if (n.includes('sauce')) {
+    return (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-[14px] w-[14px] xl:h-[15px] xl:w-[15px]">
+        <path d="M10 2h4"/>
+        <path d="M12 2v4"/>
+        <path d="M9 6h6a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/>
+        <path d="M10 12h4"/>
+      </svg>
+    );
+  }
+  return null;
+};
+
 interface MenuShowcaseSectionProps {
   menu: MenuPayload;
   variant?: 'home' | 'listing';
@@ -18,6 +101,7 @@ interface MenuShowcaseSectionProps {
 
 export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSectionProps) {
   const [activeCategory, setActiveCategory] = useState<number | 'all'>('all');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [homePage, setHomePage] = useState(0);
   const [visibleCount, setVisibleCount] = useState(16);
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -104,15 +188,13 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
     <motion.section
       ref={sectionRef}
       id="menu"
-      className={`relative overflow-hidden bg-[#050505] px-6 pb-[92px] text-white sm:px-10 lg:px-16 ${
-        variant === 'home' ? 'pt-[170px] sm:pt-[190px] lg:pb-[120px] lg:pt-[245px]' : 'py-[92px] lg:py-[120px]'
-      }`}
+      className={`special-menu relative overflow-x-clip bg-[#050505] px-6 pb-[92px] text-white sm:px-10 lg:px-16 ${variant === 'home' ? 'pt-[170px] sm:pt-[190px] lg:pb-[120px] lg:pt-[245px]' : 'py-[92px] lg:py-[120px]'
+        }`}
       onPointerMove={prefersReducedMotion ? undefined : handlePointerMove}
     >
       {variant === 'home' ? (
         <>
           <div className="pointer-events-none absolute inset-x-0 top-0 z-[1] h-[150px] bg-[#080c0d] sm:h-[172px] lg:h-[220px]" />
-          <div className="pointer-events-none absolute inset-x-0 top-[148px] z-[2] h-px bg-gradient-to-r from-transparent via-white/10 to-transparent sm:top-[170px] lg:top-[218px]" />
           <div className="pointer-events-none absolute inset-x-0 top-[118px] z-[2] h-[90px] bg-gradient-to-b from-transparent via-black/35 to-[#050505] sm:top-[136px] lg:top-[174px] lg:h-[120px]" />
         </>
       ) : null}
@@ -201,34 +283,77 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
         </motion.div>
 
         <motion.div
-          className="mt-8 flex flex-wrap items-center justify-center gap-2 lg:gap-3"
+          className="food-menu sticky top-[70px] z-[100] mt-8 w-full bg-[#050505] py-4 lg:top-[80px]"
           initial={prefersReducedMotion ? false : { opacity: 0, y: 22 }}
           whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.25 }}
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
         >
-          <motion.button
-            type="button"
-            onClick={() => setActiveCategory('all')}
-            className={activeCategory === 'all' ? categoryActiveClass : categoryClass}
-            whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.04 }}
-            whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
-          >
-            All
-          </motion.button>
-          {menu.categories.map((category) => (
-            <motion.button
-              key={category.id}
+          {/* Mobile Dropdown Toggle */}
+          <div className="relative mx-auto max-w-[400px] lg:hidden">
+            <button
               type="button"
-              onClick={() => setActiveCategory(category.id)}
-              className={activeCategory === category.id ? categoryActiveClass : categoryClass}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex w-full items-center justify-between rounded-full bg-[#1b1b1b] px-6 py-3.5 font-display text-[15px] text-white shadow-[0_4px_14px_rgba(0,0,0,0.3)] transition hover:bg-[#2b2b2b]"
+            >
+              <div className="flex items-center gap-3">
+                <CategoryIcon name={activeCategory === 'all' ? 'All' : (menu.categories.find(c => c.id === activeCategory)?.name || 'All')} />
+                {activeCategory === 'all' ? 'All Categories' : menu.categories.find(c => c.id === activeCategory)?.name}
+              </div>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`h-4 w-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}>
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </button>
+            
+            <div className={`absolute left-0 right-0 top-[calc(100%+8px)] z-50 flex max-h-[60vh] origin-top flex-col gap-1 overflow-y-auto rounded-[16px] border border-white/10 bg-[#111] p-2 shadow-[0_14px_34px_rgba(0,0,0,0.6)] transition-all duration-300 ${isDropdownOpen ? 'scale-y-100 opacity-100' : 'pointer-events-none scale-y-95 opacity-0'}`}>
+              <button
+                type="button"
+                onClick={() => { setActiveCategory('all'); setIsDropdownOpen(false); }}
+                className={`flex w-full items-center gap-3 rounded-full px-4 py-3 font-display text-[14px] transition ${activeCategory === 'all' ? 'bg-ember text-white' : 'text-white/70 hover:bg-[#222] hover:text-white'}`}
+              >
+                <CategoryIcon name="All" />
+                All Categories
+              </button>
+              {menu.categories.map((category) => (
+                <button
+                  key={category.id}
+                  type="button"
+                  onClick={() => { setActiveCategory(category.id); setIsDropdownOpen(false); }}
+                  className={`flex w-full items-center gap-3 rounded-full px-4 py-3 font-display text-[14px] transition ${activeCategory === category.id ? 'bg-ember text-white' : 'text-white/70 hover:bg-[#222] hover:text-white'}`}
+                >
+                  <CategoryIcon name={category.name} />
+                  {category.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Desktop Inline Buttons */}
+          <div className="hidden flex-wrap items-center justify-center gap-3 lg:flex">
+            <motion.button
+              type="button"
+              onClick={() => setActiveCategory('all')}
+              className={activeCategory === 'all' ? categoryActiveClass : categoryClass}
               whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.04 }}
               whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
             >
-              {category.icon ? <Image src={category.icon} alt="" width={14} height={14} className="h-3.5 w-3.5 object-contain" /> : null}
-              {category.name}
+              <CategoryIcon name="All" />
+              All
             </motion.button>
-          ))}
+            {menu.categories.map((category) => (
+              <motion.button
+                key={category.id}
+                type="button"
+                onClick={() => setActiveCategory(category.id)}
+                className={activeCategory === category.id ? categoryActiveClass : categoryClass}
+                whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.04 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
+              >
+                <CategoryIcon name={category.name} />
+                {category.name}
+              </motion.button>
+            ))}
+          </div>
         </motion.div>
 
         {visibleItems.length ? (
@@ -251,42 +376,45 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
         ) : null}
 
         {variant === 'home' && totalPages > 1 ? (
-          <div className="mt-8 flex items-center justify-center gap-2">
+          <div className="mt-12 flex items-center justify-center gap-[28px]">
             <motion.button
               type="button"
               onClick={() => setHomePage((page) => (page - 1 + totalPages) % totalPages)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#171b1d] font-display text-[20px] leading-none text-white/70 transition hover:bg-ember hover:text-white"
+              className="inline-flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#1c1c1c] text-white transition hover:bg-ember"
               aria-label="Previous menu items"
-              whileHover={prefersReducedMotion ? undefined : { x: -2, scale: 1.08 }}
-              whileTap={prefersReducedMotion ? undefined : { scale: 0.94 }}
+              whileHover={prefersReducedMotion ? undefined : { x: -2, scale: 1.05 }}
+              whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="14" viewBox="0 0 18 14" fill="none" className="scale-x-[-1]">
-                <path d="M17.3644 5.93621C17.5519 6.12374 17.6572 6.37805 17.6572 6.64321C17.6572 6.90838 17.5519 7.16268 17.3644 7.35021L11.7074 13.0072C11.6152 13.1027 11.5048 13.1789 11.3828 13.2313C11.2608 13.2837 11.1296 13.3113 10.9968 13.3125C10.8641 13.3136 10.7324 13.2883 10.6095 13.238C10.4866 13.1878 10.3749 13.1135 10.281 13.0196C10.1872 12.9257 10.1129 12.8141 10.0626 12.6912C10.0123 12.5683 9.98704 12.4366 9.98819 12.3038C9.98934 12.171 10.0169 12.0398 10.0693 11.9178C10.1217 11.7958 10.1979 11.6855 10.2934 11.5932L14.2434 7.64321L1.00044 7.64321C0.735224 7.64321 0.480869 7.53785 0.293333 7.35032C0.105797 7.16278 0.000440598 6.90843 0.000440598 6.64321C0.000440598 6.378 0.105797 6.12364 0.293333 5.93611C0.480869 5.74857 0.735224 5.64321 1.00044 5.64321L14.2434 5.64321L10.2934 1.69321C10.1113 1.50461 10.0105 1.25201 10.0128 0.989811C10.015 0.727614 10.1202 0.476801 10.3056 0.291393C10.491 0.105986 10.7418 0.000815392 11.004 -0.00146294C11.2662 -0.00374126 11.5188 0.0970526 11.7074 0.279211L17.3644 5.93621Z" fill="white"/>
+                <path d="M17.3644 5.93621C17.5519 6.12374 17.6572 6.37805 17.6572 6.64321C17.6572 6.90838 17.5519 7.16268 17.3644 7.35021L11.7074 13.0072C11.6152 13.1027 11.5048 13.1789 11.3828 13.2313C11.2608 13.2837 11.1296 13.3113 10.9968 13.3125C10.8641 13.3136 10.7324 13.2883 10.6095 13.238C10.4866 13.1878 10.3749 13.1135 10.281 13.0196C10.1872 12.9257 10.1129 12.8141 10.0626 12.6912C10.0123 12.5683 9.98704 12.4366 9.98819 12.3038C9.98934 12.171 10.0169 12.0398 10.0693 11.9178C10.1217 11.7958 10.1979 11.6855 10.2934 11.5932L14.2434 7.64321L1.00044 7.64321C0.735224 7.64321 0.480869 7.53785 0.293333 7.35032C0.105797 7.16278 0.000440598 6.90843 0.000440598 6.64321C0.000440598 6.378 0.105797 6.12364 0.293333 5.93611C0.480869 5.74857 0.735224 5.64321 1.00044 5.64321L14.2434 5.64321L10.2934 1.69321C10.1113 1.50461 10.0105 1.25201 10.0128 0.989811C10.015 0.727614 10.1202 0.476801 10.3056 0.291393C10.491 0.105986 10.7418 0.000815392 11.004 -0.00146294C11.2662 -0.00374126 11.5188 0.0970526 11.7074 0.279211L17.3644 5.93621Z" fill="currentColor" />
               </svg>
             </motion.button>
-            {Array.from({ length: totalPages }).map((_, index) => (
-              <motion.button
-                key={index}
-                type="button"
-                onClick={() => setHomePage(index)}
-                className={`h-[15px] w-[15px] rounded-full border-2 transition ${
-                  homePage === index ? 'border-ember bg-ember shadow-[0_0_0_4px_rgba(246,139,36,0.15)]' : 'border-white/45 bg-[#171b1d] hover:border-ember'
-                }`}
-                aria-label={`Show menu page ${index + 1}`}
-                whileHover={prefersReducedMotion ? undefined : { scale: 1.18 }}
-                whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
-              />
-            ))}
+            <div className="flex items-center gap-[14px]">
+              {Array.from({ length: totalPages }).map((_, index) => (
+                <motion.button
+                  key={index}
+                  type="button"
+                  onClick={() => setHomePage(index)}
+                  className={`flex h-[24px] w-[24px] items-center justify-center rounded-full border transition-colors ${homePage === index ? 'border-ember' : 'border-white/20 hover:border-white/40'
+                    }`}
+                  aria-label={`Show menu page ${index + 1}`}
+                  whileHover={prefersReducedMotion ? undefined : { scale: 1.1 }}
+                  whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
+                >
+                  <span className={`block h-[12px] w-[12px] rounded-full transition-colors ${homePage === index ? 'bg-ember' : 'bg-[#8a8a8a]'}`} />
+                </motion.button>
+              ))}
+            </div>
             <motion.button
               type="button"
               onClick={() => setHomePage((page) => (page + 1) % totalPages)}
-              className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#171b1d] font-display text-[20px] leading-none text-white/70 transition hover:bg-ember hover:text-white"
+              className="inline-flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#1c1c1c] text-white transition hover:bg-ember"
               aria-label="Next menu items"
-              whileHover={prefersReducedMotion ? undefined : { x: 2, scale: 1.08 }}
-              whileTap={prefersReducedMotion ? undefined : { scale: 0.94 }}
+              whileHover={prefersReducedMotion ? undefined : { x: 2, scale: 1.05 }}
+              whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="14" viewBox="0 0 18 14" fill="none">
-                <path d="M17.3644 5.93621C17.5519 6.12374 17.6572 6.37805 17.6572 6.64321C17.6572 6.90838 17.5519 7.16268 17.3644 7.35021L11.7074 13.0072C11.6152 13.1027 11.5048 13.1789 11.3828 13.2313C11.2608 13.2837 11.1296 13.3113 10.9968 13.3125C10.8641 13.3136 10.7324 13.2883 10.6095 13.238C10.4866 13.1878 10.3749 13.1135 10.281 13.0196C10.1872 12.9257 10.1129 12.8141 10.0626 12.6912C10.0123 12.5683 9.98704 12.4366 9.98819 12.3038C9.98934 12.171 10.0169 12.0398 10.0693 11.9178C10.1217 11.7958 10.1979 11.6855 10.2934 11.5932L14.2434 7.64321L1.00044 7.64321C0.735224 7.64321 0.480869 7.53785 0.293333 7.35032C0.105797 7.16278 0.000440598 6.90843 0.000440598 6.64321C0.000440598 6.378 0.105797 6.12364 0.293333 5.93611C0.480869 5.74857 0.735224 5.64321 1.00044 5.64321L14.2434 5.64321L10.2934 1.69321C10.1113 1.50461 10.0105 1.25201 10.0128 0.989811C10.015 0.727614 10.1202 0.476801 10.3056 0.291393C10.491 0.105986 10.7418 0.000815392 11.004 -0.00146294C11.2662 -0.00374126 11.5188 0.0970526 11.7074 0.279211L17.3644 5.93621Z" fill="white"/>
+                <path d="M17.3644 5.93621C17.5519 6.12374 17.6572 6.37805 17.6572 6.64321C17.6572 6.90838 17.5519 7.16268 17.3644 7.35021L11.7074 13.0072C11.6152 13.1027 11.5048 13.1789 11.3828 13.2313C11.2608 13.2837 11.1296 13.3113 10.9968 13.3125C10.8641 13.3136 10.7324 13.2883 10.6095 13.238C10.4866 13.1878 10.3749 13.1135 10.281 13.0196C10.1872 12.9257 10.1129 12.8141 10.0626 12.6912C10.0123 12.5683 9.98704 12.4366 9.98819 12.3038C9.98934 12.171 10.0169 12.0398 10.0693 11.9178C10.1217 11.7958 10.1979 11.6855 10.2934 11.5932L14.2434 7.64321L1.00044 7.64321C0.735224 7.64321 0.480869 7.53785 0.293333 7.35032C0.105797 7.16278 0.000440598 6.90843 0.000440598 6.64321C0.000440598 6.378 0.105797 6.12364 0.293333 5.93611C0.480869 5.74857 0.735224 5.64321 1.00044 5.64321L14.2434 5.64321L10.2934 1.69321C10.1113 1.50461 10.0105 1.25201 10.0128 0.989811C10.015 0.727614 10.1202 0.476801 10.3056 0.291393C10.491 0.105986 10.7418 0.000815392 11.004 -0.00146294C11.2662 -0.00374126 11.5188 0.0970526 11.7074 0.279211L17.3644 5.93621Z" fill="currentColor" />
               </svg>
             </motion.button>
           </div>
@@ -318,17 +446,17 @@ function MenuCard({ item, index }: { item: MenuItem; variant: 'home' | 'listing'
 
   return (
     <motion.article
-      className="group relative flex min-h-[452px] w-full overflow-visible rounded-[12px] border border-dashed border-white/20 bg-[#101416] px-[22px] pb-[21px] pt-[15px] text-white outline-none transition duration-300 hover:-translate-y-1 hover:border-transparent hover:bg-[#f68b24] focus-within:-translate-y-1 focus-within:border-transparent focus-within:bg-[#f68b24] sm:max-w-[280px]"
+      className="group relative flex min-h-[452px] w-full overflow-visible rounded-[12px] border border-dashed border-white/20 bg-[#0A0D0F] px-[22px] pb-[21px] pt-[15px] text-white outline-none transition-transform duration-300 hover:-translate-y-1 hover:border-transparent hover:bg-[#f68b24] focus-within:-translate-y-1 focus-within:border-transparent focus-within:bg-[#f68b24] sm:max-w-[280px]"
       initial={
         prefersReducedMotion
           ? false
           : {
-              opacity: 0,
-              y: 34,
-              rotateX: 7,
-              scale: 0.96,
-              filter: 'blur(12px)',
-            }
+            opacity: 0,
+            y: 34,
+            rotateX: 7,
+            scale: 0.96,
+            filter: 'blur(12px)',
+          }
       }
       whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: [0, -5, 0], rotateX: 0, scale: 1, filter: 'blur(0px)' }}
       whileHover={prefersReducedMotion ? undefined : { y: -8, rotateX: 2.5, scale: 1.012 }}
@@ -342,8 +470,8 @@ function MenuCard({ item, index }: { item: MenuItem; variant: 'home' | 'listing'
       }}
       style={{ transformPerspective: 1100, transformStyle: 'preserve-3d' }}
     >
-      <div className="pointer-events-none absolute -left-[16px] -right-[16px] -top-[24px] z-0 h-[64px] opacity-0 transition duration-300 group-hover:opacity-100 group-focus-within:opacity-100">
-        <Image src="/app/images/hover-bg.png" alt="" fill sizes="340px" className="object-fill" unoptimized />
+      <div className="pointer-events-none absolute -left-[0] -right-[0] -top-[30px] z-0 h-[53px] hidden group-hover:block group-focus-within:block">
+        <Image src="/app/images/hover-bg.png" alt="" fill sizes="340px" className="object-fill" unoptimized priority />
       </div>
       <div className="relative z-10 flex w-full flex-col">
         <motion.div
