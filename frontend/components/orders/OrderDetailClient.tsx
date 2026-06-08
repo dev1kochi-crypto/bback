@@ -78,7 +78,7 @@ export function OrderDetailClient() {
                 <Panel title="Order Item" description="Lorem Ipsum is Simply Dummy Text Of The Printing And Typesetting Industry...">
                   <CommerceStagger className="space-y-0 border-t border-white/[0.07] pt-5">
                     {order.items.map((item) => (
-                      <CommerceItem key={`${item.menu_item_id}-${item.name}`} className="flex items-center gap-6 border-b border-white/[0.07] py-5 first:pt-0 last:border-0 last:pb-0">
+                      <CommerceItem key={`${item.menu_item_id}-${item.name}`} className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 border-b border-white/[0.07] py-5 first:pt-0 last:border-0 last:pb-0">
                         <div className="relative h-[98px] w-[132px] shrink-0 overflow-hidden rounded-full bg-white/[0.055]">
                           {item.image ? (
                             <Image src={item.image} alt={item.name} fill sizes="132px" className="object-cover" />
@@ -86,12 +86,12 @@ export function OrderDetailClient() {
                             <div className="grid h-full w-full place-items-center font-display text-[22px] text-ember">B</div>
                           )}
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <h2 className="font-display text-[30px] font-medium leading-[1.1] text-white">{item.name}</h2>
-                          <p className="mt-2.5 font-body text-[18px] font-normal leading-[1.35] text-[#DEDEDE]/85">{item.category_name ?? 'Menu item'}</p>
+                        <div className="min-w-0 flex-1 w-full sm:w-auto">
+                          <h2 className="font-display text-[24px] sm:text-[30px] font-medium leading-[1.1] text-white">{item.name}</h2>
+                          <p className="mt-2.5 font-body text-[16px] sm:text-[18px] font-normal leading-[1.35] text-[#DEDEDE]/85">{item.category_name ?? 'Menu item'}</p>
                           <p className="mt-2 line-clamp-1 font-body text-[14px] font-normal leading-[1.55] text-[#DEDEDE]/72">{itemDescription(item.category_name)}</p>
                         </div>
-                        <p className="self-center font-display text-[28px] font-medium text-white">{item.line_total}</p>
+                        <p className="self-start sm:self-center font-display text-[24px] sm:text-[28px] font-medium text-white">{item.line_total}</p>
                       </CommerceItem>
                     ))}
                   </CommerceStagger>
@@ -235,10 +235,10 @@ type SummaryRowData = {
 
 function SummaryRow({ label, detail, amount, strong = false }: SummaryRowData) {
   return (
-    <div className="grid grid-cols-[minmax(92px,1fr)_minmax(120px,1fr)_minmax(86px,0.8fr)] items-center gap-5 font-body text-[14px] font-normal leading-[1.45]">
+    <div className="flex flex-col sm:grid sm:grid-cols-[minmax(92px,1fr)_minmax(120px,1fr)_minmax(86px,0.8fr)] sm:items-center gap-1 sm:gap-5 font-body text-[14px] font-normal leading-[1.45] py-2 sm:py-0 border-b border-white/[0.05] sm:border-0 last:border-0">
       <span className={strong ? 'font-medium text-white' : 'text-[#DEDEDE]'}>{label}</span>
-      <span className={strong ? 'font-medium text-white' : 'text-[#DEDEDE]'}>{detail}</span>
-      <span className={strong ? 'text-right font-medium text-white' : 'text-right text-[#DEDEDE]'}>{amount}</span>
+      {detail ? <span className={strong ? 'font-medium text-white' : 'text-[#DEDEDE]'}>{detail}</span> : null}
+      <span className={strong ? 'sm:text-right font-medium text-white mt-1 sm:mt-0' : 'sm:text-right text-[#DEDEDE] mt-1 sm:mt-0'}>{amount}</span>
     </div>
   );
 }

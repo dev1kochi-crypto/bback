@@ -103,31 +103,40 @@ export function OrderProcessSection({ payload }: OrderProcessSectionProps) {
             ) : null}
           </motion.div>
 
-          <div className="relative mt-9 space-y-7 before:absolute before:left-[23px] before:top-6 before:h-[calc(100%-3rem)] before:w-px before:border-l before:border-dotted before:border-white/28">
+          <div className="relative mt-12 flex flex-col gap-[48px]">
             {items.map((item, index) => (
               <motion.div
                 key={item.id}
-                className="relative grid grid-cols-[48px_1fr] gap-5"
+                className="relative grid grid-cols-[60px_1fr] gap-6"
                 initial={prefersReducedMotion ? false : { opacity: 0, x: 34, y: 12, rotateY: 6, filter: 'blur(8px)' }}
                 whileInView={prefersReducedMotion ? undefined : { opacity: 1, x: 0, y: 0, rotateY: 0, filter: 'blur(0px)' }}
                 viewport={{ once: false, amount: 0.25 }}
                 transition={{ duration: 0.68, ease: [0.16, 1, 0.3, 1], delay: index * 0.09 }}
                 style={{ transformPerspective: 900, transformStyle: 'preserve-3d' }}
               >
-                <motion.div
-                  className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white"
-                  animate={prefersReducedMotion ? undefined : { y: [0, -4, 0], boxShadow: ['0 0 0 rgba(255,122,0,0)', '0 0 24px rgba(255,122,0,0.28)', '0 0 0 rgba(255,122,0,0)'] }}
-                  transition={prefersReducedMotion ? undefined : { duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: index * 0.35 }}
-                >
-                  {item.icon ? (
-                    <Image src={item.icon} alt={item.icon_alt || ''} width={25} height={25} className="h-[25px] w-[25px] object-contain" />
-                  ) : (
-                    <span className="h-3 w-3 rounded-full bg-ember" />
-                  )}
-                </motion.div>
-                <div className="pt-1">
-                  {item.title ? <h3 className="font-display text-[18px] font-semibold leading-none tracking-[0.04em] text-white">{item.title}</h3> : null}
-                  {item.description ? <p className="mt-2 max-w-[610px] font-display text-[15px] font-light leading-[1.45] tracking-[0.25px] text-[#BEBEBE]">{item.description}</p> : null}
+                {index < items.length - 1 && (
+                  <div className="absolute bottom-[-48px] left-[30px] top-[60px] flex w-1 -translate-x-1/2 flex-col items-center justify-evenly py-[8px]">
+                    {[...Array(5)].map((_, i) => (
+                      <span key={i} className="h-[5px] w-[5px] rounded-full bg-[#6b6b6b]" />
+                    ))}
+                  </div>
+                )}
+                <div className="relative flex flex-col items-center justify-start">
+                  <motion.div
+                    className="relative z-10 flex h-[60px] w-[60px] items-center justify-center rounded-full bg-white"
+                    animate={prefersReducedMotion ? undefined : { y: [0, -4, 0], boxShadow: ['0 0 0 rgba(255,122,0,0)', '0 0 24px rgba(255,122,0,0.28)', '0 0 0 rgba(255,122,0,0)'] }}
+                    transition={prefersReducedMotion ? undefined : { duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: index * 0.35 }}
+                  >
+                    {item.icon ? (
+                      <Image src={item.icon} alt={item.icon_alt || ''} width={30} height={30} className="h-[30px] w-[30px] object-contain" />
+                    ) : (
+                      <span className="h-4 w-4 rounded-full bg-ember" />
+                    )}
+                  </motion.div>
+                </div>
+                <div className="pt-[10px]">
+                  {item.title ? <h3 className="font-display text-[20px] font-semibold leading-none tracking-[0.04em] text-white">{item.title}</h3> : null}
+                  {item.description ? <p className="mt-3 max-w-[610px] font-display text-[15px] font-light leading-[1.6] tracking-[0.25px] text-[#BEBEBE]">{item.description}</p> : null}
                 </div>
               </motion.div>
             ))}
