@@ -155,6 +155,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('storage', handleStorage);
   }, [cart, syncIfLoggedIn]);
 
+  const toastTimeoutRef = useRef<number | null>(null);
+
   const addItem = useCallback((item: MenuItem) => {
     const nextCart = normalizeCart({
       ...cart,
@@ -164,7 +166,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart(nextCart);
     const addedItem = nextCart.items.find((cartItem) => cartItem.menu_item_id === item.id) ?? null;
     setToast(addedItem);
-    window.setTimeout(() => setToast(null), 2600);
+    
+    if (toastTimeoutRef.current !== null) {
+      window.clearTimeout(toastTimeoutRef.current);
+    }
+    toastTimeoutRef.current = window.setTimeout(() => setToast(null), 2600);
+    
     void syncIfLoggedIn(nextCart);
   }, [cart, pricing, syncIfLoggedIn]);
 

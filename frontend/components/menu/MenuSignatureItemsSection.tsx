@@ -24,7 +24,7 @@ export function MenuSignatureItemsSection({ section, items }: MenuSignatureItems
   }
 
   return (
-    <section className="relative overflow-hidden bg-[#050505] px-6 pb-[126px] pt-[104px] text-white sm:px-10 lg:px-12 lg:pb-[156px] lg:pt-[132px]">
+    <section className="cta-home relative overflow-hidden bg-[#050505] px-6 pb-[126px] pt-[104px] text-white sm:px-10 lg:px-12 lg:pb-[156px] lg:pt-[132px]">
       <div className="pointer-events-none absolute inset-0 bg-[url('/app/images/Mask group (18).jpg')] bg-cover bg-center opacity-20" />
       <div className="pointer-events-none absolute bottom-[-28px] left-[-14px] font-title text-[clamp(8rem,16vw,18.5rem)] font-normal uppercase leading-none text-white/[0.08]">
         Signature Items
