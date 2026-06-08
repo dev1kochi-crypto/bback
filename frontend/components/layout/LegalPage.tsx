@@ -18,8 +18,8 @@ export async function LegalPage({ title, contentKey }: LegalPageProps) {
 
   return (
     <SiteShell pageBanner={{ title }}>
-      <main className="bg-[#050505] px-6 py-16 text-white sm:px-10 lg:px-16">
-        <article className="mx-auto max-w-[1100px] font-display text-[18px] leading-relaxed text-white/70">
+      <main className="legal-page">
+        <article className="legal-page__inner">
           <div
             className="legal-content"
             dangerouslySetInnerHTML={{ __html: content }}

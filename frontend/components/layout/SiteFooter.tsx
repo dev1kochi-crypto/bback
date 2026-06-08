@@ -114,7 +114,11 @@ const socialIcons: Record<string, string> = {
 
 function SocialLink({ name, url }: { name: string; url: string }) {
   const icon = socialIcons[name];
-  const iconSrc = icon ? absoluteAssetUrl(icon) ?? icon : null;
+  if (!icon) {
+    return null;
+  }
+
+  const iconSrc = absoluteAssetUrl(icon) ?? icon;
 
   return (
     <a
@@ -124,11 +128,7 @@ function SocialLink({ name, url }: { name: string; url: string }) {
       aria-label={socialLabels[name] ?? name}
       className="site-footer__social-link"
     >
-      {iconSrc ? (
-        <Image src={iconSrc} alt="" width={22} height={22} className="site-footer__social-icon" />
-      ) : (
-        socialLabels[name]?.slice(0, 2) ?? name.slice(0, 2)
-      )}
+      <Image src={iconSrc} alt="" width={22} height={22} className="site-footer__social-icon" />
     </a>
   );
 }
@@ -253,7 +253,17 @@ export function SiteFooter({ site }: SiteFooterProps) {
           <p>
             Copyright &copy; {year} All Rights Reserved. {site.company_name ?? 'B.back'}
           </p>
-          <p>Designed by : MightyWarners Technologies LLC</p>
+          <p>
+            Designed by :{' '}
+            <a
+              href="https://mightywarner.ae/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="site-footer__link"
+            >
+              MightyWarners Technologies LLC
+            </a>
+          </p>
         </div>
       </div>
     </footer>

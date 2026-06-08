@@ -19,6 +19,7 @@ Route::middleware(['web'])->group(function () {
         ->middleware(['cms.auth'])
         ->group(function () {
             Route::get('/', [DashboardController::class, 'index'])->name('cms.dashboard');
+            Route::get('/dashboard/orders-chart', [DashboardController::class, 'orderChart'])->name('cms.dashboard.orders-chart');
 
             if (config('cms-kit.common.modules.about-us', true)) {
                 Route::middleware(['cms.permission:about-us.view'])->group(function () {

@@ -52,8 +52,18 @@ export function AuthShell({ title, subtitle, children, footerAction }: AuthShell
         </section>
 
         <footer className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-ember/70 pt-5 font-body text-[12px] font-semibold text-white/62">
-          <span>Copyright &copy; 2026 All Rights Reserved. B-Back</span>
-          <span>Designed by MightyWarriors Technologies LLC</span>
+          <span>Copyright &copy; {new Date().getFullYear()} All Rights Reserved. B-Back</span>
+          <span>
+            Designed by{' '}
+            <a
+              href="https://mightywarner.ae/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition hover:text-ember"
+            >
+              MightyWarners Technologies LLC
+            </a>
+          </span>
         </footer>
       </div>
     </main>

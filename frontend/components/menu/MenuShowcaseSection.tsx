@@ -9,6 +9,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { Group } from 'three';
 
 const CategoryIcon = ({ name }: { name: string }) => {
@@ -101,12 +102,17 @@ interface MenuShowcaseSectionProps {
 
 export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSectionProps) {
   const [activeCategory, setActiveCategory] = useState<number | 'all'>('all');
+  const [foodFilter, setFoodFilter] = useState<'all' | MenuItem['food_type']>('all');
+  const [spicyOnly, setSpicyOnly] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
   const [homePage, setHomePage] = useState(0);
   const [visibleCount, setVisibleCount] = useState(16);
   const sectionRef = useRef<HTMLElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
+  const disableCardRevealMotion = Boolean(prefersReducedMotion || isMobileViewport);
   const cursorX = useMotionValue(0);
   const cursorY = useMotionValue(0);
   const glowX = useSpring(cursorX, { stiffness: 90, damping: 28, mass: 0.35 });
@@ -118,10 +124,21 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
   const gridY = useTransform(scrollYProgress, [0, 1], [18, -18]);
   const hasData = Boolean(menu.section && menu.categories.length && menu.items.length && (variant !== 'home' || menu.section.display_home));
   const pageSize = variant === 'home' ? 4 : 16;
+  const visibleCategories = useMemo(() => menu.categories.slice(0, 5), [menu.categories]);
+  const activeCategoryLabel = activeCategory === 'all'
+    ? 'All Categories'
+    : menu.categories.find((category) => category.id === activeCategory)?.name || 'All Categories';
+  const activeExtraFilterCount = (foodFilter === 'all' ? 0 : 1) + (spicyOnly ? 1 : 0) + (activeCategory !== 'all' && !visibleCategories.some((category) => category.id === activeCategory) ? 1 : 0);
 
   const filteredItems = useMemo(() => {
-    return activeCategory === 'all' ? menu.items : menu.items.filter((item) => item.category_id === activeCategory);
-  }, [activeCategory, menu.items]);
+    return menu.items.filter((item) => {
+      const matchesCategory = activeCategory === 'all' || item.category_id === activeCategory;
+      const matchesFoodType = foodFilter === 'all' || item.food_type === foodFilter;
+      const matchesSpicy = !spicyOnly || item.spicy;
+
+      return matchesCategory && matchesFoodType && matchesSpicy;
+    });
+  }, [activeCategory, foodFilter, menu.items, spicyOnly]);
 
   const pagedItems = useMemo(() => {
     return variant === 'home' ? filteredItems.slice(0, 16) : filteredItems;
@@ -141,7 +158,17 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
   useEffect(() => {
     setHomePage(0);
     setVisibleCount(16);
-  }, [activeCategory, variant]);
+  }, [activeCategory, foodFilter, spicyOnly, variant]);
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 639px)');
+    const syncMobileViewport = () => setIsMobileViewport(query.matches);
+
+    syncMobileViewport();
+    query.addEventListener('change', syncMobileViewport);
+
+    return () => query.removeEventListener('change', syncMobileViewport);
+  }, []);
 
   useEffect(() => {
     if (variant !== 'listing' || visibleCount >= filteredItems.length) {
@@ -290,42 +317,53 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
           transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
         >
           {/* Mobile Dropdown Toggle */}
-          <div className="relative mx-auto max-w-[400px] lg:hidden">
-            <button
-              type="button"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex w-full items-center justify-between rounded-full bg-[#1b1b1b] px-6 py-3.5 font-display text-[15px] text-white shadow-[0_4px_14px_rgba(0,0,0,0.3)] transition hover:bg-[#2b2b2b]"
-            >
-              <div className="flex items-center gap-3">
-                <CategoryIcon name={activeCategory === 'all' ? 'All' : (menu.categories.find(c => c.id === activeCategory)?.name || 'All')} />
-                {activeCategory === 'all' ? 'All Categories' : menu.categories.find(c => c.id === activeCategory)?.name}
-              </div>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`h-4 w-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}>
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
-            </button>
-            
-            <div className={`absolute left-0 right-0 top-[calc(100%+8px)] z-50 flex max-h-[60vh] origin-top flex-col gap-1 overflow-y-auto rounded-[16px] border border-white/10 bg-[#111] p-2 shadow-[0_14px_34px_rgba(0,0,0,0.6)] transition-all duration-300 ${isDropdownOpen ? 'scale-y-100 opacity-100' : 'pointer-events-none scale-y-95 opacity-0'}`}>
+          <div className="mx-auto flex max-w-[460px] items-center gap-3 lg:hidden">
+            <div className="relative min-w-0 flex-1">
               <button
                 type="button"
-                onClick={() => { setActiveCategory('all'); setIsDropdownOpen(false); }}
-                className={`flex w-full items-center gap-3 rounded-full px-4 py-3 font-display text-[14px] transition ${activeCategory === 'all' ? 'bg-ember text-white' : 'text-white/70 hover:bg-[#222] hover:text-white'}`}
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className="flex w-full items-center justify-between rounded-full bg-[#1b1b1b] px-5 py-3.5 font-display text-[15px] text-white shadow-[0_4px_14px_rgba(0,0,0,0.3)] transition hover:bg-[#2b2b2b]"
               >
-                <CategoryIcon name="All" />
-                All Categories
+                <div className="flex min-w-0 items-center gap-3">
+                  <CategoryIcon name={activeCategory === 'all' ? 'All' : activeCategoryLabel} />
+                  <span className="truncate">{activeCategoryLabel}</span>
+                </div>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`h-4 w-4 shrink-0 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}>
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
               </button>
-              {menu.categories.map((category) => (
+
+              <div className={`absolute left-0 right-0 top-[calc(100%+8px)] z-50 flex max-h-[60vh] origin-top flex-col gap-1 overflow-y-auto rounded-[16px] border border-white/10 bg-[#111] p-2 shadow-[0_14px_34px_rgba(0,0,0,0.6)] transition-all duration-300 ${isDropdownOpen ? 'scale-y-100 opacity-100' : 'pointer-events-none scale-y-95 opacity-0'}`}>
                 <button
-                  key={category.id}
                   type="button"
-                  onClick={() => { setActiveCategory(category.id); setIsDropdownOpen(false); }}
-                  className={`flex w-full items-center gap-3 rounded-full px-4 py-3 font-display text-[14px] transition ${activeCategory === category.id ? 'bg-ember text-white' : 'text-white/70 hover:bg-[#222] hover:text-white'}`}
+                  onClick={() => { setActiveCategory('all'); setIsDropdownOpen(false); }}
+                  className={`flex w-full items-center gap-3 rounded-full px-4 py-3 font-display text-[14px] transition ${activeCategory === 'all' ? 'bg-ember text-white' : 'text-white/70 hover:bg-[#222] hover:text-white'}`}
                 >
-                  <CategoryIcon name={category.name} />
-                  {category.name}
+                  <CategoryIcon name="All" />
+                  All Categories
                 </button>
-              ))}
+                {visibleCategories.map((category) => (
+                  <button
+                    key={category.id}
+                    type="button"
+                    onClick={() => { setActiveCategory(category.id); setIsDropdownOpen(false); }}
+                    className={`flex w-full items-center gap-3 rounded-full px-4 py-3 font-display text-[14px] transition ${activeCategory === category.id ? 'bg-ember text-white' : 'text-white/70 hover:bg-[#222] hover:text-white'}`}
+                  >
+                    <CategoryIcon name={category.name || ''} />
+                    {category.name}
+                  </button>
+                ))}
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={() => setIsFilterDrawerOpen(true)}
+              className={`relative inline-flex h-[46px] w-[46px] shrink-0 items-center justify-center rounded-full font-display text-white transition ${activeExtraFilterCount ? 'bg-ember shadow-[0_10px_24px_rgba(255,122,0,0.28)]' : 'bg-[#1b1b1b] hover:bg-[#2b2b2b]'}`}
+              aria-label="Open filters"
+            >
+              <FilterIcon />
+              {activeExtraFilterCount ? <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-white px-1 text-[10px] font-black text-black">{activeExtraFilterCount}</span> : null}
+            </button>
           </div>
 
           {/* Desktop Inline Buttons */}
@@ -340,7 +378,7 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
               <CategoryIcon name="All" />
               All
             </motion.button>
-            {menu.categories.map((category) => (
+            {visibleCategories.map((category) => (
               <motion.button
                 key={category.id}
                 type="button"
@@ -349,12 +387,141 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
                 whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.04 }}
                 whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
               >
-                <CategoryIcon name={category.name} />
+                <CategoryIcon name={category.name || ''} />
                 {category.name}
               </motion.button>
             ))}
+            <motion.button
+              type="button"
+              onClick={() => setIsFilterDrawerOpen(true)}
+              className={`relative inline-flex h-8 w-8 items-center justify-center rounded-full text-white transition ${activeExtraFilterCount ? 'bg-ember shadow-[0_10px_24px_rgba(255,122,0,0.28)]' : 'bg-[#171b1d] hover:bg-ember'}`}
+              whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.04 }}
+              whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
+              aria-label="Open filters"
+            >
+              <FilterIcon />
+              {activeExtraFilterCount ? <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-white px-1 text-[10px] font-black text-black">{activeExtraFilterCount}</span> : null}
+            </motion.button>
           </div>
         </motion.div>
+
+        {isFilterDrawerOpen && typeof document !== 'undefined' ? createPortal(
+          <div className="fixed inset-0 z-[9999]">
+            <button
+              type="button"
+              className="absolute inset-0 bg-black/75"
+              aria-label="Close filters"
+              onClick={() => setIsFilterDrawerOpen(false)}
+            />
+            <motion.aside
+              className="absolute right-0 top-0 flex h-full w-full max-w-[430px] flex-col overflow-hidden border-l border-white/10 bg-[#050707] bg-[url('/app/images/Mask group (18).jpg')] bg-cover bg-center text-white shadow-[-22px_0_60px_rgba(0,0,0,0.72)]"
+              initial={prefersReducedMotion ? false : { x: 420 }}
+              animate={prefersReducedMotion ? undefined : { x: 0 }}
+              exit={prefersReducedMotion ? undefined : { x: 420 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="pointer-events-none absolute inset-0 bg-[#050707]/92" />
+              <div className="relative z-10 flex items-center justify-between border-b border-white/10 px-6 py-5">
+                <h3 className="font-display text-[24px] font-black uppercase leading-none">Filters</h3>
+                <button
+                  type="button"
+                  onClick={() => setIsFilterDrawerOpen(false)}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)] transition hover:bg-ember"
+                  aria-label="Close filters"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-5 w-5">
+                    <path d="M6 6l12 12" />
+                    <path d="M18 6L6 18" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="relative z-10 flex-1 overflow-y-auto px-6 py-6">
+                <div>
+                  <p className="font-display text-[13px] uppercase text-white/45">Categories</p>
+                  <div className="mt-4 grid grid-cols-1 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setActiveCategory('all')}
+                      className={`flex h-11 items-center gap-3 rounded-full px-4 font-display text-[14px] transition ${activeCategory === 'all' ? 'bg-ember text-white' : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'}`}
+                    >
+                      <CategoryIcon name="All" />
+                      All Categories
+                    </button>
+                    {menu.categories.map((category) => (
+                      <button
+                        key={category.id}
+                        type="button"
+                        onClick={() => setActiveCategory(category.id)}
+                        className={`flex h-11 items-center gap-3 rounded-full px-4 font-display text-[14px] transition ${activeCategory === category.id ? 'bg-ember text-white' : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'}`}
+                      >
+                        <CategoryIcon name={category.name || ''} />
+                        {category.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-8">
+                  <p className="font-display text-[13px] uppercase text-white/45">Food Type</p>
+                  <div className="mt-4 grid grid-cols-3 gap-2">
+                    {[
+                      { label: 'All', value: 'all' as const },
+                      { label: 'Veg', value: 'veg' as const },
+                      { label: 'Non Veg', value: 'non_veg' as const },
+                    ].map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setFoodFilter(option.value)}
+                        className={`h-11 rounded-full font-display text-[13px] transition ${foodFilter === option.value ? 'bg-ember text-white' : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'}`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-8">
+                  <p className="font-display text-[13px] uppercase text-white/45">Spicy</p>
+                  <button
+                    type="button"
+                    onClick={() => setSpicyOnly((current) => !current)}
+                    className={`mt-4 flex h-11 w-full items-center justify-between rounded-full px-4 font-display text-[14px] transition ${spicyOnly ? 'bg-ember text-white' : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'}`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Image src="/app/images/chilli.svg" alt="" width={18} height={18} className="h-[18px] w-[18px] object-contain" unoptimized />
+                      Spicy items only
+                    </span>
+                    <span className={`h-5 w-5 rounded-full border ${spicyOnly ? 'border-white bg-white' : 'border-white/35'}`} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="relative z-10 grid grid-cols-2 gap-3 border-t border-white/10 bg-[#050707]/82 p-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveCategory('all');
+                    setFoodFilter('all');
+                    setSpicyOnly(false);
+                  }}
+                  className="h-11 border border-white/20 font-display text-[13px] uppercase text-white transition hover:border-white hover:bg-white hover:text-black"
+                >
+                  Reset
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsFilterDrawerOpen(false)}
+                  className="h-11 bg-ember font-display text-[13px] uppercase text-white transition hover:bg-white hover:text-black"
+                >
+                  Apply
+                </button>
+              </div>
+            </motion.aside>
+          </div>,
+          document.body,
+        ) : null}
 
         {visibleItems.length ? (
           <motion.div
@@ -363,14 +530,14 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
                 ? 'mt-9 flex flex-wrap items-stretch justify-center gap-5 lg:mt-12 lg:gap-6'
                 : 'mx-auto mt-10 grid max-w-[1280px] justify-items-center gap-x-7 gap-y-9 sm:grid-cols-2 lg:grid-cols-4'
             }
-            initial={prefersReducedMotion ? false : { opacity: 0 }}
-            whileInView={prefersReducedMotion ? undefined : { opacity: 1 }}
+            initial={false}
+            animate={{ opacity: 1 }}
             viewport={{ once: false, amount: 0.12 }}
             transition={{ duration: 0.4 }}
             style={prefersReducedMotion ? undefined : { y: gridY }}
           >
             {visibleItems.map((item, index) => (
-              <MenuCard key={item.id} item={item} variant={variant} index={index} />
+              <MenuCard key={item.id} item={item} variant={variant} index={index} disableRevealMotion={disableCardRevealMotion} />
             ))}
           </motion.div>
         ) : null}
@@ -438,17 +605,29 @@ const categoryClass = 'inline-flex h-8 items-center gap-2 rounded-full bg-[#171b
 const categoryActiveClass = 'inline-flex h-8 items-center gap-2 rounded-full bg-ember px-3 font-display text-[12px] text-white shadow-[0_10px_24px_rgba(255,122,0,0.28)] xl:px-4 xl:text-[13px]';
 const fajitaImage = '/app/images/Fajita.png';
 
-function MenuCard({ item, index }: { item: MenuItem; variant: 'home' | 'listing'; index: number }) {
+function FilterIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-[15px] w-[15px]">
+      <path d="M4 6h16" />
+      <path d="M7 12h10" />
+      <path d="M10 18h4" />
+    </svg>
+  );
+}
+
+function MenuCard({ item, index, disableRevealMotion = false }: { item: MenuItem; variant: 'home' | 'listing'; index: number; disableRevealMotion?: boolean }) {
   const prefersReducedMotion = useReducedMotion();
+  const shouldReduceMotion = prefersReducedMotion || disableRevealMotion;
   const { addItem } = useCart();
   const router = useRouter();
   const floatDelay = (index % 4) * 0.35;
+  const hasOfferPrice = Boolean(item.offer_price);
 
   return (
     <motion.article
       className="group relative flex min-h-[452px] w-full overflow-visible rounded-[12px] border border-dashed border-white/20 bg-[#0A0D0F] px-[22px] pb-[21px] pt-[15px] text-white outline-none transition-transform duration-300 hover:-translate-y-1 hover:border-transparent hover:bg-[#f68b24] focus-within:-translate-y-1 focus-within:border-transparent focus-within:bg-[#f68b24] sm:max-w-[280px]"
       initial={
-        prefersReducedMotion
+        shouldReduceMotion
           ? false
           : {
             opacity: 0,
@@ -458,7 +637,8 @@ function MenuCard({ item, index }: { item: MenuItem; variant: 'home' | 'listing'
             filter: 'blur(12px)',
           }
       }
-      whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: [0, -5, 0], rotateX: 0, scale: 1, filter: 'blur(0px)' }}
+      animate={shouldReduceMotion ? { opacity: 1, y: 0, rotateX: 0, scale: 1, filter: 'blur(0px)' } : undefined}
+      whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: [0, -5, 0], rotateX: 0, scale: 1, filter: 'blur(0px)' }}
       whileHover={prefersReducedMotion ? undefined : { y: -8, rotateX: 2.5, scale: 1.012 }}
       viewport={{ once: false, amount: 0.22 }}
       transition={{
@@ -495,7 +675,11 @@ function MenuCard({ item, index }: { item: MenuItem; variant: 'home' | 'listing'
         </motion.div>
         <div className="-mt-[2px]">
           <h3 className="font-display text-[27px] font-black leading-[0.95] tracking-normal">{item.name}</h3>
-          {item.category_name ? <p className="mt-[6px] text-[13px] font-semibold leading-none text-white/65 transition group-hover:text-black group-focus-within:text-black">{item.category_name}</p> : null}
+          <div className="mt-[8px] flex flex-wrap items-center gap-2">
+            {item.category_name ? <p className="text-[13px] font-semibold leading-none text-white/65 transition group-hover:text-black group-focus-within:text-black">{item.category_name}</p> : null}
+            <MenuAttributeBadge type={item.food_type} />
+            {item.spicy ? <SpicyBadge /> : null}
+          </div>
           {item.description ? <p className="mt-[17px] line-clamp-3 max-w-[222px] text-[12px] font-semibold leading-[1.42] text-white/60 transition group-hover:text-black/85 group-focus-within:text-black/85">{item.description}</p> : null}
         </div>
         <div className="mt-auto flex items-center gap-[8px] pt-[20px]">
@@ -513,11 +697,52 @@ function MenuCard({ item, index }: { item: MenuItem; variant: 'home' | 'listing'
           <button type="button" onClick={() => addItem(item)} className="inline-flex h-[38px] w-[38px] items-center justify-center border border-white/75">
             <Image src="/app/images/menu-card-bag.png" alt="" width={15} height={15} className="h-[15px] w-[15px] object-contain" unoptimized />
           </button>
-          <div className="ml-auto font-display text-[27px] font-medium leading-none text-white">{item.price}</div>
+          <div className="ml-auto flex flex-col items-end gap-1 font-display leading-none text-white">
+            {hasOfferPrice ? (
+              <span className="text-[14px] font-medium text-white/45 line-through transition group-hover:text-black/55 group-focus-within:text-black/55">
+                {formatMenuPrice(item.price)}
+              </span>
+            ) : null}
+            <span className="text-[27px] font-medium">
+              {formatMenuPrice(item.offer_price || item.price)}
+            </span>
+          </div>
         </div>
       </div>
     </motion.article>
   );
+}
+
+function MenuAttributeBadge({ type }: { type: MenuItem['food_type'] }) {
+  const isVeg = type === 'veg';
+
+  return (
+    <span
+      className={`inline-flex h-[16px] w-[16px] items-center justify-center border transition ${
+      isVeg
+        ? 'border-[#54c86a]'
+        : 'border-[#ef4444]'
+      }`}
+      title={isVeg ? 'Veg' : 'Non Veg'}
+      aria-label={isVeg ? 'Veg' : 'Non Veg'}
+    >
+      <span className={`h-[7px] w-[7px] rounded-full ${isVeg ? 'bg-[#54c86a]' : 'bg-[#ef4444]'}`} />
+    </span>
+  );
+}
+
+function SpicyBadge() {
+  return (
+    <span className="inline-flex h-[18px] w-[18px] items-center justify-center" title="Spicy" aria-label="Spicy">
+      <Image src="/app/images/chilli.svg" alt="" width={18} height={18} className="h-[18px] w-[18px] object-contain" unoptimized />
+    </span>
+  );
+}
+
+function formatMenuPrice(price: string): string {
+  const numericPrice = Number(price);
+
+  return Number.isFinite(numericPrice) ? numericPrice.toFixed(2) : price;
 }
 
 function FloatingBubbles() {

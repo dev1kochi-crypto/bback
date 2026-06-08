@@ -545,7 +545,7 @@ class MenuController extends Controller
     protected function validateSignatureItem(Request $request): array
     {
         $rules = [
-            'menu_item_id' => ['nullable', 'exists:menu_items,id'],
+            'menu_item_id' => ['required', 'exists:menu_items,id'],
             'image' => $this->imageRules('menus.signature_item_image', ['nullable', 'image']),
             'remove_image' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:1'],
