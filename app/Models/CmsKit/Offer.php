@@ -3,6 +3,7 @@
 namespace App\Models\CmsKit;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Offer extends Model
@@ -10,8 +11,11 @@ class Offer extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'menu_item_id',
         'image',
         'alt_text',
+        'offer_percent',
+        'offer_price',
         'translations',
         'sort_order',
         'status',
@@ -19,9 +23,16 @@ class Offer extends Model
 
     protected $casts = [
         'translations' => 'array',
+        'offer_percent' => 'decimal:2',
+        'offer_price' => 'decimal:2',
         'sort_order' => 'integer',
         'status' => 'boolean',
     ];
+
+    public function menuItem(): BelongsTo
+    {
+        return $this->belongsTo(MenuItem::class);
+    }
 
     public function scopeActive($query)
     {

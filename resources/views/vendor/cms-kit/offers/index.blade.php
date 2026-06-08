@@ -17,6 +17,9 @@
                     <tr>
                         <th style="width:50px;">#</th>
                         <th style="width:120px;">Image</th>
+                        <th>Menu Item</th>
+                        <th style="width:110px;">Offer %</th>
+                        <th style="width:120px;">Offer Price</th>
                         <th>Alt Text</th>
                         <th style="width:90px;">Order</th>
                         <th style="width:90px;" class="text-center">Status</th>
@@ -43,6 +46,9 @@ $(function() {
         columns: [
             {data: 'DT_RowIndex', orderable: false, searchable: false},
             {data: 'image_preview', orderable: false, searchable: false},
+            {data: 'menu_item_text', orderable: false},
+            {data: 'offer_percent_text', name: 'offer_percent'},
+            {data: 'offer_price_text', name: 'offer_price'},
             {data: 'alt_text_value', name: 'alt_text'},
             {data: 'order', orderable: false, searchable: false},
             {data: 'status', orderable: false, searchable: false, className: 'text-center'},

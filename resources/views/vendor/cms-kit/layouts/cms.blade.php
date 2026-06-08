@@ -503,6 +503,44 @@
                 promotion: false
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('form').forEach((form) => {
+                let clickedSubmit = null;
+
+                form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach((button) => {
+                    button.addEventListener('click', () => {
+                        clickedSubmit = button;
+                    });
+                });
+
+                form.addEventListener('submit', (event) => {
+                    if (event.defaultPrevented || form.dataset.submitting === '1' || form.dataset.disableSubmitLoading === '1') {
+                        return;
+                    }
+
+                    form.dataset.submitting = '1';
+
+                    const submitButton = clickedSubmit || form.querySelector('button[type="submit"], input[type="submit"]');
+
+                    if (submitButton) {
+                        submitButton.dataset.originalText = submitButton.tagName === 'INPUT'
+                            ? submitButton.value
+                            : submitButton.innerHTML;
+
+                        if (submitButton.tagName === 'INPUT') {
+                            submitButton.value = 'Please wait...';
+                        } else {
+                            submitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Please wait...';
+                        }
+                    }
+
+                    form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach((button) => {
+                        button.disabled = true;
+                    });
+                });
+            });
+        });
     </script>
     @stack('scripts')
 </body>

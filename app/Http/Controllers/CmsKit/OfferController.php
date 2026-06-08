@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\CmsKit;
 
 use App\Models\CmsKit\Language;
+use App\Models\CmsKit\MenuItem;
 use App\Models\CmsKit\Offer;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -18,12 +19,17 @@ class OfferController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            return DataTables::of(Offer::query()->orderBy('sort_order')->orderBy('id'))
+            return DataTables::of(Offer::query()->with('menuItem')->orderBy('sort_order')->orderBy('id'))
                 ->addIndexColumn()
                 ->addColumn('image_preview', fn (Offer $offer) => $offer->image
                     ? '<img src="' . asset('storage/' . $offer->image) . '" class="img-thumbnail" style="height:52px;">'
-                    : '-')
-                ->addColumn('alt_text_value', fn (Offer $offer) => e($offer->getTranslation('alt_text')))
+                    : ($offer->menuItem?->image
+                        ? '<img src="' . asset('storage/' . $offer->menuItem->image) . '" class="img-thumbnail" style="height:52px;">'
+                        : '-'))
+                ->addColumn('menu_item_text', fn (Offer $offer) => e($offer->menuItem?->getTranslation('name') ?? '-'))
+                ->addColumn('alt_text_value', fn (Offer $offer) => e($offer->getTranslation('alt_text') ?? $offer->menuItem?->getTranslation('image_alt') ?? $offer->menuItem?->getTranslation('name') ?? '-'))
+                ->addColumn('offer_percent_text', fn (Offer $offer) => $offer->offer_percent !== null ? rtrim(rtrim(number_format((float) $offer->offer_percent, 2), '0'), '.') . '%' : '-')
+                ->addColumn('offer_price_text', fn (Offer $offer) => $offer->offer_price !== null ? number_format((float) $offer->offer_price, 2) : '-')
                 ->addColumn('status', fn (Offer $offer) => '<div class="form-check form-switch"><input class="form-check-input toggle-status" type="checkbox" data-id="' . $offer->id . '" ' . ($offer->status ? 'checked' : '') . '></div>')
                 ->addColumn('order', fn (Offer $offer) => '<input type="number" min="1" class="form-control form-control-sm reorder-input" data-id="' . $offer->id . '" value="' . $offer->sort_order . '" style="width:80px;">')
                 ->addColumn('action', fn (Offer $offer) => '<div class="btn-group">'
@@ -40,9 +46,10 @@ class OfferController extends Controller
     public function create()
     {
         $languages = Language::active()->get();
+        $menuItems = MenuItem::active()->with('category')->orderBy('sort_order')->orderBy('id')->get();
         $nextOrder = (Offer::max('sort_order') ?? 0) + 1;
 
-        return view('cms-kit::offers.create', compact('languages', 'nextOrder'));
+        return view('cms-kit::offers.create', compact('languages', 'menuItems', 'nextOrder'));
     }
 
     public function store(Request $request)
@@ -55,7 +62,10 @@ class OfferController extends Controller
         Offer::where('sort_order', '>=', $order)->increment('sort_order');
 
         $payload = [
+            'menu_item_id' => $request->input('menu_item_id'),
             'alt_text' => data_get($translations, "{$defaultLanguage}.alt_text"),
+            'offer_percent' => $request->input('offer_percent'),
+            'offer_price' => $request->input('offer_price'),
             'translations' => $translations,
             'sort_order' => $order,
             'status' => $request->boolean('status'),
@@ -75,8 +85,9 @@ class OfferController extends Controller
     {
         $offer = Offer::findOrFail($id);
         $languages = Language::active()->get();
+        $menuItems = MenuItem::active()->with('category')->orderBy('sort_order')->orderBy('id')->get();
 
-        return view('cms-kit::offers.edit', compact('offer', 'languages'));
+        return view('cms-kit::offers.edit', compact('offer', 'languages', 'menuItems'));
     }
 
     public function update(Request $request, int $id)
@@ -87,7 +98,10 @@ class OfferController extends Controller
         $defaultLanguage = $this->defaultLanguageCode();
 
         $payload = [
+            'menu_item_id' => $request->input('menu_item_id'),
             'alt_text' => data_get($translations, "{$defaultLanguage}.alt_text"),
+            'offer_percent' => $request->input('offer_percent'),
+            'offer_price' => $request->input('offer_price'),
             'translations' => $translations,
             'status' => $request->boolean('status'),
         ];
@@ -157,6 +171,9 @@ class OfferController extends Controller
     protected function validateOffer(Request $request): array
     {
         $rules = [
+            'menu_item_id' => ['nullable', 'exists:menu_items,id'],
+            'offer_percent' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'offer_price' => ['nullable', 'numeric', 'min:0'],
             'image' => $this->imageRules('offers.image', ['nullable', 'image']),
             'remove_image' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:1'],

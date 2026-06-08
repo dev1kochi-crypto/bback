@@ -40,9 +40,11 @@ export interface MenuSignatureSection {
 
 export interface MenuSignatureItem {
   id: number;
+  menu_item_id: number | null;
   image: string | null;
   image_alt: string | null;
   title: string | null;
+  menu_item: Pick<MenuItem, 'id' | 'name' | 'description' | 'price' | 'food_type' | 'spicy'> | null;
   sort_order: number;
 }
 

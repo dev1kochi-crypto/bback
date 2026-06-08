@@ -38,6 +38,7 @@ class MenuController extends Controller
             ->get();
         $signatureItems = MenuSignatureItem::query()
             ->active()
+            ->with('menuItem')
             ->orderBy('sort_order')
             ->orderBy('id')
             ->get();
@@ -106,9 +107,18 @@ class MenuController extends Controller
     {
         return $items->map(fn (MenuSignatureItem $item) => [
             'id' => $item->id,
-            'image' => $item->image ? $this->publicStorageUrl($item->image) : null,
-            'image_alt' => $item->getTranslation('image_alt') ?? $item->image_alt,
-            'title' => $item->getTranslation('title'),
+            'menu_item_id' => $item->menu_item_id,
+            'image' => ($item->image ?: $item->menuItem?->image) ? $this->publicStorageUrl($item->image ?: $item->menuItem->image) : null,
+            'image_alt' => $item->getTranslation('image_alt') ?? $item->image_alt ?? $item->menuItem?->getTranslation('image_alt') ?? $item->menuItem?->image_alt,
+            'title' => $item->getTranslation('title') ?? $item->menuItem?->getTranslation('name'),
+            'menu_item' => $item->menuItem ? [
+                'id' => $item->menuItem->id,
+                'name' => $item->menuItem->getTranslation('name'),
+                'description' => $item->menuItem->getTranslation('description'),
+                'price' => number_format((float) $item->menuItem->price, 2, '.', ''),
+                'food_type' => $item->menuItem->food_type,
+                'spicy' => $item->menuItem->spicy,
+            ] : null,
             'sort_order' => $item->sort_order,
         ])->values();
     }

@@ -3,6 +3,7 @@
 namespace App\Models\CmsKit;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MenuSignatureItem extends Model
@@ -10,6 +11,7 @@ class MenuSignatureItem extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'menu_item_id',
         'image',
         'image_alt',
         'title',
@@ -23,6 +25,11 @@ class MenuSignatureItem extends Model
         'sort_order' => 'integer',
         'status' => 'boolean',
     ];
+
+    public function menuItem(): BelongsTo
+    {
+        return $this->belongsTo(MenuItem::class);
+    }
 
     public function scopeActive($query)
     {
