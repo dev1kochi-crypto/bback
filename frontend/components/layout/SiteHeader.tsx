@@ -173,6 +173,7 @@ export function SiteHeader({ site, activeNavUrl, fixed = true, hideDesktopLogo =
         className={[
           fixed ? 'fixed inset-x-0 top-0 z-[120]' : 'relative z-30',
           'pointer-events-none transition-all duration-500',
+          hideDesktopLogo ? 'inner-page-header' : '',
           isScrolled ? 'scrolled' : '',
         ].join(' ')}
       >
@@ -211,7 +212,7 @@ export function SiteHeader({ site, activeNavUrl, fixed = true, hideDesktopLogo =
               />
             </Link>
 
-            {!hideDesktopLogo ? (
+            {(!hideDesktopLogo || isScrolled) ? (
               <Link href="/" className="site-logo absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center lg:inline-flex">
                 <Image
                   src={absoluteAssetUrl(site.logo ?? '/app/images/logo.svg') ?? '/app/images/logo.svg'}

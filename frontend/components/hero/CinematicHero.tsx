@@ -30,6 +30,8 @@ export function CinematicHero({ banners }: CinematicHeroProps) {
   const [isPaused, setIsPaused] = useState(false);
   const activeBanner = banners[activeIndex];
   const staticTomatoImage = absoluteAssetUrl('/app/images/revslider_h2-tomato 1.png') ?? '/app/images/revslider_h2-tomato 1.png';
+  const staticMushroomImage = absoluteAssetUrl('/app/images/revslider_h2-mushroom 1.png') ?? '/app/images/revslider_h2-mushroom 1.png';
+  const staticMushroomImage2 = absoluteAssetUrl('/app/images/revslider_h2-mushroom 2.png') ?? '/app/images/revslider_h2-mushroom 2.png';
 
   const resolved = useMemo(() => {
     if (!activeBanner) {
@@ -203,7 +205,7 @@ export function CinematicHero({ banners }: CinematicHeroProps) {
           y: (event.clientY / rect.height - 0.5) * -2,
         });
       }}
-      className="relative min-h-screen select-none overflow-hidden bg-charcoal text-cream [--scroll-depth:0]"
+      className="home-hero relative min-h-screen select-none overflow-hidden bg-charcoal text-cream [--scroll-depth:0]"
     >
       {resolved.backgroundImage ? (
         <div className="pointer-events-none absolute inset-0">
@@ -236,8 +238,8 @@ export function CinematicHero({ banners }: CinematicHeroProps) {
         ))}
       </div>
 
-      <div className="pointer-events-none relative z-20 flex min-h-screen flex-col px-5 py-6 sm:px-8 lg:px-12">
-        <div className="relative flex flex-1 items-center justify-center  banner-wrapper">
+      <div className="home-hero__shell pointer-events-none relative z-20 flex min-h-screen flex-col px-5 py-6 sm:px-8 lg:px-12">
+        <div className="home-hero__stage relative flex flex-1 items-center justify-center banner-wrapper">
           <div
             className="pointer-events-auto absolute left-0 top-1/2 z-50 hidden -translate-y-1/2 flex-col gap-4 lg:flex"
             onMouseEnter={() => setIsPaused(true)}
@@ -262,7 +264,7 @@ export function CinematicHero({ banners }: CinematicHeroProps) {
             ))}
           </div>
 
-          <div ref={textRef} className="pointer-events-none absolute inset-x-0 top-[13%] mx-auto h-[76vh] w-full max-w-none text-center lg:top-[13%]">
+          <div ref={textRef} className="home-hero__copy pointer-events-none absolute inset-x-0 top-[13%] mx-auto h-[76vh] w-full max-w-none text-center lg:top-[13%]">
             <div
               className="slide-text hero-copy hero-copy-back hero-back-word absolute inset-x-0 top-[55%] z-[12] px-[3.4vw] font-display font-normal uppercase leading-[0.8] tracking-[0.015em]"
               style={{ fontSize: bottomFontSize }}
@@ -289,9 +291,39 @@ export function CinematicHero({ banners }: CinematicHeroProps) {
             </h1>
           </div>
 
+          {/* Mobile floating decor */}
+          <motion.div
+            className="pointer-events-none absolute left-[2%] top-[18%] z-10 h-14 w-14 opacity-80 md:hidden"
+            animate={{ y: [0, -10, 0], rotate: [0, 6, 0] }}
+            transition={{ duration: 5.2, repeat: Infinity, ease: 'easeInOut' }}
+          >
+            <Image src={staticTomatoImage} alt="" fill sizes="56px" className="object-contain" />
+          </motion.div>
+          <motion.div
+            className="pointer-events-none absolute right-[4%] top-[28%] z-10 h-12 w-12 opacity-75 md:hidden"
+            animate={{ y: [0, 8, 0], rotate: [0, -5, 0] }}
+            transition={{ duration: 4.8, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+          >
+            <Image src={staticMushroomImage} alt="" fill sizes="48px" className="object-contain" />
+          </motion.div>
+          <motion.div
+            className="pointer-events-none absolute bottom-[22%] left-[6%] z-10 h-11 w-11 opacity-70 md:hidden"
+            animate={{ y: [0, -7, 0], x: [0, 4, 0] }}
+            transition={{ duration: 6.1, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+          >
+            <Image src={staticMushroomImage2} alt="" fill sizes="44px" className="object-contain" />
+          </motion.div>
+          <motion.div
+            className="pointer-events-none absolute bottom-[18%] right-[8%] z-10 h-10 w-10 opacity-65 md:hidden"
+            animate={{ y: [0, 9, 0], rotate: [0, -8, 0] }}
+            transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: 1.1 }}
+          >
+            <Image src={staticTomatoImage} alt="" fill sizes="40px" className="object-contain blur-[0.5px]" />
+          </motion.div>
+
           <div
             ref={imageRef}
-            className="hero-food relative z-30 mt-[4.25rem] flex w-full justify-center will-change-transform lg:mt-[5.25rem]"
+            className="home-hero__food hero-food relative z-30 mt-[4.25rem] flex w-full justify-center will-change-transform lg:mt-[5.25rem]"
             style={{
               transform: `translate3d(${pointer.x * 18}px, ${pointer.y * -10}px, 0) scale(${resolved.scale})`,
             }}

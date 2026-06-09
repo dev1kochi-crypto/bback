@@ -403,7 +403,7 @@
                 </nav>
 
                 <div class="d-flex align-items-center gap-3">
-                    <a href="/" target="_blank" class="btn btn-premium btn-view-site btn-sm">
+                    <a href="{{ rtrim((string) (config('services.frontend.url') ?: config('app.url')), '/') }}" target="_blank" rel="noopener noreferrer" class="btn btn-premium btn-view-site btn-sm">
                         <i class="fas fa-external-link-alt me-2"></i> View Site
                     </a>
                     

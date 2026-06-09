@@ -49,12 +49,12 @@ export function CartPageClient() {
   }
 
   return (
-    <main className="relative overflow-hidden bg-[#050505] px-6 py-20 text-white sm:px-10 lg:px-12">
+    <main className="relative overflow-hidden bg-[#050505] px-4 py-14 text-white sm:px-10 sm:py-20 lg:px-12">
       <div className="cinematic-noise pointer-events-none absolute inset-0" />
       <CommercePage className="relative z-[2] mx-auto grid max-w-[1180px] gap-8 lg:grid-cols-[1fr_360px]">
         <section>
-          <div className="mb-5 flex items-center justify-between font-body text-[13px] text-white/62">
-            <label className="inline-flex items-center gap-2">
+          <div className="mb-4 flex items-center justify-between gap-4 font-body text-[12px] text-white/70 sm:mb-5 sm:text-[13px]">
+            <label className="inline-flex min-w-0 items-center gap-2">
               <input
                 type="checkbox"
                 checked={allSelected}
@@ -63,31 +63,31 @@ export function CartPageClient() {
               />
               Select All Items
             </label>
-            {cart.items.length ? <button type="button" onClick={clearCart} className="text-red-400">Clear All Items</button> : null}
+            {cart.items.length ? <button type="button" onClick={clearCart} className="shrink-0 text-red-400">Clear All Items</button> : null}
           </div>
-          <CommerceStagger className="space-y-3">
+          <CommerceStagger className="space-y-2.5 sm:space-y-3">
             {cart.items.map((item) => (
-              <CommerceItem key={item.menu_item_id} className={`grid items-center gap-4 rounded-[6px] border p-4 transition sm:grid-cols-[24px_80px_1fr_110px_90px] ${item.selected === false ? 'border-white/8 bg-black/15 opacity-60' : 'border-white/12 bg-black/30'}`}>
+              <CommerceItem key={item.menu_item_id} className={`relative grid grid-cols-[64px_minmax(0,1fr)] items-center gap-x-3 gap-y-2.5 rounded-[6px] border p-3 transition sm:grid-cols-[24px_80px_1fr_110px_90px] sm:gap-4 sm:p-4 ${item.selected === false ? 'border-white/8 bg-black/15 opacity-60' : 'border-white/12 bg-black/30'}`}>
                 <input
                   type="checkbox"
                   checked={item.selected !== false}
                   onChange={(event) => toggleItemSelected(item.menu_item_id, event.target.checked)}
-                  className="accent-ember"
+                  className="absolute right-3 top-3 accent-ember sm:static"
                 />
-                <div className="relative h-[70px] w-[80px]">
+                <div className="relative h-[58px] w-[64px] sm:h-[70px] sm:w-[80px]">
                   {item.image ? <Image src={item.image} alt={item.name} fill sizes="80px" className="object-contain" /> : null}
                 </div>
-                <div>
-                  <h2 className="font-display text-[20px] font-semibold">{item.name}</h2>
-                  <p className="font-body text-[12px] text-white/42">{item.category_name}</p>
-                  <button type="button" onClick={() => removeItem(item.menu_item_id)} className="mt-2 font-body text-[11px] font-semibold text-red-400">Delete item</button>
+                <div className="min-w-0 pr-7 sm:pr-0">
+                  <h2 className="font-display text-[17px] font-semibold leading-tight sm:text-[20px]">{item.name}</h2>
+                  <p className="mt-0.5 font-body text-[11px] text-white/42 sm:text-[12px]">{item.category_name}</p>
+                  <button type="button" onClick={() => removeItem(item.menu_item_id)} className="mt-1 font-body text-[11px] font-semibold text-red-400 sm:mt-2">Delete item</button>
                 </div>
-                <div className="flex items-center gap-3">
-                  <button type="button" onClick={() => updateQuantity(item.menu_item_id, item.quantity + 1)} className="grid h-7 w-7 place-items-center rounded-full bg-white/12">+</button>
-                  <span className="font-display text-[18px]">{item.quantity}</span>
-                  <button type="button" onClick={() => item.quantity > 1 ? updateQuantity(item.menu_item_id, item.quantity - 1) : removeItem(item.menu_item_id)} className="grid h-7 w-7 place-items-center rounded-full bg-white/12">-</button>
+                <div className="col-span-2 flex items-center gap-3 border-t border-white/10 pt-2.5 sm:col-auto sm:border-0 sm:pt-0">
+                  <button type="button" onClick={() => updateQuantity(item.menu_item_id, item.quantity + 1)} className="grid h-7 w-7 place-items-center rounded-full bg-white/12 text-[16px] sm:h-7 sm:w-7">+</button>
+                  <span className="min-w-[18px] text-center font-display text-[18px]">{item.quantity}</span>
+                  <button type="button" onClick={() => item.quantity > 1 ? updateQuantity(item.menu_item_id, item.quantity - 1) : removeItem(item.menu_item_id)} className="grid h-7 w-7 place-items-center rounded-full bg-white/12 text-[16px] sm:h-7 sm:w-7">-</button>
                 </div>
-                <div className="text-right font-display text-[23px] font-semibold">{item.line_total}</div>
+                <div className="absolute bottom-3 right-3 font-display text-[21px] font-semibold sm:static sm:text-right sm:text-[23px]">{item.line_total}</div>
               </CommerceItem>
             ))}
             {!cart.items.length ? (
@@ -98,7 +98,7 @@ export function CartPageClient() {
             ) : null}
           </CommerceStagger>
         </section>
-        <CommercePanel className="h-fit rounded-[8px] bg-[#101516] p-6">
+        <CommercePanel className="h-fit rounded-[8px] bg-[#101516] p-5 sm:p-6">
           <h2 className="font-display text-[24px] font-semibold">Order Summary</h2>
           <div className="mt-5 space-y-3 border-b border-white/10 pb-4 font-body text-[13px]">
             <div className="flex justify-between"><span>Products Amount</span><span>{cart.subtotal} GEL</span></div>

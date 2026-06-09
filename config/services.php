@@ -68,7 +68,7 @@ return [
     ],
 
     'frontend' => [
-        'url' => env('FRONTEND_URL'),
+        'url' => env('WEB_URL', env('FRONTEND_URL')),
         'revalidate_secret' => env('FRONTEND_REVALIDATE_SECRET'),
     ],
 ];

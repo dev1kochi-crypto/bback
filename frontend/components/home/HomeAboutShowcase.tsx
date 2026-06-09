@@ -18,10 +18,74 @@ const assets = {
   tomato: absoluteAssetUrl('/app/images/revslider_h2-tomato 1.png') ?? '/app/images/revslider_h2-tomato 1.png',
   tomatoes: absoluteAssetUrl('/app/images/tomates-cerise 1.png') ?? '/app/images/tomates-cerise 1.png',
   leaf: absoluteAssetUrl('/app/images/leaf 1.png') ?? '/app/images/leaf 1.png',
+  mushroom: absoluteAssetUrl('/app/images/revslider_h2-mushroom 1.png') ?? '/app/images/revslider_h2-mushroom 1.png',
+  mushroom2: absoluteAssetUrl('/app/images/revslider_h2-mushroom 2.png') ?? '/app/images/revslider_h2-mushroom 2.png',
 };
 
 interface HomeAboutShowcaseProps {
   about: AboutUsContent | null;
+}
+
+interface AboutCopyProps {
+  line1: string;
+  line2: string;
+  description: string;
+  buttonText: string;
+  buttonUrl: string;
+  variant: 'mobile' | 'desktop';
+}
+
+function AboutCopy({ line1, line2, description, buttonText, buttonUrl, variant }: AboutCopyProps) {
+  const isMobile = variant === 'mobile';
+
+  return (
+    <>
+      <p
+        className={
+          isMobile
+            ? 'font-display text-[15px] leading-none text-[#8f8f8f]'
+            : 'font-display text-[20px] leading-none text-[#8f8f8f] lg:text-[16px]'
+        }
+      >
+        {line1}
+      </p>
+      <h2
+        className={
+          isMobile
+            ? 'mt-2 font-display text-[clamp(2.15rem,9.5vw,2.85rem)] uppercase leading-[0.92] text-white'
+            : 'mt-4 font-display text-[clamp(4.2rem,14vw,7.6rem)] uppercase leading-[0.88] text-white lg:mt-3 lg:text-[76px] xl:text-[88px]'
+        }
+      >
+        {line2}
+      </h2>
+      <div
+        className={
+          isMobile
+            ? 'mx-auto mt-3 h-[4px] w-[min(72%,11rem)] origin-center -skew-x-[34deg] bg-[#f58214] [clip-path:polygon(4%_38%,100%_0,96%_60%,0_100%)]'
+            : 'mt-[18px] h-[5px] w-[258px] origin-left -skew-x-[34deg] bg-[#f58214] lg:ml-[148px] lg:mt-[16px] [clip-path:polygon(4%_38%,100%_0,96%_60%,0_100%)]'
+        }
+      />
+      <p
+        className={
+          isMobile
+            ? 'relative z-10 mt-4 text-[14px] leading-[1.7] text-[#dfdfdf]'
+            : 'relative z-10 mt-[32px] max-w-[420px] text-[15.5px] leading-[1.65] text-[#dfdfdf] [text-shadow:0_2px_4px_rgba(0,0,0,0.8)] lg:mt-[44px] lg:max-w-[390px] lg:text-[15px] lg:leading-[1.75] lg:text-[#9f9f9f] lg:[text-shadow:none]'
+        }
+      >
+        {description}
+      </p>
+      <a
+        href={buttonUrl}
+        className={
+          isMobile
+            ? 'relative z-10 mt-5 inline-flex h-[44px] min-w-[120px] items-center justify-center border border-white/75 bg-transparent px-4 font-display text-[18px] leading-none text-white transition hover:border-[#f58214] hover:bg-[#f58214] hover:text-black'
+            : 'relative z-10 mt-[36px] inline-flex h-[50px] min-w-[130px] items-center justify-center border border-white/75 bg-transparent px-5 font-display text-[22px] leading-none text-white transition hover:border-[#f58214] hover:bg-[#f58214] hover:text-black lg:mt-[34px] lg:h-[42px] lg:min-w-[110px] lg:px-4 lg:text-[17px]'
+        }
+      >
+        {buttonText}
+      </a>
+    </>
+  );
 }
 
 export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
@@ -49,16 +113,110 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
           y: (event.clientY / rect.height - 0.5) * 2,
         });
       }}
-      className="relative isolate min-h-[760px] overflow-hidden bg-[#050505] px-5 py-24 text-white sm:px-8 lg:h-[760px] lg:min-h-0 lg:px-0 lg:py-0 xl:h-[820px]"
+      className="relative isolate overflow-hidden bg-[#050505] text-white lg:h-[760px] xl:h-[820px]"
     >
       <div className="absolute inset-0 bg-[#050505]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_76%_36%,rgba(255,255,255,0.07),transparent_30%),radial-gradient(circle_at_16%_50%,rgba(0,0,0,0.75),transparent_36%)]" />
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-[-42px] z-30 h-[150px] opacity-95 lg:h-[170px]">
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-14 opacity-95 sm:h-16 lg:bottom-[-42px] lg:h-[170px]">
         <Image src={assets.bottomTexture} alt="" fill sizes="100vw" className="object-cover object-bottom" />
       </div>
 
-      <div className="relative h-full min-h-[620px] w-full lg:min-h-0">
+      {/* Mobile layout */}
+      <div className="relative z-10 px-5 pb-10 pt-8 lg:hidden">
+        <div className="relative mx-auto max-w-[22rem]">
+          <motion.div
+            className="relative z-20 px-2 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.35 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          >
+            <AboutCopy
+              line1={line1}
+              line2={line2}
+              description={description}
+              buttonText={buttonText}
+              buttonUrl={buttonUrl}
+              variant="mobile"
+            />
+          </motion.div>
+
+          <div className="pointer-events-none relative mt-4">
+            <div className="flex items-end justify-between gap-2">
+              <motion.div
+                className="relative h-[5.25rem] w-[5.75rem] shrink-0"
+                animate={{ y: [0, 8, 0], rotate: [0, -1.4, 0] }}
+                transition={{ duration: 7.5, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <Image src={assets.pizza} alt="Pizza" fill sizes="92px" className="object-contain object-bottom drop-shadow-[0_8px_18px_rgba(0,0,0,0.55)]" />
+              </motion.div>
+
+              <div className="flex flex-1 items-end justify-center gap-2.5 pb-1">
+                <motion.div
+                  className="relative h-[3.25rem] w-[3.25rem]"
+                  animate={{ y: [0, 6, 0], rotate: [0, -6, 0] }}
+                  transition={{ duration: 4.9, repeat: Infinity, ease: 'easeInOut', delay: 0.3 }}
+                >
+                  <Image src={assets.mushroom} alt="" fill sizes="52px" className="object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.45)]" />
+                </motion.div>
+
+                <motion.div
+                  className="relative h-[3rem] w-[3rem]"
+                  animate={{ y: [0, -6, 0], x: [0, 3, 0] }}
+                  transition={{ duration: 5.8, repeat: Infinity, ease: 'easeInOut', delay: 0.9 }}
+                >
+                  <Image src={assets.mushroom2} alt="" fill sizes="48px" className="object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.45)]" />
+                </motion.div>
+
+                <motion.div
+                  className="relative h-[2.75rem] w-[3.5rem]"
+                  animate={{ y: [0, -5, 0], rotate: [0, 3, 0] }}
+                  transition={{ duration: 6.2, repeat: Infinity, ease: 'easeInOut', delay: 0.6 }}
+                >
+                  <Image src={assets.tomatoes} alt="" fill sizes="56px" className="object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.45)]" />
+                </motion.div>
+
+                <motion.div
+                  className="relative h-[2.75rem] w-[2.75rem]"
+                  animate={{ y: [0, -7, 0], rotate: [0, 6, 0] }}
+                  transition={{ duration: 5.9, repeat: Infinity, ease: 'easeInOut', delay: 1.1 }}
+                >
+                  <Image src={assets.leaf} alt="" fill sizes="44px" className="object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.45)]" />
+                </motion.div>
+              </div>
+
+              <motion.div
+                className="relative h-[4.75rem] w-[2.75rem] shrink-0"
+                animate={{ y: [0, -9, 0], rotate: [0, -2, 0] }}
+                transition={{ duration: 6.9, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+              >
+                <Image src={assets.friesBottom} alt="" fill sizes="44px" className="scale-x-[-1] object-contain object-bottom drop-shadow-[0_6px_14px_rgba(0,0,0,0.5)]" />
+              </motion.div>
+            </div>
+
+            <div className="mt-2 flex items-center justify-center gap-4 opacity-80">
+              <motion.div
+                className="relative h-[2rem] w-[3.5rem]"
+                animate={{ y: [0, -4, 0], opacity: [0.72, 0.92, 0.72] }}
+                transition={{ duration: 6.8, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <Image src={assets.sketchSmall} alt="" fill sizes="56px" className="object-contain" />
+              </motion.div>
+              <motion.div
+                className="relative h-[2.25rem] w-[4rem]"
+                animate={{ y: [0, 5, 0], rotate: [0, -2, 0] }}
+                transition={{ duration: 7.4, repeat: Infinity, ease: 'easeInOut', delay: 0.7 }}
+              >
+                <Image src={assets.sketchLarge} alt="" fill sizes="64px" className="object-contain" />
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop layout — unchanged */}
+      <div className="relative hidden h-full min-h-[620px] w-full lg:block lg:min-h-0">
         <motion.div
           className="pointer-events-none absolute -left-[80px] bottom-[20px] z-20 h-[280px] w-[220px] sm:-left-[120px] sm:bottom-[92px] sm:h-[530px] sm:w-[412px] lg:-left-[90px] lg:bottom-[96px] lg:h-[560px] lg:w-[436px] xl:-left-[64px] xl:h-[620px] xl:w-[482px]"
           animate={{ y: [0, 12, 0], rotate: [0, -1.4, 0] }}
@@ -74,15 +232,6 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
           transition={{ duration: 6.4, repeat: Infinity, ease: 'easeInOut' }}
         >
           <Image src={assets.friesTop} alt="" fill sizes="254px" className="object-contain object-top" />
-        </motion.div>
-
-        <motion.div
-          className="pointer-events-none absolute -left-[24px] bottom-[42px] z-20 h-[210px] w-[72px] scale-x-[-1] sm:h-[260px] sm:w-[88px] lg:bottom-[54px] lg:h-[280px] lg:w-[94px]"
-          animate={{ y: [0, -10, 0], rotate: [0, -2, 0] }}
-          transition={{ duration: 6.9, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          {/* <Image src={assets.pizza} alt="" fill sizes="756px" className="object-contain object-top" /> */}
-          <img src={assets.pizza} alt="" className="object-contain object-top" />
         </motion.div>
 
         <motion.div
@@ -116,16 +265,14 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
           viewport={{ once: true, amount: 0.35 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
         >
-          <p className="font-display text-[20px] leading-none text-[#8f8f8f] lg:text-[16px]">{line1}</p>
-          <h2 className="mt-4 font-display text-[clamp(4.2rem,14vw,7.6rem)] uppercase leading-[0.88] text-white lg:mt-3 lg:text-[76px] xl:text-[88px]">{line2}</h2>
-          <div className="mt-[18px] h-[5px] w-[258px] origin-left -skew-x-[34deg] bg-[#f58214] lg:ml-[148px] lg:mt-[16px] [clip-path:polygon(4%_38%,100%_0,96%_60%,0_100%)]" />
-          <p className="mt-[32px] max-w-[420px] text-[15.5px] leading-[1.65] text-[#dfdfdf] [text-shadow:0_2px_4px_rgba(0,0,0,0.8)] lg:[text-shadow:none] lg:text-[#9f9f9f] lg:mt-[44px] lg:max-w-[390px] lg:text-[15px] lg:leading-[1.75] relative z-10">{description}</p>
-          <a
-            href={buttonUrl}
-            className="mt-[36px] inline-flex h-[50px] min-w-[130px] items-center justify-center border border-white/75 bg-transparent px-5 font-display text-[22px] leading-none text-white transition hover:border-[#f58214] hover:bg-[#f58214] hover:text-black lg:mt-[34px] lg:h-[42px] lg:min-w-[110px] lg:px-4 lg:text-[17px] relative z-10"
-          >
-            {buttonText}
-          </a>
+          <AboutCopy
+            line1={line1}
+            line2={line2}
+            description={description}
+            buttonText={buttonText}
+            buttonUrl={buttonUrl}
+            variant="desktop"
+          />
         </motion.div>
 
         <motion.div
@@ -137,7 +284,7 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
         </motion.div>
 
         <motion.div
-          className="pointer-events-none absolute -right-[120px] top-[20px] z-20 h-[240px] w-[300px] sm:right-[-190px] sm:top-[120px] sm:h-[455px] sm:w-[568px] md:right-[-156px] md:top-[96px] lg:right-[-136px] lg:top-[92px] lg:h-[570px] lg:w-[712px] xl:right-[-82px] xl:top-[84px] xl:h-[650px] xl:w-[812px]"
+          className="home-about-showcase__burger pointer-events-none absolute -right-[120px] top-[20px] z-20 h-[240px] w-[300px] sm:right-[-190px] sm:top-[120px] sm:h-[455px] sm:w-[568px] md:right-[-156px] md:top-[96px] lg:right-[-136px] lg:top-[92px] lg:h-[570px] lg:w-[712px] xl:right-[-82px] xl:top-[84px] xl:h-[650px] xl:w-[812px]"
           animate={{ y: [0, -10, 0], rotate: [0, 0.6, 0] }}
           transition={{ duration: 7.6, repeat: Infinity, ease: 'easeInOut' }}
           style={{ x: pointer.x * 12 }}
@@ -152,7 +299,6 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
         >
           <Image src={assets.tomato} alt="" fill sizes="132px" className="object-contain" />
         </motion.div>
-
       </div>
     </section>
   );

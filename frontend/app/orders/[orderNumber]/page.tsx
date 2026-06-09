@@ -14,7 +14,7 @@ export async function generateMetadata() {
 
 export default function OrderDetailPage() {
   return (
-    <SiteShell pageBanner={{ title: 'Order Details' }}>
+    <SiteShell pageBanner={{ title: 'Order Details', compact: true }}>
       <OrderDetailClient />
     </SiteShell>
   );

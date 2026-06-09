@@ -197,9 +197,9 @@ export function CheckoutAddressClient() {
 
   if (isHydrated && !selectedItems.length) {
     return (
-      <main className="relative overflow-hidden bg-black px-6 py-20 text-white sm:px-8 lg:px-10">
-        <div className="relative z-[2] mx-auto max-w-[760px] rounded-[8px] border border-white/12 bg-[#101516] p-8 text-center">
-          <h1 className="font-display text-[42px] font-black uppercase leading-none">Your Cart Is Empty</h1>
+      <main className="relative overflow-hidden bg-black px-4 py-14 text-white sm:px-8 sm:py-20 lg:px-10">
+        <div className="relative z-[2] mx-auto max-w-[760px] rounded-[8px] border border-white/12 bg-[#101516] p-5 text-center sm:p-8">
+          <h1 className="font-display text-[34px] font-black uppercase leading-none sm:text-[42px]">Your Cart Is Empty</h1>
           <p className="mx-auto mt-4 max-w-[520px] font-body text-[15px] font-normal leading-[1.7] text-white/60">
             Add items to your cart from the menu, then continue to checkout.
           </p>
@@ -217,15 +217,15 @@ export function CheckoutAddressClient() {
   }
 
   return (
-    <main className="relative overflow-hidden bg-black px-6 py-14 text-white sm:px-8 lg:px-10 lg:py-16">
+    <main className="relative overflow-hidden bg-black px-4 py-10 text-white sm:px-8 sm:py-14 lg:px-10 lg:py-16">
       <CommercePage className="relative z-[2] mx-auto grid max-w-[1180px] gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <CommercePanel className="rounded-[8px] border border-white/12 bg-[#0a0a0a] p-6 sm:p-8">
+        <CommercePanel className="rounded-[8px] border border-white/12 bg-[#0a0a0a] p-5 sm:p-8">
         <form onSubmit={handleContinue} className="contents">
           <Link href="/cart" className="mb-6 inline-flex h-10 items-center border border-white/15 px-4 font-body text-[12px] font-bold uppercase text-white/70 transition hover:border-ember hover:text-ember">
             Back to Cart
           </Link>
 
-          <h1 className="font-display text-[44px] font-black uppercase leading-none text-white">Delivery Address</h1>
+          <h1 className="font-display text-[36px] font-black uppercase leading-none text-white sm:text-[44px]">Delivery Address</h1>
           <p className="mt-3 max-w-[680px] font-body text-[14px] font-normal leading-[1.7] text-white/58">
             Add your delivery details. Use current location to pin coordinates, then confirm the readable address.
           </p>

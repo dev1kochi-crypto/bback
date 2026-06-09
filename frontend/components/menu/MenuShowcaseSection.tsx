@@ -4,7 +4,7 @@ import type { MenuPayload, MenuItem } from '@/types/menu';
 import { useCart } from '@/components/cart/CartProvider';
 import { Stars } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -106,11 +106,25 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
   const [spicyOnly, setSpicyOnly] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-  const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
+    return window.matchMedia('(max-width: 639px)').matches;
+  });
+  const [homePageSize, setHomePageSize] = useState(() => {
+    if (typeof window === 'undefined') {
+      return 4;
+    }
+
+    return window.matchMedia('(max-width: 1023px)').matches ? 1 : 4;
+  });
   const [homePage, setHomePage] = useState(0);
   const [visibleCount, setVisibleCount] = useState(16);
   const sectionRef = useRef<HTMLElement | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const homeSliderTouchStartX = useRef(0);
   const prefersReducedMotion = useReducedMotion();
   const disableCardRevealMotion = Boolean(prefersReducedMotion || isMobileViewport);
   const cursorX = useMotionValue(0);
@@ -123,7 +137,8 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
   const orbY = useTransform(scrollYProgress, [0, 1], [70, -70]);
   const gridY = useTransform(scrollYProgress, [0, 1], [18, -18]);
   const hasData = Boolean(menu.section && menu.categories.length && menu.items.length && (variant !== 'home' || menu.section.display_home));
-  const pageSize = variant === 'home' ? 4 : 16;
+  const pageSize = variant === 'home' ? homePageSize : 16;
+  const isHomeSingleSlide = variant === 'home' && homePageSize === 1;
   const visibleCategories = useMemo(() => menu.categories.slice(0, 5), [menu.categories]);
   const activeCategoryLabel = activeCategory === 'all'
     ? 'All Categories'
@@ -158,7 +173,7 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
   useEffect(() => {
     setHomePage(0);
     setVisibleCount(16);
-  }, [activeCategory, foodFilter, spicyOnly, variant]);
+  }, [activeCategory, foodFilter, spicyOnly, variant, homePageSize]);
 
   useEffect(() => {
     const query = window.matchMedia('(max-width: 639px)');
@@ -169,6 +184,44 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
 
     return () => query.removeEventListener('change', syncMobileViewport);
   }, []);
+
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 1023px)');
+    const syncHomePageSize = () => setHomePageSize(query.matches ? 1 : 4);
+
+    syncHomePageSize();
+    query.addEventListener('change', syncHomePageSize);
+
+    return () => query.removeEventListener('change', syncHomePageSize);
+  }, []);
+
+  const goToHomePage = (page: number) => {
+    setHomePage((page + totalPages) % totalPages);
+  };
+
+  const handleHomeSliderTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    homeSliderTouchStartX.current = event.touches[0]?.clientX ?? 0;
+  };
+
+  const handleHomeSliderTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    if (!isHomeSingleSlide || totalPages <= 1) {
+      return;
+    }
+
+    const touchEndX = event.changedTouches[0]?.clientX ?? 0;
+    const deltaX = homeSliderTouchStartX.current - touchEndX;
+
+    if (Math.abs(deltaX) < 48) {
+      return;
+    }
+
+    if (deltaX > 0) {
+      goToHomePage(homePage + 1);
+      return;
+    }
+
+    goToHomePage(homePage - 1);
+  };
 
   useEffect(() => {
     if (variant !== 'listing' || visibleCount >= filteredItems.length) {
@@ -215,7 +268,7 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
     <motion.section
       ref={sectionRef}
       id="menu"
-      className={`special-menu relative overflow-x-clip bg-[#050505] px-6 pb-[92px] text-white sm:px-10 lg:px-16 ${variant === 'home' ? 'pt-[170px] sm:pt-[190px] lg:pb-[120px] lg:pt-[245px]' : 'py-[92px] lg:py-[120px]'
+      className={`special-menu relative overflow-x-clip bg-[#050505] px-5 pb-[92px] text-white sm:px-10 lg:overflow-x-visible lg:px-16 ${variant === 'home' ? 'pt-12 sm:pt-[190px] lg:pb-[120px] lg:pt-[245px]' : 'py-[56px] sm:py-[76px] lg:py-[120px]'
         }`}
       onPointerMove={prefersReducedMotion ? undefined : handlePointerMove}
     >
@@ -263,7 +316,7 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
 
       {variant === 'home' ? (
         <motion.div
-          className="pointer-events-none absolute right-[0px] top-[64px] z-20 hidden h-[250px] w-[470px] lg:block  xl:top-[68px] xl:h-[300px] xl:w-[560px]"
+          className="special-menu__fajita pointer-events-none absolute right-[0px] top-[64px] z-20 hidden h-[250px] w-[470px] lg:block xl:top-[68px] xl:h-[300px] xl:w-[560px]"
           initial={prefersReducedMotion ? false : { opacity: 0, x: 72, y: -18, rotate: -5, filter: 'blur(8px)' }}
           whileInView={prefersReducedMotion ? undefined : { opacity: 1, x: 0, y: 0, rotate: 0, filter: 'blur(0px)' }}
           animate={prefersReducedMotion ? undefined : { y: [0, -10, 0], rotate: [0, 1.2, 0] }}
@@ -290,12 +343,12 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
           style={prefersReducedMotion ? undefined : { y: titleY }}
         >
           {menu.section?.line_1 ? <p className="font-display text-[14px] text-white/45">{menu.section.line_1}</p> : null}
-          <h2 className="mt-2 font-display text-[clamp(3rem,4.4vw,5.1rem)] font-black uppercase leading-none text-white">
+          <h2 className="mt-2 font-display text-[clamp(2.45rem,4.4vw,5.1rem)] font-black uppercase leading-none text-white">
             {title}
           </h2>
           <div className="mx-auto mt-5 h-[10px] w-[170px] translate-x-[64px] bg-[url('/app/images/Vector-2.png')] bg-contain bg-center bg-no-repeat max-sm:translate-x-0" />
           {description ? (
-            <p className="mx-auto mt-7 max-w-[860px] text-[15px] leading-[1.7] text-[#9b9b9b] sm:text-[17px]">
+            <p className="mx-auto mt-5 max-w-[860px] text-[14px] leading-[1.65] text-[#9b9b9b] sm:mt-7 sm:text-[17px]">
               {description}
             </p>
           ) : null}
@@ -524,29 +577,66 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
         ) : null}
 
         {visibleItems.length ? (
-          <motion.div
-            className={
-              variant === 'home'
-                ? 'mt-9 flex flex-wrap items-stretch justify-center gap-5 lg:mt-12 lg:gap-6'
-                : 'mx-auto mt-10 grid max-w-[1280px] justify-items-center gap-x-7 gap-y-9 sm:grid-cols-2 lg:grid-cols-4'
-            }
-            initial={false}
-            animate={{ opacity: 1 }}
-            viewport={{ once: false, amount: 0.12 }}
-            transition={{ duration: 0.4 }}
-            style={prefersReducedMotion ? undefined : { y: gridY }}
-          >
-            {visibleItems.map((item, index) => (
-              <MenuCard key={item.id} item={item} variant={variant} index={index} disableRevealMotion={disableCardRevealMotion} />
-            ))}
-          </motion.div>
+          isHomeSingleSlide ? (
+            <div
+              className="home-menu-slider mx-auto mt-9 w-full max-w-[320px] touch-pan-y lg:mt-12"
+              onTouchStart={handleHomeSliderTouchStart}
+              onTouchEnd={handleHomeSliderTouchEnd}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={`${homePage}-${visibleItems[0]?.id}`}
+                  className="flex justify-center"
+                  initial={prefersReducedMotion ? false : { opacity: 0, x: 36 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={prefersReducedMotion ? undefined : { opacity: 0, x: -36 }}
+                  transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <MenuCard
+                    item={visibleItems[0]}
+                    variant={variant}
+                    index={0}
+                    disableRevealMotion={disableCardRevealMotion}
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          ) : (
+            <motion.div
+              className={
+                variant === 'home'
+                  ? 'mt-9 flex flex-wrap items-stretch justify-center gap-5 lg:mt-12 lg:gap-6'
+                  : 'mx-auto mt-10 grid max-w-[1280px] justify-items-center gap-x-7 gap-y-9 max-sm:mt-6 max-sm:gap-y-3 max-sm:px-4 sm:grid-cols-2 lg:grid-cols-4'
+              }
+              initial={false}
+              animate={{ opacity: 1 }}
+              viewport={{ once: false, amount: 0.12 }}
+              transition={{ duration: 0.4 }}
+              style={prefersReducedMotion || variant === 'listing' ? undefined : { y: gridY }}
+            >
+              {visibleItems.map((item, index) => (
+                variant === 'listing' ? (
+                  <div key={item.id} className="w-full">
+                    <div className="sm:hidden">
+                      <MenuListingMobileCard item={item} />
+                    </div>
+                    <div className="hidden sm:block">
+                      <MenuCard item={item} variant={variant} index={index} disableRevealMotion={disableCardRevealMotion} />
+                    </div>
+                  </div>
+                ) : (
+                  <MenuCard key={item.id} item={item} variant={variant} index={index} disableRevealMotion={disableCardRevealMotion} />
+                )
+              ))}
+            </motion.div>
+          )
         ) : null}
 
         {variant === 'home' && totalPages > 1 ? (
-          <div className="mt-12 flex items-center justify-center gap-[28px]">
+          <div className={`flex items-center justify-center ${isHomeSingleSlide ? 'mt-8 gap-10' : 'mt-12 gap-[28px]'}`}>
             <motion.button
               type="button"
-              onClick={() => setHomePage((page) => (page - 1 + totalPages) % totalPages)}
+              onClick={() => goToHomePage(homePage - 1)}
               className="inline-flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#1c1c1c] text-white transition hover:bg-ember"
               aria-label="Previous menu items"
               whileHover={prefersReducedMotion ? undefined : { x: -2, scale: 1.05 }}
@@ -556,25 +646,27 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
                 <path d="M17.3644 5.93621C17.5519 6.12374 17.6572 6.37805 17.6572 6.64321C17.6572 6.90838 17.5519 7.16268 17.3644 7.35021L11.7074 13.0072C11.6152 13.1027 11.5048 13.1789 11.3828 13.2313C11.2608 13.2837 11.1296 13.3113 10.9968 13.3125C10.8641 13.3136 10.7324 13.2883 10.6095 13.238C10.4866 13.1878 10.3749 13.1135 10.281 13.0196C10.1872 12.9257 10.1129 12.8141 10.0626 12.6912C10.0123 12.5683 9.98704 12.4366 9.98819 12.3038C9.98934 12.171 10.0169 12.0398 10.0693 11.9178C10.1217 11.7958 10.1979 11.6855 10.2934 11.5932L14.2434 7.64321L1.00044 7.64321C0.735224 7.64321 0.480869 7.53785 0.293333 7.35032C0.105797 7.16278 0.000440598 6.90843 0.000440598 6.64321C0.000440598 6.378 0.105797 6.12364 0.293333 5.93611C0.480869 5.74857 0.735224 5.64321 1.00044 5.64321L14.2434 5.64321L10.2934 1.69321C10.1113 1.50461 10.0105 1.25201 10.0128 0.989811C10.015 0.727614 10.1202 0.476801 10.3056 0.291393C10.491 0.105986 10.7418 0.000815392 11.004 -0.00146294C11.2662 -0.00374126 11.5188 0.0970526 11.7074 0.279211L17.3644 5.93621Z" fill="currentColor" />
               </svg>
             </motion.button>
-            <div className="flex items-center gap-[14px]">
-              {Array.from({ length: totalPages }).map((_, index) => (
-                <motion.button
-                  key={index}
-                  type="button"
-                  onClick={() => setHomePage(index)}
-                  className={`flex h-[24px] w-[24px] items-center justify-center rounded-full border transition-colors ${homePage === index ? 'border-ember' : 'border-white/20 hover:border-white/40'
-                    }`}
-                  aria-label={`Show menu page ${index + 1}`}
-                  whileHover={prefersReducedMotion ? undefined : { scale: 1.1 }}
-                  whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
-                >
-                  <span className={`block h-[12px] w-[12px] rounded-full transition-colors ${homePage === index ? 'bg-ember' : 'bg-[#8a8a8a]'}`} />
-                </motion.button>
-              ))}
-            </div>
+            {!isHomeSingleSlide ? (
+              <div className="flex items-center gap-[14px]">
+                {Array.from({ length: totalPages }).map((_, index) => (
+                  <motion.button
+                    key={index}
+                    type="button"
+                    onClick={() => setHomePage(index)}
+                    className={`flex h-[24px] w-[24px] items-center justify-center rounded-full border transition-colors ${homePage === index ? 'border-ember' : 'border-white/20 hover:border-white/40'
+                      }`}
+                    aria-label={`Show menu page ${index + 1}`}
+                    whileHover={prefersReducedMotion ? undefined : { scale: 1.1 }}
+                    whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
+                  >
+                    <span className={`block h-[12px] w-[12px] rounded-full transition-colors ${homePage === index ? 'bg-ember' : 'bg-[#8a8a8a]'}`} />
+                  </motion.button>
+                ))}
+              </div>
+            ) : null}
             <motion.button
               type="button"
-              onClick={() => setHomePage((page) => (page + 1) % totalPages)}
+              onClick={() => goToHomePage(homePage + 1)}
               className="inline-flex h-[52px] w-[52px] items-center justify-center rounded-full bg-[#1c1c1c] text-white transition hover:bg-ember"
               aria-label="Next menu items"
               whileHover={prefersReducedMotion ? undefined : { x: 2, scale: 1.05 }}
@@ -615,7 +707,7 @@ function FilterIcon() {
   );
 }
 
-function MenuCard({ item, index, disableRevealMotion = false }: { item: MenuItem; variant: 'home' | 'listing'; index: number; disableRevealMotion?: boolean }) {
+function MenuCard({ item, variant, index, disableRevealMotion = false }: { item: MenuItem; variant: 'home' | 'listing'; index: number; disableRevealMotion?: boolean }) {
   const prefersReducedMotion = useReducedMotion();
   const shouldReduceMotion = prefersReducedMotion || disableRevealMotion;
   const { addItem } = useCart();
@@ -710,6 +802,76 @@ function MenuCard({ item, index, disableRevealMotion = false }: { item: MenuItem
         </div>
       </div>
     </motion.article>
+  );
+}
+
+function MenuListingMobileCard({ item }: { item: MenuItem }) {
+  const { addItem } = useCart();
+  const router = useRouter();
+  const hasOfferPrice = Boolean(item.offer_price);
+
+  return (
+    <article className="group relative flex w-full items-stretch gap-3 overflow-hidden rounded-[14px] border border-white/12 bg-[#0d1012] p-3 text-white shadow-[0_8px_24px_rgba(0,0,0,0.35)] outline-none transition-[background-color,border-color] duration-300 active:border-transparent active:bg-[#f68b24]">
+      <div className="relative h-[88px] w-[88px] shrink-0 rounded-[10px] bg-[#14181b]">
+        <Image
+          src="/app/images/menu-card-brush.png"
+          alt=""
+          fill
+          sizes="88px"
+          className="scale-[1.15] object-contain opacity-55"
+          aria-hidden="true"
+          unoptimized
+        />
+        {item.image ? (
+          <Image src={item.image} alt={item.image_alt || item.name || 'Menu item'} fill sizes="88px" className="scale-[1.05] object-contain object-center drop-shadow-[0_8px_12px_rgba(0,0,0,0.22)]" />
+        ) : null}
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col justify-between">
+        <div>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h3 className="font-display text-[17px] font-black leading-[1.1] tracking-normal">{item.name}</h3>
+              <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                {item.category_name ? <p className="text-[11px] font-semibold leading-none text-white/65">{item.category_name}</p> : null}
+                <MenuAttributeBadge type={item.food_type} />
+                {item.spicy ? <SpicyBadge /> : null}
+              </div>
+            </div>
+            <div className="flex shrink-0 flex-col items-end gap-0.5 font-display leading-none text-white">
+              {hasOfferPrice ? (
+                <span className="text-[11px] font-medium text-white/45 line-through">
+                  {formatMenuPrice(item.price)}
+                </span>
+              ) : null}
+              <span className="text-[18px] font-semibold">
+                {formatMenuPrice(item.offer_price || item.price)}
+              </span>
+            </div>
+          </div>
+          {item.description ? (
+            <p className="mt-2 line-clamp-2 text-[11px] font-semibold leading-[1.35] text-white/60">
+              {item.description}
+            </p>
+          ) : null}
+        </div>
+        <div className="mt-2.5 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              addItem(item);
+              router.push('/cart');
+            }}
+            className="inline-flex h-[32px] items-center justify-center gap-1.5 border border-white/75 bg-transparent px-2.5 font-display text-[10px] font-medium uppercase text-white"
+          >
+            <Image src="/app/images/menu-card-whatsapp.png" alt="" width={13} height={13} className="h-[13px] w-[13px] object-contain" unoptimized />
+            Buy Now
+          </button>
+          <button type="button" onClick={() => addItem(item)} className="inline-flex h-[32px] w-[32px] items-center justify-center border border-white/75">
+            <Image src="/app/images/menu-card-bag.png" alt="" width={13} height={13} className="h-[13px] w-[13px] object-contain" unoptimized />
+          </button>
+        </div>
+      </div>
+    </article>
   );
 }
 

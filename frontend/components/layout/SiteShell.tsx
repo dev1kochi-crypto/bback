@@ -5,7 +5,9 @@ import { SiteHeader, SiteHeaderSpacer } from '@/components/layout/SiteHeader';
 import { PageBanner } from '@/components/layout/PageBanner';
 
 export interface PageBannerConfig {
-  title: string;
+  title?: string;
+  compact?: boolean;
+  logoOnly?: boolean;
 }
 
 interface SiteShellProps {
@@ -24,12 +26,17 @@ export async function SiteShell({
 }: SiteShellProps) {
   const site = await getSite().catch(() => defaultSitePayload);
   const isHome = variant === 'home';
-  const bannerTitle = !isHome ? pageBanner?.title : undefined;
+  const showPageBanner = !isHome && pageBanner && (pageBanner.logoOnly || pageBanner.title);
+  const bannerTitle = pageBanner?.title;
 
   return (
     <>
-      <SiteHeader site={site} activeNavUrl={activeNavUrl} hideDesktopLogo={Boolean(bannerTitle)} />
-      {bannerTitle ? <PageBanner site={site} title={bannerTitle} /> : <SiteHeaderSpacer variant={isHome ? 'home' : 'inner'} />}
+      <SiteHeader site={site} activeNavUrl={activeNavUrl} hideDesktopLogo={Boolean(showPageBanner)} />
+      {showPageBanner ? (
+        <PageBanner site={site} title={bannerTitle ?? ''} compact={pageBanner?.compact} logoOnly={pageBanner?.logoOnly} />
+      ) : (
+        <SiteHeaderSpacer variant={isHome ? 'home' : 'inner'} />
+      )}
       {children}
       <SiteFooter site={site} />
     </>
