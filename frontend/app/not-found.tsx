@@ -2,21 +2,47 @@ import { SiteShell } from '@/components/layout/SiteShell';
 import Image from 'next/image';
 import Link from 'next/link';
 
+export const metadata = {
+  title: 'Page Not Found | B.back',
+  description: 'The page you are looking for could not be found.',
+};
+
+function NotFoundHero() {
+  return (
+    <div className="not-found-hero" aria-hidden="true">
+      <div className="not-found-hero__code">
+        <span className="not-found-hero__digit">4</span>
+        <span className="not-found-hero__zero">
+          <span className="not-found-hero__cap">
+            <Image
+              src="/app/images/Isolation_Mode.png"
+              alt=""
+              width={120}
+              height={100}
+              priority
+              className="not-found-hero__cap-image"
+            />
+          </span>
+          <span className="not-found-hero__zero-char">0</span>
+        </span>
+        <span className="not-found-hero__digit">4</span>
+      </div>
+    </div>
+  );
+}
+
 export default function NotFound() {
   return (
-    <SiteShell>
-      <main className="bg-black px-6 py-20 text-white sm:px-10 lg:px-16">
-        <section className="mx-auto flex min-h-[360px] max-w-[900px] flex-col items-center justify-center text-center">
-          <div className="relative h-[132px] w-[220px]">
-            <span className="absolute inset-x-0 top-3 font-display text-[110px] font-black leading-none text-white/10">404</span>
-            <Image src="/app/images/logo.svg" alt="B.back" width={130} height={60} className="absolute left-1/2 top-10 h-[70px] w-auto -translate-x-1/2 object-contain" />
-          </div>
-          <h1 className="mt-8 font-display text-[42px] font-medium uppercase leading-none sm:text-[58px]">Oops, Page Not Found</h1>
-          <p className="mt-4 max-w-[520px] font-display text-[18px] leading-relaxed text-white/55">
-            Sorry, the page you are looking for does not exist.
+    <SiteShell pageBanner={{ logoOnly: true }}>
+      <main className="not-found-page">
+        <section className="not-found-page__stage">
+          <NotFoundHero />
+          <h1 className="not-found-page__title">Oops, Page Not Found</h1>
+          <p className="not-found-page__message">
+            Sorry, We can&apos;t find the page you&apos;re looking for.
           </p>
-          <Link href="/" className="mt-8 inline-flex h-11 items-center justify-center bg-ember px-7 font-display text-[14px] font-medium uppercase text-white transition hover:brightness-110">
-            Back To Home
+          <Link href="/" className="not-found-page__button">
+            Back To Home Page
           </Link>
         </section>
       </main>

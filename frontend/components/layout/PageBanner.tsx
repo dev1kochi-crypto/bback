@@ -8,26 +8,32 @@ import Link from 'next/link';
 interface PageBannerProps {
   site: SitePayload;
   title: string;
+  compact?: boolean;
+  logoOnly?: boolean;
 }
 
-export function PageBanner({ site, title }: PageBannerProps) {
-  const headerBg = absoluteAssetUrl(siteAssets.headerBackground) ?? siteAssets.headerBackground;
-  const panelBg = absoluteAssetUrl(siteAssets.pageBannerBackground) ?? siteAssets.pageBannerBackground;
+export function PageBanner({ site, title, compact = false, logoOnly = false }: PageBannerProps) {
+  const bannerBg = absoluteAssetUrl(siteAssets.pageBannerBackground) ?? siteAssets.pageBannerBackground;
   const logo = absoluteAssetUrl(site.logo ?? '/app/images/logo.svg') ?? '/app/images/logo.svg';
 
   return (
-    <section className="page-banner">
+    <section
+      className={[
+        'page-banner',
+        compact ? 'page-banner--compact' : '',
+        logoOnly ? 'page-banner--logo-only' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <div
         className="page-banner__background"
-        style={{ backgroundImage: `url(${headerBg})` }}
+        style={{ backgroundImage: `url(${bannerBg})` }}
       />
       <div className="page-banner__shade" />
 
       <div className="page-banner__inner">
-        <div
-          className="page-banner__panel"
-          style={{ backgroundImage: `url(${panelBg})` }}
-        >
+        <div className="page-banner__panel">
           <Link href="/" className="page-banner__logo">
             <Image
               src={logo}
@@ -39,16 +45,18 @@ export function PageBanner({ site, title }: PageBannerProps) {
             />
           </Link>
 
-          <div className="page-banner__content">
-            <AnimatedPageTitle title={title} />
-            <p className="page-banner__breadcrumb">
-              <Link href="/" className="page-banner__breadcrumb-home">
-                Home
-              </Link>
-              <span className="page-banner__breadcrumb-separator">/</span>
-              <span className="page-banner__breadcrumb-current">{title}</span>
-            </p>
-          </div>
+          {!logoOnly ? (
+            <div className="page-banner__content">
+              <AnimatedPageTitle title={title} />
+              <p className="page-banner__breadcrumb">
+                <Link href="/" className="page-banner__breadcrumb-home">
+                  Home
+                </Link>
+                <span className="page-banner__breadcrumb-separator">/</span>
+                <span className="page-banner__breadcrumb-current">{title}</span>
+              </p>
+            </div>
+          ) : null}
         </div>
       </div>
     </section>

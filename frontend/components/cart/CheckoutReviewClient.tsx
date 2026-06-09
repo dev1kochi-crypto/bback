@@ -129,8 +129,8 @@ export function CheckoutReviewClient() {
 
   if (!draft) {
     return (
-      <main className="relative overflow-hidden bg-black px-6 py-20 text-white sm:px-8 lg:px-10">
-        <div className="relative z-[2] mx-auto max-w-[760px] rounded-[8px] border border-white/12 bg-[#101516] p-8 text-center">
+      <main className="relative overflow-hidden bg-black px-4 py-14 text-white sm:px-8 sm:py-20 lg:px-10">
+        <div className="relative z-[2] mx-auto max-w-[760px] rounded-[8px] border border-white/12 bg-[#101516] p-5 text-center sm:p-8">
           <p className="font-body text-[15px] text-white/60">Preparing checkout...</p>
         </div>
       </main>
@@ -139,9 +139,9 @@ export function CheckoutReviewClient() {
 
   if (isHydrated && !selectedItems.length) {
     return (
-      <main className="relative overflow-hidden bg-black px-6 py-20 text-white sm:px-8 lg:px-10">
-        <div className="relative z-[2] mx-auto max-w-[760px] rounded-[8px] border border-white/12 bg-[#101516] p-8 text-center">
-          <h1 className="font-display text-[34px] font-black uppercase leading-none">Checkout</h1>
+      <main className="relative overflow-hidden bg-black px-4 py-14 text-white sm:px-8 sm:py-20 lg:px-10">
+        <div className="relative z-[2] mx-auto max-w-[760px] rounded-[8px] border border-white/12 bg-[#101516] p-5 text-center sm:p-8">
+          <h1 className="font-display text-[30px] font-black uppercase leading-none sm:text-[34px]">Checkout</h1>
           <p className="mt-4 font-body text-[15px] text-white/60">No items selected for checkout.</p>
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <Link href="/menu" className="inline-flex h-11 items-center justify-center bg-ember px-6 font-body text-[13px] font-bold uppercase text-white">
@@ -157,15 +157,15 @@ export function CheckoutReviewClient() {
   }
 
   return (
-    <main className="relative overflow-hidden bg-black px-6 py-14 text-white sm:px-8 lg:px-10 lg:py-16">
+    <main className="relative overflow-hidden bg-black px-4 py-10 text-white sm:px-8 sm:py-14 lg:px-10 lg:py-16">
       <CommercePage className="relative z-[2] mx-auto grid max-w-[1180px] gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <CommercePanel className="rounded-[8px] border border-white/12 bg-[#0a0a0a] p-6 sm:p-8">
+        <CommercePanel className="rounded-[8px] border border-white/12 bg-[#0a0a0a] p-5 sm:p-8">
         <form onSubmit={isVerifyingCheckoutOtp ? handleOtpSubmit : handleSubmit} className="contents">
           <Link href="/checkout" className="mb-6 inline-flex h-10 items-center border border-white/15 px-4 font-body text-[12px] font-bold uppercase text-white/70 transition hover:border-ember hover:text-ember">
             Change Address
           </Link>
 
-          <h1 className="font-display text-[44px] font-black uppercase leading-none text-white">Checkout</h1>
+          <h1 className="font-display text-[36px] font-black uppercase leading-none text-white sm:text-[44px]">Checkout</h1>
           <p className="mt-3 max-w-[680px] font-body text-[14px] font-normal leading-[1.7] text-white/58">
             Review your items, payment method, and delivery address before placing the order.
           </p>
@@ -180,8 +180,8 @@ export function CheckoutReviewClient() {
             <h2 className="font-display text-[20px] font-medium text-white">Order Items</h2>
             <CommerceStagger className="mt-4 space-y-3">
               {selectedItems.map((item) => (
-                <CommerceItem key={item.menu_item_id} className="grid items-center gap-4 border-b border-white/8 pb-4 sm:grid-cols-[72px_1fr_120px_90px]">
-                  <div className="relative h-[72px] w-[72px]">
+                <CommerceItem key={item.menu_item_id} className="relative grid grid-cols-[64px_minmax(0,1fr)] items-center gap-x-3 gap-y-2.5 border-b border-white/8 pb-3 sm:grid-cols-[72px_1fr_120px_90px] sm:gap-4 sm:pb-4">
+                  <div className="relative h-[58px] w-[64px] sm:h-[72px] sm:w-[72px]">
                     {item.image ? (
                       <Image src={item.image} alt={item.name} fill sizes="72px" className="object-contain" />
                     ) : (
@@ -189,15 +189,15 @@ export function CheckoutReviewClient() {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <p className="font-display text-[18px] font-medium text-white">{item.name}</p>
+                    <p className="font-display text-[17px] font-medium leading-tight text-white sm:text-[18px]">{item.name}</p>
                     <p className="mt-1 font-body text-[12px] text-white/50">{item.category_name ?? 'Menu item'}</p>
-                    <button type="button" onClick={() => removeItem(item.menu_item_id)} className="mt-2 font-body text-[11px] font-semibold text-red-400">
+                    <button type="button" onClick={() => removeItem(item.menu_item_id)} className="mt-1 font-body text-[11px] font-semibold text-red-400 sm:mt-2">
                       Remove item
                     </button>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="col-span-2 flex items-center gap-3 border-t border-white/10 pt-2.5 sm:col-auto sm:border-0 sm:pt-0">
                     <button type="button" onClick={() => updateQuantity(item.menu_item_id, item.quantity + 1)} className="grid h-7 w-7 place-items-center rounded-full bg-white/12">+</button>
-                    <span className="min-w-[20px] text-center font-display text-[18px]">{item.quantity}</span>
+                    <span className="min-w-[18px] text-center font-display text-[18px]">{item.quantity}</span>
                     <button
                       type="button"
                       onClick={() => (item.quantity > 1 ? updateQuantity(item.menu_item_id, item.quantity - 1) : removeItem(item.menu_item_id))}
@@ -206,7 +206,7 @@ export function CheckoutReviewClient() {
                       -
                     </button>
                   </div>
-                  <p className="text-right font-display text-[20px] text-white">{item.line_total}</p>
+                  <p className="absolute bottom-3 right-0 font-display text-[20px] text-white sm:static sm:text-right">{item.line_total}</p>
                 </CommerceItem>
               ))}
             </CommerceStagger>

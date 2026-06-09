@@ -45,7 +45,7 @@ export function OrderDetailClient() {
   const mapUrl = order ? deliveryMapUrl(order) : null;
 
   return (
-    <section className="relative bg-black px-5 pb-14 pt-14 text-white antialiased sm:px-8 lg:px-10 lg:pb-16 lg:pt-16">
+    <section className="order-detail-page relative bg-black px-4 pb-10 pt-5 text-white antialiased sm:px-8 sm:pt-8 lg:px-10 lg:pb-16 lg:pt-16">
       <div className="cinematic-noise pointer-events-none absolute inset-0 opacity-35" />
       <div className="relative z-[2] mx-auto max-w-[1500px]">
         {isLoading ? <OrderDetailLoadingState /> : null}
@@ -62,36 +62,41 @@ export function OrderDetailClient() {
               </CommerceSection>
             ) : null}
 
-            <CommerceSection className="mb-8" delay={0.05}>
-              <div className="flex flex-wrap items-center gap-4">
-                <h1 className="font-display text-[30px] font-medium uppercase leading-[1.1] text-white sm:text-[32px]">
+            <CommerceSection className="mb-5 sm:mb-8" delay={0.05}>
+              <div className="flex flex-col items-start gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+                <h1 className="font-display text-[22px] font-medium uppercase leading-[1.08] text-white sm:text-[32px]">
                   Order ID : {displayOrder(order)}
                 </h1>
                 <StatusBadge status={order.status} />
               </div>
-              <p className="mt-2.5 font-body text-[16px] font-normal leading-[1.6] text-[#DEDEDE]/75">{formatDateTime(order.created_at)}</p>
+              <p className="mt-2 font-body text-[14px] font-normal leading-[1.5] text-[#DEDEDE]/75 sm:mt-2.5 sm:text-[16px] sm:leading-[1.6]">{formatDateTime(order.created_at)}</p>
             </CommerceSection>
 
-            <div className="grid gap-10 lg:grid-cols-[minmax(0,880px)_420px] xl:gap-12">
-              <CommerceStagger className="space-y-7">
+            <div className="grid gap-6 sm:gap-8 lg:grid-cols-[minmax(0,880px)_420px] lg:gap-10 xl:gap-12">
+              <CommerceStagger className="space-y-5 sm:space-y-7">
                 <CommerceItem>
                 <Panel title="Order Item" description="Lorem Ipsum is Simply Dummy Text Of The Printing And Typesetting Industry...">
                   <CommerceStagger className="space-y-0 border-t border-white/[0.07] pt-5">
                     {order.items.map((item) => (
-                      <CommerceItem key={`${item.menu_item_id}-${item.name}`} className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 border-b border-white/[0.07] py-5 first:pt-0 last:border-0 last:pb-0">
-                        <div className="relative h-[98px] w-[132px] shrink-0 overflow-hidden rounded-full bg-white/[0.055]">
+                      <CommerceItem key={`${item.menu_item_id}-${item.name}`} className="flex gap-3.5 border-b border-white/[0.07] py-4 first:pt-0 last:border-0 last:pb-0 sm:flex-row sm:items-center sm:gap-6 sm:py-5">
+                        <div className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-full bg-white/[0.055] sm:h-[98px] sm:w-[132px]">
                           {item.image ? (
-                            <Image src={item.image} alt={item.name} fill sizes="132px" className="object-cover" />
+                            <Image src={item.image} alt={item.name} fill sizes="(max-width: 639px) 72px, 132px" className="object-cover" />
                           ) : (
-                            <div className="grid h-full w-full place-items-center font-display text-[22px] text-ember">B</div>
+                            <div className="grid h-full w-full place-items-center font-display text-[18px] text-ember sm:text-[22px]">B</div>
                           )}
                         </div>
-                        <div className="min-w-0 flex-1 w-full sm:w-auto">
-                          <h2 className="font-display text-[24px] sm:text-[30px] font-medium leading-[1.1] text-white">{item.name}</h2>
-                          <p className="mt-2.5 font-body text-[16px] sm:text-[18px] font-normal leading-[1.35] text-[#DEDEDE]/85">{item.category_name ?? 'Menu item'}</p>
-                          <p className="mt-2 line-clamp-1 font-body text-[14px] font-normal leading-[1.55] text-[#DEDEDE]/72">{itemDescription(item.category_name)}</p>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <h2 className="font-display text-[19px] font-medium leading-[1.12] text-white sm:text-[30px] sm:leading-[1.1]">{item.name}</h2>
+                              <p className="mt-1 font-body text-[14px] font-normal leading-[1.35] text-[#DEDEDE]/85 sm:mt-2.5 sm:text-[18px]">{item.category_name ?? 'Menu item'}</p>
+                            </div>
+                            <p className="shrink-0 font-display text-[18px] font-medium text-white sm:hidden">{item.line_total}</p>
+                          </div>
+                          <p className="mt-1.5 line-clamp-2 font-body text-[13px] font-normal leading-[1.45] text-[#DEDEDE]/72 sm:mt-2 sm:line-clamp-1 sm:text-[14px] sm:leading-[1.55]">{itemDescription(item.category_name)}</p>
                         </div>
-                        <p className="self-start sm:self-center font-display text-[24px] sm:text-[28px] font-medium text-white">{item.line_total}</p>
+                        <p className="hidden shrink-0 self-center font-display text-[28px] font-medium text-white sm:block">{item.line_total}</p>
                       </CommerceItem>
                     ))}
                   </CommerceStagger>
@@ -142,7 +147,7 @@ export function OrderDetailClient() {
                 </CommerceItem>
               </CommerceStagger>
 
-              <CommerceStagger className="space-y-7">
+              <CommerceStagger className="space-y-5 sm:space-y-7">
                 <CommerceItem>
                 <Panel title="Customers" compact>
                   <div className="flex items-center gap-3.5 border-t border-white/[0.07] pt-4">
@@ -213,15 +218,15 @@ export function OrderDetailClient() {
 
 function Panel({ title, action, compact = false, description, children }: { title: string; action?: string; compact?: boolean; description?: string; children: React.ReactNode }) {
   return (
-    <section className={['rounded-[8px] border border-white/[0.09] bg-[#080d0e] shadow-none', compact ? 'p-[18px]' : 'p-6'].join(' ')}>
-      <div className={['flex items-start justify-between gap-4', compact ? 'pb-0' : 'pb-0'].join(' ')}>
-        <div>
-          <h2 className="font-display text-[20px] font-medium leading-[1.35] text-white">{title}</h2>
-          {description ? <p className="mt-2 font-body text-[16px] font-normal leading-[1.6] text-[#DEDEDE]">{description}</p> : null}
+    <section className={['rounded-[8px] border border-white/[0.09] bg-[#080d0e] shadow-none', compact ? 'p-4 sm:p-[18px]' : 'p-4 sm:p-6'].join(' ')}>
+      <div className="flex items-start justify-between gap-3 sm:gap-4">
+        <div className="min-w-0">
+          <h2 className="font-display text-[18px] font-medium leading-[1.3] text-white sm:text-[20px] sm:leading-[1.35]">{title}</h2>
+          {description ? <p className="mt-2 hidden font-body text-[16px] font-normal leading-[1.6] text-[#DEDEDE] sm:block">{description}</p> : null}
         </div>
         {action ? <StatusBadge status={action} small /> : null}
       </div>
-      <div className={description ? 'mt-5' : compact ? 'mt-4' : 'mt-5'}>{children}</div>
+      <div className={description ? 'mt-4 sm:mt-5' : compact ? 'mt-3 sm:mt-4' : 'mt-4 sm:mt-5'}>{children}</div>
     </section>
   );
 }
@@ -234,11 +239,18 @@ type SummaryRowData = {
 };
 
 function SummaryRow({ label, detail, amount, strong = false }: SummaryRowData) {
+  const labelClass = strong ? 'font-medium text-white' : 'text-[#DEDEDE]';
+  const amountClass = strong
+    ? 'font-display text-[17px] font-medium text-white'
+    : 'font-display text-[15px] font-medium text-white';
+
   return (
-    <div className="flex flex-col sm:grid sm:grid-cols-[minmax(92px,1fr)_minmax(120px,1fr)_minmax(86px,0.8fr)] sm:items-center gap-1 sm:gap-5 font-body text-[14px] font-normal leading-[1.45] py-2 sm:py-0 border-b border-white/[0.05] sm:border-0 last:border-0">
-      <span className={strong ? 'font-medium text-white' : 'text-[#DEDEDE]'}>{label}</span>
-      {detail ? <span className={strong ? 'font-medium text-white' : 'text-[#DEDEDE]'}>{detail}</span> : null}
-      <span className={strong ? 'sm:text-right font-medium text-white mt-1 sm:mt-0' : 'sm:text-right text-[#DEDEDE] mt-1 sm:mt-0'}>{amount}</span>
+    <div className="flex items-start justify-between gap-4 border-b border-white/[0.07] py-3 font-body text-[14px] font-normal leading-[1.45] last:border-0 sm:grid sm:grid-cols-[minmax(92px,1fr)_minmax(120px,1fr)_minmax(86px,0.8fr)] sm:items-center sm:gap-5 sm:border-0 sm:py-0">
+      <div className="min-w-0 sm:contents">
+        <span className={labelClass}>{label}</span>
+        {detail ? <span className={`${labelClass} mt-0.5 block text-[13px] text-[#DEDEDE]/75 sm:mt-0 sm:text-[14px] sm:text-[#DEDEDE]`}>{detail}</span> : <span className="hidden sm:block" />}
+      </div>
+      <span className={`shrink-0 min-w-[3.25rem] text-right ${amountClass}`}>{amount}</span>
     </div>
   );
 }
@@ -246,6 +258,7 @@ function SummaryRow({ label, detail, amount, strong = false }: SummaryRowData) {
 function summaryRows(order: OrderDetail): SummaryRowData[] {
   const discountAmount = Number(order.discount_amount);
   const deliveryAmount = Number(order.delivery_charge_amount);
+  const taxAmount = Number(order.tax_amount);
 
   return [
     {
@@ -264,6 +277,11 @@ function summaryRows(order: OrderDetail): SummaryRowData[] {
       amount: deliveryAmount > 0 ? order.delivery_charge_amount : '',
     },
     {
+      label: 'Tax',
+      detail: taxAmount > 0 ? 'Tax Amount' : 'No Tax',
+      amount: taxAmount > 0 ? order.tax_amount : '',
+    },
+    {
       label: 'Total Amount',
       detail: '',
       amount: order.total,
@@ -274,7 +292,7 @@ function summaryRows(order: OrderDetail): SummaryRowData[] {
 
 function StatusBadge({ status, small = false }: { status: string; small?: boolean }) {
   return (
-    <span className={['inline-flex items-center justify-center bg-ember font-body font-normal text-white', small ? 'h-9 px-4 text-[14px]' : 'h-9 px-5 text-[14px]'].join(' ')}>
+    <span className={['inline-flex items-center justify-center bg-ember font-body font-normal text-white', small ? 'h-8 px-3 text-[12px] sm:h-9 sm:px-4 sm:text-[14px]' : 'h-8 px-4 text-[12px] sm:h-9 sm:px-5 sm:text-[14px]'].join(' ')}>
       {statusLabel(status)}
     </span>
   );

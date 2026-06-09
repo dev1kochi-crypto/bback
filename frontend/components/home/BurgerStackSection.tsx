@@ -89,6 +89,42 @@ const layers = [
   { src: assets.bunBottom, label: 'Stone-Ground Whole Wheat', from: 'right' as const, id: '6', icon: <WheatIcon /> },
 ];
 
+function getMobileLabelForFrame(frameId: string) {
+  const frameIndex = Number(frameId);
+
+  if (frameIndex <= 1) {
+    return null;
+  }
+
+  if (frameIndex === 6) {
+    return layers[5];
+  }
+
+  return layers[frameIndex - 2];
+}
+
+function hiddenLayerState(direction: number, width: number) {
+  return {
+    x: direction * (width * 0.55),
+    y: -40,
+    rotate: direction * 14,
+    opacity: 0,
+    scale: 0.9,
+    filter: 'blur(8px)',
+  };
+}
+
+function visibleLayerState() {
+  return {
+    x: 0,
+    y: 0,
+    rotate: 0,
+    opacity: 1,
+    scale: 1,
+    filter: 'blur(0px)',
+  };
+}
+
 export function BurgerStackSection() {
   const rootRef = useRef<HTMLElement>(null);
 
@@ -101,6 +137,8 @@ export function BurgerStackSection() {
 
     const ctx = gsap.context(() => {
       const items = gsap.utils.toArray<HTMLElement>('.nebula-layer');
+      const isMobile = window.innerWidth < 1024;
+      const scrollDistance = isMobile ? 1280 : 2400;
 
       gsap.to('.nebula-float', {
         y: -18,
@@ -116,67 +154,136 @@ export function BurgerStackSection() {
         scrollTrigger: {
           trigger: root,
           start: 'top top',
-          end: '+=2400',
+          end: `+=${scrollDistance}`,
           scrub: 1,
           pin: true,
           anticipatePin: 1,
+          invalidateOnRefresh: true,
         },
       });
 
-      items.forEach((element, index) => {
-        const direction = element.dataset.from === 'left' ? -1 : 1;
-
-        timeline.fromTo(
-          element,
-          {
-            x: direction * (window.innerWidth * 0.7),
-            y: -60,
-            rotate: direction * 18,
-            opacity: 0,
-            scale: 0.88,
-            filter: 'blur(10px)',
-          },
-          {
-            x: 0,
-            y: 0,
-            rotate: 0,
-            opacity: 1,
-            scale: 1,
-            filter: 'blur(0px)',
-            ease: 'power3.out',
-            duration: 1,
-          },
-          index * 0.55,
+      if (isMobile) {
+        const mobileLabels = gsap.utils.toArray<HTMLElement>(
+          '.nebula-label-mobile:not(.nebula-label-mobile-1) .nebula-label-mobile-inner',
         );
-      });
 
-      timeline
-        .to('.nebula-burger-stage', { scale: 1.04, ease: 'power2.inOut', duration: 1 }, '>-0.2')
-        .to('.nebula-burger-glow', { opacity: 1, scale: 1.3, ease: 'power2.out', duration: 1 }, '<')
-        .from(
-          '.nebula-label',
-          {
-            opacity: 0,
-            x: (_, element) => ((element as HTMLElement).dataset.side === 'left' ? -90 : 90),
-            stagger: 0.1,
-            duration: 0.7,
-            ease: 'power3.out',
-          },
-          '<+0.2',
-        );
+        if (items[0]) {
+          gsap.set(items[0], visibleLayerState());
+        }
+
+        items.slice(1).forEach((element) => {
+          const direction = element.dataset.from === 'left' ? -1 : 1;
+          gsap.set(element, hiddenLayerState(direction, window.innerWidth));
+        });
+
+        gsap.set(mobileLabels, { opacity: 0, scale: 0.96 });
+
+        items.slice(1).forEach((element, index) => {
+          const direction = element.dataset.from === 'left' ? -1 : 1;
+          const layerId = String(index + 2);
+          const previousLayerId = String(index + 1);
+          const position = index * 0.55;
+
+          timeline.fromTo(
+            element,
+            hiddenLayerState(direction, window.innerWidth),
+            { ...visibleLayerState(), ease: 'power3.out', duration: 1 },
+            position,
+          );
+
+          timeline.to(
+            `.nebula-label-mobile-${previousLayerId} .nebula-label-mobile-inner`,
+            { opacity: 0, scale: 0.96, duration: 0.3, ease: 'power2.in' },
+            position,
+          );
+
+          timeline.fromTo(
+            `.nebula-label-mobile-${layerId} .nebula-label-mobile-inner`,
+            { opacity: 0, scale: 0.96 },
+            { opacity: 1, scale: 1, duration: 0.45, ease: 'power3.out' },
+            position + 0.05,
+          );
+        });
+
+        timeline
+          .to('.nebula-burger-stage', { scale: 1.04, ease: 'power2.inOut', duration: 1 }, '>-0.2')
+          .to('.nebula-burger-glow', { opacity: 0.55, scale: 1.2, ease: 'power2.out', duration: 1 }, '<');
+
+        if (mobileLabels.length) {
+          timeline.to(
+            mobileLabels,
+            {
+              opacity: 1,
+              scale: 1,
+              duration: 0.45,
+              stagger: 0.08,
+              ease: 'power3.out',
+            },
+            '>-0.05',
+          );
+        }
+      } else {
+        items.forEach((element, index) => {
+          const direction = element.dataset.from === 'left' ? -1 : 1;
+
+          timeline.fromTo(
+            element,
+            {
+              x: direction * (window.innerWidth * 0.7),
+              y: -60,
+              rotate: direction * 18,
+              opacity: 0,
+              scale: 0.88,
+              filter: 'blur(10px)',
+            },
+            {
+              x: 0,
+              y: 0,
+              rotate: 0,
+              opacity: 1,
+              scale: 1,
+              filter: 'blur(0px)',
+              ease: 'power3.out',
+              duration: 1,
+            },
+            index * 0.55,
+          );
+        });
+
+        timeline
+          .to('.nebula-burger-stage', { scale: 1.04, ease: 'power2.inOut', duration: 1 }, '>-0.2')
+          .to('.nebula-burger-glow', { opacity: 1, scale: 1.3, ease: 'power2.out', duration: 1 }, '<')
+          .from(
+            '.nebula-label',
+            {
+              opacity: 0,
+              x: (_, element) => ((element as HTMLElement).dataset.side === 'left' ? -90 : 90),
+              stagger: 0.1,
+              duration: 0.7,
+              ease: 'power3.out',
+            },
+            '<+0.2',
+          );
+      }
     }, root);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <section id="build" ref={rootRef} className="relative h-screen overflow-hidden bg-black">
+    <section id="build" ref={rootRef} className="home-burger-stack relative h-screen overflow-hidden bg-black max-lg:h-auto max-lg:min-h-0">
       <img src={assets.bg} alt="" aria-hidden className="bg-burger absolute opacity-95" />
-      <img src={assets.friesLeft} alt="" aria-hidden className=" pointer-events-none absolute left-[-22px] top-[112px] hidden h-[620px] w-[360px] scale-x-[-1] object-contain object-left-top lg:block xl:h-[700px] xl:w-[406px]" />
-      <img src={assets.friesRight} alt="" aria-hidden className=" pointer-events-none absolute right-[-8px] bottom-[112px] hidden h-[330px] w-auto scale-x-[-1] object-contain lg:block" />
+      <img src={assets.friesLeft} alt="" aria-hidden className="pointer-events-none absolute left-[-28px] top-[72px] h-[220px] w-[130px] scale-x-[-1] object-contain object-left-top lg:hidden" />
+      <img src={assets.friesLeft} alt="" aria-hidden className="pointer-events-none absolute left-[-22px] top-[112px] hidden h-[620px] w-[360px] scale-x-[-1] object-contain object-left-top lg:block xl:h-[700px] xl:w-[406px]" />
+      <img src={assets.friesRight} alt="" aria-hidden className="pointer-events-none absolute right-[-6px] top-[34%] h-[88px] w-auto scale-x-[-1] object-contain lg:hidden" />
+      <img src={assets.friesRight} alt="" aria-hidden className="pointer-events-none absolute right-[-8px] bottom-[112px] hidden h-[330px] w-auto scale-x-[-1] object-contain lg:block" />
+      <img src={assets.cherryTomatoes} alt="" aria-hidden className="nebula-float pointer-events-none absolute right-3 top-4 h-[110px] w-[72px] object-contain lg:hidden" />
       <img src={assets.cherryTomatoes} alt="" aria-hidden className="nebula-float pointer-events-none absolute right-[42px] top-[32px] hidden h-[310px] w-[200px] object-contain lg:block xl:h-[360px] xl:w-[230px]" />
+      <img src={assets.slicedTomato} alt="" aria-hidden className="nebula-float pointer-events-none absolute left-3 top-[48%] h-[48px] w-auto object-contain lg:hidden" />
       <img src={assets.slicedTomato} alt="" aria-hidden className="nebula-float pointer-events-none absolute left-[128px] top-[616px] hidden h-[78px] w-auto object-contain lg:block" />
+      <img src={assets.basilLeaf} alt="" aria-hidden className="nebula-float pointer-events-none absolute left-[14%] top-[30%] h-[44px] w-auto rotate-12 object-contain lg:hidden" />
       <img src={assets.basilLeaf} alt="" aria-hidden className="nebula-float pointer-events-none absolute left-[258px] top-[250px] hidden h-[72px] w-auto rotate-12 object-contain lg:block" />
+      <img src={assets.smallLeaf} alt="" aria-hidden className="nebula-float pointer-events-none absolute right-[10%] top-[52%] h-[40px] w-auto -rotate-12 object-contain lg:hidden" />
       <img src={assets.smallLeaf} alt="" aria-hidden className="nebula-float pointer-events-none absolute bottom-[96px] right-[23%] hidden h-[72px] w-auto -rotate-12 object-contain lg:block" />
 
       <div
@@ -188,21 +295,40 @@ export function BurgerStackSection() {
         }}
       />
 
-      <div className="relative mx-auto flex h-full max-w-[1480px] flex-col items-center justify-center px-6 lg:px-10 lg:pt-[50px]">
-        <div className="relative mt-16 h-[650px] w-full max-w-[1260px] md:mt-10 lg:mt-0">
+      <div className="home-burger-stack__content relative mx-auto flex h-full max-w-[1480px] flex-col items-center justify-center px-6 lg:px-10 lg:pt-[50px]">
+        <div className="home-burger-stack__stage-wrap relative mt-6 flex w-full max-w-[1260px] items-center justify-center sm:mt-8 md:mt-10 lg:mt-0 lg:block lg:h-[650px] max-lg:mt-0 max-lg:min-h-0">
           <div className="nebula-burger-stage">
-            {layers.map((layer) => (
-              <img
-                key={layer.label}
-                src={layer.src}
-                alt={layer.label}
-                width={604}
-                height={160}
-                loading="lazy"
-                data-from={layer.from}
-                className={`stage-1 nebula-layer burger-layer burger-layer-${layer.id}`}
-              />
-            ))}
+            {layers.map((layer) => {
+              const mobileLabel = getMobileLabelForFrame(layer.id);
+
+              return (
+                <div key={layer.label} className={`burger-layer-item burger-layer-item-${layer.id}`}>
+                  <div className="burger-layer-frame">
+                    <img
+                      src={layer.src}
+                      alt={layer.label}
+                      width={604}
+                      height={160}
+                      loading={layer.id === '1' ? 'eager' : 'lazy'}
+                      data-from={layer.from}
+                      className={`stage-1 nebula-layer burger-layer burger-layer-${layer.id}`}
+                    />
+                    {mobileLabel ? (
+                      <div
+                        className={`nebula-label-mobile nebula-label-mobile-${layer.id} lg:hidden ${
+                          mobileLabel.from === 'left' ? 'nebula-label-mobile--left' : 'nebula-label-mobile--right'
+                        }`}
+                      >
+                        <div className="nebula-label-mobile-inner flex items-center gap-1.5">
+                          <span className="callout-icon scale-[0.72]">{mobileLabel.icon}</span>
+                          <span className="font-display text-[10px] leading-tight text-white sm:text-[11px]">{mobileLabel.label}</span>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           <div className="pointer-events-none hidden lg:block">

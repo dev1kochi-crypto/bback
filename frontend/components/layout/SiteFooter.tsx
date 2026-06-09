@@ -137,9 +137,40 @@ function menuHref(url: string): string {
   return url.startsWith('#') ? `/menu${url}` : url;
 }
 
+function hasText(value: string | null | undefined): value is string {
+  return Boolean(value && value.replace(/<[^>]*>/g, '').trim());
+}
+
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const isExternal = /^https?:\/\//i.test(href);
+
+  if (isExternal) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="site-footer__link">
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} className="site-footer__link">
+      {children}
+    </Link>
+  );
+}
+
 export function SiteFooter({ site }: SiteFooterProps) {
   const logo = absoluteAssetUrl(site.logo ?? '/app/images/logo.svg') ?? '/app/images/logo.svg';
   const year = new Date().getFullYear();
+  const footerMenuLinks = site.footer.menu_links.slice(0, 6);
+  const usefulLinks = [
+    hasText(site.privacy_policy)
+      ? { label: 'Privacy Policy', href: site.footer.privacy_policy_url || '/privacy-policy' }
+      : null,
+    hasText(site.terms_and_conditions)
+      ? { label: 'Terms and Conditions', href: site.footer.terms_url || '/terms-and-conditions' }
+      : null,
+  ].filter((item): item is { label: string; href: string } => Boolean(item));
   const mapHref =
     site.google_map_link ??
     (site.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(site.address)}` : undefined);
@@ -172,39 +203,38 @@ export function SiteFooter({ site }: SiteFooterProps) {
               </ul>
             </div>
 
-            <div>
-              <h3 className="site-footer__heading">Our Menu</h3>
-              <ul className="site-footer__list">
-                {site.footer.menu_links.map((item) => (
-                  <li key={item.label}>
-                    <Link href={menuHref(item.url)} className="site-footer__link">
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {footerMenuLinks.length ? (
+              <div>
+                <h3 className="site-footer__heading">Our Menu</h3>
+                <ul className="site-footer__list">
+                  {footerMenuLinks.map((item) => (
+                    <li key={`${item.label}-${item.url}`}>
+                      <FooterLink href={menuHref(item.url)}>
+                        {item.label}
+                      </FooterLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
 
             <div>
-              <h3 className="site-footer__heading">Useful Links</h3>
-              <ul className="site-footer__list">
-                {site.footer.privacy_policy_url ? (
-                  <li>
-                    <a href={site.footer.privacy_policy_url} className="site-footer__link">
-                      Privacy Policy
-                    </a>
-                  </li>
-                ) : null}
-                {site.footer.terms_url ? (
-                  <li>
-                    <a href={site.footer.terms_url} className="site-footer__link">
-                      Terms and Conditions
-                    </a>
-                  </li>
-                ) : null}
-              </ul>
+              {usefulLinks.length ? (
+                <>
+                  <h3 className="site-footer__heading">Useful Links</h3>
+                  <ul className="site-footer__list">
+                    {usefulLinks.map((item) => (
+                      <li key={item.label}>
+                        <FooterLink href={item.href}>
+                          {item.label}
+                        </FooterLink>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : null}
 
-              <h3 className="site-footer__heading site-footer__heading--spaced">Contact Info</h3>
+              <h3 className={`site-footer__heading ${usefulLinks.length ? 'site-footer__heading--spaced' : ''}`}>Contact Info</h3>
               <div className="site-footer__contact-list">
                 {site.address ? (
                   <ContactRow icon={siteAssets.contactDirectionsIcon} href={mapHref}>
@@ -269,4 +299,3 @@ export function SiteFooter({ site }: SiteFooterProps) {
     </footer>
   );
 }
-
