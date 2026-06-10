@@ -196,6 +196,12 @@ export function BurgerStackSection() {
       }
 
       const scrollDistance = 2400;
+      const centeredX = { xPercent: -50, left: '50%' };
+
+      gsap.set('.nebula-burger-stage', { ...centeredX, transformOrigin: '50% 50%' });
+      gsap.set('.nebula-burger-glow', { ...centeredX, transformOrigin: '50% 50%' });
+      gsap.set(items, centeredX);
+
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: root,
@@ -214,6 +220,7 @@ export function BurgerStackSection() {
         timeline.fromTo(
           element,
           {
+            ...centeredX,
             x: direction * (window.innerWidth * 0.7),
             y: -60,
             rotate: direction * 18,
@@ -222,6 +229,7 @@ export function BurgerStackSection() {
             filter: 'blur(10px)',
           },
           {
+            ...centeredX,
             x: 0,
             y: 0,
             rotate: 0,
@@ -236,8 +244,8 @@ export function BurgerStackSection() {
       });
 
       timeline
-        .to('.nebula-burger-stage', { scale: 1.04, ease: 'power2.inOut', duration: 1 }, '>-0.2')
-        .to('.nebula-burger-glow', { opacity: 1, scale: 1.3, ease: 'power2.out', duration: 1 }, '<')
+        .to('.nebula-burger-stage', { ...centeredX, scale: 1.04, ease: 'power2.inOut', duration: 1 }, '>-0.2')
+        .to('.nebula-burger-glow', { ...centeredX, opacity: 1, scale: 1.3, ease: 'power2.out', duration: 1 }, '<')
         .from(
           '.nebula-label',
           {
@@ -280,7 +288,7 @@ export function BurgerStackSection() {
       />
 
       <div className="home-burger-stack__content relative mx-auto flex h-full max-w-[1480px] flex-col items-center justify-center px-6 lg:px-10 lg:pt-[50px]">
-        <div className="home-burger-stack__stage-wrap relative mt-6 flex w-full max-w-[1260px] items-center justify-center sm:mt-8 md:mt-10 lg:mt-0 lg:block lg:h-[650px] max-lg:mt-0 max-lg:min-h-0">
+        <div className="home-burger-stack__stage-wrap relative mx-auto mt-6 flex w-full max-w-[1260px] items-center justify-center sm:mt-8 md:mt-10 lg:mt-0 lg:h-[650px] max-lg:mt-0 max-lg:min-h-0">
           <div className="nebula-burger-stage">
             {layers.map((layer) => {
               const mobileLabel = getMobileLabelForFrame(layer.id);
