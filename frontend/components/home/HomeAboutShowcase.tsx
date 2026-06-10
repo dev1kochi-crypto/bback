@@ -113,12 +113,12 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
           y: (event.clientY / rect.height - 0.5) * 2,
         });
       }}
-      className="relative isolate overflow-hidden bg-[#050505] text-white lg:h-[760px] xl:h-[820px]"
+      className="home-about-showcase relative isolate overflow-hidden bg-[#050505] text-white lg:h-[760px] xl:h-[820px]"
     >
       <div className="absolute inset-0 bg-[#050505]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_76%_36%,rgba(255,255,255,0.07),transparent_30%),radial-gradient(circle_at_16%_50%,rgba(0,0,0,0.75),transparent_36%)]" />
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-[-30px] z-[1] h-[112px] opacity-70 sm:h-[128px] lg:bottom-[-42px] lg:z-30 lg:h-[170px] lg:opacity-95">
+      <div className="home-about-showcase__bottom-texture pointer-events-none absolute inset-x-0 bottom-[-30px] z-[1] h-[112px] opacity-70 sm:h-[128px] lg:bottom-[-42px] lg:z-30 lg:h-[170px] lg:opacity-95">
         <Image src={assets.bottomTexture} alt="" fill sizes="100vw" className="object-cover object-bottom" />
       </div>
 
@@ -214,9 +214,9 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
       </div>
 
       {/* Desktop layout — unchanged */}
-      <div className="relative hidden h-full min-h-[620px] w-full lg:block lg:min-h-0">
+      <div className="home-about-showcase__desktop relative hidden h-full min-h-[620px] w-full lg:block lg:min-h-0">
         <motion.div
-          className="pointer-events-none absolute -left-[80px] bottom-[20px] z-20 h-[280px] w-[220px] sm:-left-[120px] sm:bottom-[92px] sm:h-[530px] sm:w-[412px] lg:-left-[90px] lg:bottom-[96px] lg:h-[560px] lg:w-[436px] xl:-left-[64px] xl:h-[620px] xl:w-[482px]"
+          className="home-about-showcase__pizza pointer-events-none absolute -left-[80px] bottom-[20px] z-20 h-[280px] w-[220px] sm:-left-[120px] sm:bottom-[92px] sm:h-[530px] sm:w-[412px] lg:-left-[90px] lg:bottom-[96px] lg:h-[560px] lg:w-[436px] xl:-left-[64px] xl:h-[620px] xl:w-[482px]"
           animate={{ y: [0, 12, 0], rotate: [0, -1.4, 0] }}
           transition={{ duration: 7.5, repeat: Infinity, ease: 'easeInOut' }}
           style={{ x: pointer.x * -10 }}
@@ -225,7 +225,7 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
         </motion.div>
 
         <motion.div
-          className="pointer-events-none absolute -left-[34px] top-[-8px] z-20 h-[230px] w-[94px] scale-x-[-1] sm:-left-[18px] sm:h-[280px] sm:w-[113px] lg:left-[10px] lg:top-[18px] lg:h-[300px] lg:w-[122px] xl:left-[28px]"
+          className="home-about-showcase__fries pointer-events-none absolute -left-[34px] top-[-8px] z-20 h-[230px] w-[94px] scale-x-[-1] sm:-left-[18px] sm:h-[280px] sm:w-[113px] lg:left-[10px] lg:top-[18px] lg:h-[300px] lg:w-[122px] xl:left-[28px]"
           animate={{ y: [0, -12, 0], rotate: [0, 2, 0] }}
           transition={{ duration: 6.4, repeat: Infinity, ease: 'easeInOut' }}
         >
@@ -233,7 +233,7 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
         </motion.div>
 
         <motion.div
-          className="pointer-events-none absolute left-[18%] top-[27%] z-30 hidden h-[92px] w-[146px] opacity-[0.62] md:block"
+          className="home-about-showcase__sketch-small pointer-events-none absolute left-[18%] top-[27%] z-30 hidden h-[92px] w-[146px] opacity-[0.62] md:block"
           animate={{ y: [0, -8, 0], opacity: [0.58, 0.78, 0.58] }}
           transition={{ duration: 6.8, repeat: Infinity, ease: 'easeInOut' }}
         >
@@ -241,7 +241,7 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
         </motion.div>
 
         <motion.div
-          className="pointer-events-none absolute bottom-[17%] left-[43%] z-30 hidden h-[102px] w-[138px] opacity-[0.58] lg:block"
+          className="home-about-showcase__sketch-large pointer-events-none absolute bottom-[17%] left-[43%] z-30 hidden h-[102px] w-[138px] opacity-[0.58] lg:block"
           animate={{ y: [0, 9, 0], rotate: [0, -2, 0] }}
           transition={{ duration: 7.4, repeat: Infinity, ease: 'easeInOut' }}
         >
@@ -257,7 +257,7 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
         </motion.div>
 
         <motion.div
-          className="relative z-40 mx-auto max-w-[480px] pt-40 sm:pt-64 md:pt-32 lg:absolute lg:left-[29%] lg:top-[172px] lg:mx-0 lg:max-w-[430px] lg:pt-0 xl:top-[205px]"
+          className="home-about-showcase__content relative z-40 mx-auto max-w-[480px] pt-40 sm:pt-64 md:pt-32 lg:absolute lg:left-[29%] lg:top-[172px] lg:mx-0 lg:max-w-[430px] lg:pt-0 xl:top-[205px]"
           initial={{ opacity: 0, y: 26 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.35 }}
@@ -274,7 +274,7 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
         </motion.div>
 
         <motion.div
-          className="pointer-events-none absolute right-[-260px] top-[-22px] z-0 hidden h-[690px] w-[584px] opacity-[0.92] md:block lg:right-[-112px] lg:top-[22px] lg:h-[650px] lg:w-[552px] xl:right-[-80px] xl:h-[720px] xl:w-[610px]"
+          className="home-about-showcase__brush pointer-events-none absolute right-[-260px] top-[-22px] z-0 hidden h-[690px] w-[584px] opacity-[0.92] md:block lg:right-[-112px] lg:top-[22px] lg:h-[650px] lg:w-[552px] xl:right-[-80px] xl:h-[720px] xl:w-[610px]"
           animate={{ rotate: [0, 1.6, 0], scale: [1, 1.012, 1] }}
           transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
         >
@@ -291,7 +291,7 @@ export function HomeAboutShowcase({ about }: HomeAboutShowcaseProps) {
         </motion.div>
 
         <motion.div
-          className="pointer-events-none absolute right-[39%] top-[13%] z-30 hidden h-[94px] w-[106px] opacity-90 blur-[2.5px] lg:block xl:right-[36%]"
+          className="home-about-showcase__tomato pointer-events-none absolute right-[39%] top-[13%] z-30 hidden h-[94px] w-[106px] opacity-90 blur-[2.5px] lg:block xl:right-[36%]"
           animate={{ y: [0, -14, 0], x: [0, 8, 0], rotate: [0, 5, 0] }}
           transition={{ duration: 5.8, repeat: Infinity, ease: 'easeInOut' }}
         >

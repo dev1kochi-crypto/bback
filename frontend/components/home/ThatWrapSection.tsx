@@ -74,13 +74,22 @@ export function ThatWrapSection() {
   const titleY = useTransform(smooth, [0, 1], [24, -14]);
 
   return (
-    <section ref={ref} className="relative overflow-hidden bg-[#050505] px-5 py-[84px] text-white sm:px-8 sm:py-[104px] lg:px-12 lg:py-[126px]">
+    <section
+      ref={ref}
+      className="that-wrap-section relative overflow-hidden bg-[#050505] px-5 py-[84px] text-white sm:px-8 sm:py-[104px] lg:px-12 lg:py-[126px]"
+    >
       <div className="pointer-events-none absolute inset-0 bg-black" />
       <div className="pointer-events-none absolute inset-0 bg-[url('/app/images/Mask group (18).jpg')] bg-cover bg-center opacity-[0.18]" />
-      <Image src={assets.topBrush} alt="" width={1920} height={140} className="pointer-events-none absolute left-0 top-0 h-[116px] w-full object-fill opacity-90 sm:h-[142px] lg:h-[164px]" />
+      <Image
+        src={assets.topBrush}
+        alt=""
+        width={1920}
+        height={140}
+        className="that-wrap-section__top-brush pointer-events-none absolute left-0 top-0 h-[116px] w-full object-fill opacity-90 sm:h-[142px] lg:h-[164px]"
+      />
 
       <motion.div
-        className="pointer-events-none absolute left-[-80px] top-[84px] z-[3] hidden w-[150px] sm:block lg:left-[-18px] lg:top-[92px] lg:w-[190px]"
+        className="that-wrap-section__tomato pointer-events-none absolute left-[-80px] top-[84px] z-[3] hidden w-[150px] sm:block lg:left-[-18px] lg:top-[92px] lg:w-[190px]"
         style={prefersReducedMotion ? undefined : { y: tomatoY }}
         animate={prefersReducedMotion ? undefined : { rotate: [0, -4, 2, 0] }}
         transition={prefersReducedMotion ? undefined : { duration: 7.2, repeat: Infinity, ease: 'easeInOut' }}
@@ -89,7 +98,7 @@ export function ThatWrapSection() {
       </motion.div>
 
       <motion.div
-        className="pointer-events-none absolute left-[7%] top-[35%] z-[4] hidden w-[230px] sm:block lg:left-[8%] lg:top-[42%] lg:w-[310px] xl:left-[9%] xl:w-[360px]"
+        className="that-wrap-section__pizza pointer-events-none absolute left-[7%] top-[35%] z-[4] hidden w-[230px] sm:block lg:left-[8%] lg:top-[42%] lg:w-[310px] xl:left-[9%] xl:w-[360px]"
         style={prefersReducedMotion ? undefined : { y: pizzaY }}
         animate={prefersReducedMotion ? undefined : { rotate: [0, 1.8, -1.2, 0] }}
         transition={prefersReducedMotion ? undefined : { duration: 6.8, repeat: Infinity, ease: 'easeInOut' }}
@@ -99,7 +108,7 @@ export function ThatWrapSection() {
 
       {/* Desktop only: original overlay image */}
       <motion.div
-        className="pointer-events-none absolute bottom-[66px] right-[-86px] z-[2] hidden h-[355px] w-[760px] overflow-hidden bg-black lg:block lg:right-[-34px] lg:w-[860px] xl:right-[10px] xl:w-[914px]"
+        className="that-wrap-section__photo pointer-events-none absolute bottom-[66px] right-[-86px] z-[2] hidden h-[355px] w-[760px] overflow-hidden bg-black lg:block lg:right-[-34px] lg:w-[860px] xl:right-[10px] xl:w-[914px]"
         style={prefersReducedMotion ? undefined : { x: wrapX, scale: wrapScale }}
         initial={prefersReducedMotion ? false : { opacity: 0, x: 90, filter: 'blur(10px)' }}
         whileInView={prefersReducedMotion ? undefined : { opacity: 1, x: 0, filter: 'blur(0px)' }}
@@ -145,7 +154,7 @@ export function ThatWrapSection() {
       </div>
 
       {/* Desktop: original centered copy */}
-      <div className="relative z-[5] mx-auto hidden min-h-[430px] max-w-[1480px] items-center justify-center lg:flex">
+      <div className="that-wrap-section__content relative z-[5] mx-auto hidden min-h-[430px] max-w-[1480px] items-center justify-center lg:flex">
         <WrapCopy titleY={titleY} prefersReducedMotion={prefersReducedMotion} />
       </div>
     </section>
