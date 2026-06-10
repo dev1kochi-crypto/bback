@@ -8,6 +8,7 @@ use App\Models\CmsKit\MenuItem;
 use App\Models\CmsKit\MenuSignatureItem;
 use App\Models\CmsKit\Offer;
 use App\Models\CmsKit\SectionLabel;
+use App\Services\FrontendRevalidationService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;
@@ -757,6 +758,7 @@ class MenuController extends Controller
         }
 
         $this->normalizeOrder($modelClass);
+        app(FrontendRevalidationService::class)->revalidate(['api-menus']);
 
         return response()->json(['success' => true]);
     }

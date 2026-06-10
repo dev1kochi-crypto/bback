@@ -5,11 +5,15 @@
 html {
   scroll-behavior: smooth;
   background: $page-bg;
+  width: 100%;
+  overflow-x: clip;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
+  width: 100%;
+  overflow-x: clip;
   background: $page-bg;
   color: $text-warm;
   font-family: var(--font-display);

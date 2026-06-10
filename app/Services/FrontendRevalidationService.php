@@ -51,29 +51,32 @@ class FrontendRevalidationService
         $secret = config('services.frontend.revalidate_secret');
 
         if (! $url || ! $secret) {
+            Log::info('Frontend revalidation skipped: WEB_URL/FRONTEND_URL or FRONTEND_REVALIDATE_SECRET is not configured.');
+
             return;
         }
 
         $endpoint = rtrim($url, '/').'/api/revalidate';
+        $payload = ['tags' => $tags ?? ['cms-data']];
 
-        try {
-            $response = Http::timeout(10)
-                ->withHeaders(['x-revalidate-secret' => $secret])
-                ->post($endpoint, [
-                    'tags' => $tags ?? ['cms-data'],
-                ]);
+        dispatch(static function () use ($endpoint, $secret, $payload): void {
+            try {
+                $response = Http::timeout(10)
+                    ->withHeaders(['x-revalidate-secret' => $secret])
+                    ->post($endpoint, $payload);
 
-            if (! $response->successful()) {
-                Log::warning('Frontend revalidation failed.', [
-                    'status' => $response->status(),
-                    'body' => $response->body(),
+                if (! $response->successful()) {
+                    Log::warning('Frontend revalidation failed.', [
+                        'status' => $response->status(),
+                        'body' => $response->body(),
+                    ]);
+                }
+            } catch (\Throwable $exception) {
+                Log::warning('Frontend revalidation request failed.', [
+                    'message' => $exception->getMessage(),
                 ]);
             }
-        } catch (\Throwable $exception) {
-            Log::warning('Frontend revalidation request failed.', [
-                'message' => $exception->getMessage(),
-            ]);
-        }
+        })->afterResponse();
     }
 
     private function tagsFor(object $model): array

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\CmsKit\Offer;
+use App\Support\PublicStorageUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 
@@ -22,7 +23,10 @@ class OfferController extends Controller
             ->map(fn (Offer $offer) => [
                 'id' => $offer->id,
                 'menu_item_id' => $offer->menu_item_id,
-                'image' => ($offer->image ?: $offer->menuItem?->image) ? $this->publicStorageUrl($offer->image ?: $offer->menuItem->image) : null,
+                'image' => PublicStorageUrl::make(
+                    $offer->image ?: $offer->menuItem?->image,
+                    $offer->image ? $offer->updated_at : $offer->menuItem?->updated_at,
+                ),
                 'offer_percent' => $offer->offer_percent !== null ? number_format((float) $offer->offer_percent, 2, '.', '') : null,
                 'offer_price' => $offer->offer_price !== null ? number_format((float) $offer->offer_price, 2, '.', '') : null,
                 'alt_text' => $this->translatedValue($offer->translations ?? [], 'alt_text', $locale, $fallbackLocale, $offer->alt_text)
@@ -52,8 +56,4 @@ class OfferController extends Controller
             ?? $default;
     }
 
-    private function publicStorageUrl(string $path): string
-    {
-        return request()->getSchemeAndHttpHost() . '/storage/' . ltrim($path, '/');
-    }
 }

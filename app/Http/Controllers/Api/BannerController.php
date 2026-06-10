@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\CmsKit\Banner;
 use App\Models\CmsKit\SiteInformation;
 use App\Support\FrontendNavigation;
+use App\Support\PublicStorageUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 
@@ -23,9 +24,7 @@ class BannerController extends Controller
         $locale = app()->getLocale();
         $fallbackLocale = config('app.fallback_locale', 'en');
         $siteInformation = SiteInformation::first();
-        $logoImage = $siteInformation?->logo
-            ? $this->publicStorageUrl($siteInformation->logo)
-            : '/app/images/logo.svg';
+        $logoImage = PublicStorageUrl::fromModel($siteInformation?->logo, $siteInformation) ?? '/app/images/logo.svg';
         $navigationItems = FrontendNavigation::items();
 
         $banners = Banner::query()
@@ -55,7 +54,7 @@ class BannerController extends Controller
                     'button_url' => $primaryButton['url'] ?? null,
                     'secondary_button_text' => $secondaryButton['label'] ?? null,
                     'secondary_button_url' => $secondaryButton['url'] ?? null,
-                    'image' => $banner->image ? $this->publicStorageUrl($banner->image) : null,
+                    'image' => PublicStorageUrl::fromModel($banner->image, $banner),
                     'image_alt' => $banner->image_alt,
                     'secondary_image' => $extra['secondary_image'] ?? null,
                     'background_image' => $extra['background_image'] ?? '/app/images/Mask group (18).jpg',
@@ -98,8 +97,4 @@ class BannerController extends Controller
             ->all();
     }
 
-    private function publicStorageUrl(string $path): string
-    {
-        return request()->getSchemeAndHttpHost() . '/storage/' . ltrim($path, '/');
-    }
 }

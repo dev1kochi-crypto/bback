@@ -6,6 +6,7 @@ use App\Models\CmsKit\AboutUs;
 use App\Models\CmsKit\SectionLabel;
 use App\Models\CmsKit\SiteInformation;
 use App\Models\CmsKit\WhyChooseUsItem;
+use App\Support\PublicStorageUrl;
 use App\Support\SitePayloadBuilder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
@@ -36,7 +37,7 @@ class AboutUsController extends Controller
                 ->get()
                 ->map(fn (WhyChooseUsItem $item) => [
                     'id' => $item->id,
-                    'icon' => $item->icon ? $this->publicStorageUrl($item->icon) : null,
+                    'icon' => PublicStorageUrl::fromModel($item->icon, $item),
                     'icon_alt' => $item->icon_alt,
                     'line_1' => $this->translatedValue($item->translations ?? [], 'line_1', $locale, $fallbackLocale, $item->line_1),
                     'line_2' => $this->translatedValue($item->translations ?? [], 'line_2', $locale, $fallbackLocale, $item->line_2),
@@ -55,8 +56,8 @@ class AboutUsController extends Controller
                 'button_url' => $about->button_url,
                 'video_type' => $about->video_type,
                 'video_url' => $about->video_url,
-                'video_file' => $about->video_file ? $this->publicStorageUrl($about->video_file) : null,
-                'video_thumbnail' => $about->video_thumbnail ? $this->publicStorageUrl($about->video_thumbnail) : null,
+                'video_file' => PublicStorageUrl::fromModel($about->video_file, $about),
+                'video_thumbnail' => PublicStorageUrl::fromModel($about->video_thumbnail, $about),
                 'mission' => $this->translatedValue($about->translations ?? [], 'mission', $locale, $fallbackLocale, $about->mission),
                 'vision' => $this->translatedValue($about->translations ?? [], 'vision', $locale, $fallbackLocale, $about->vision),
                 'core_value' => $this->translatedValue($about->translations ?? [], 'core_value', $locale, $fallbackLocale, $about->core_value),
@@ -104,8 +105,4 @@ class AboutUsController extends Controller
         return trim(html_entity_decode(strip_tags($value ?? ''))) !== '';
     }
 
-    private function publicStorageUrl(string $path): string
-    {
-        return request()->getSchemeAndHttpHost() . '/storage/' . ltrim($path, '/');
-    }
 }

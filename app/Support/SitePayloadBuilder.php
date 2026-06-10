@@ -18,7 +18,7 @@ final class SitePayloadBuilder
         $googleMapLink = $extraFields['google_map_link'] ?? null;
 
         return [
-            'logo' => $siteInformation?->logo ? self::publicStorageUrl($siteInformation->logo) : '/app/images/logo.svg',
+            'logo' => PublicStorageUrl::fromModel($siteInformation?->logo, $siteInformation) ?? '/app/images/logo.svg',
             'logo_alt' => $siteInformation?->logo_alt ?? 'B.back',
             'company_name' => self::translatedValue($siteInformation, $translations, 'company_name', $locale, $fallbackLocale) ?? 'B.back',
             'phone' => $siteInformation?->phone_1,
@@ -95,8 +95,4 @@ final class SitePayloadBuilder
             ?? $siteInformation->{$field};
     }
 
-    private static function publicStorageUrl(string $path): string
-    {
-        return request()->getSchemeAndHttpHost() . '/storage/' . ltrim($path, '/');
-    }
 }

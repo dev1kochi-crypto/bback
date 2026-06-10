@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\CmsKit\SectionLabel;
 use App\Models\CmsKit\Testimonial;
+use App\Support\PublicStorageUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 
@@ -43,7 +44,7 @@ class TestimonialController extends Controller
                 'designation' => $testimonial->getTranslation('designation'),
                 'content' => $testimonial->getTranslation('content'),
                 'rating' => $testimonial->rating,
-                'image' => $testimonial->image ? $this->publicStorageUrl($testimonial->image) : null,
+                'image' => PublicStorageUrl::fromModel($testimonial->image, $testimonial),
                 'image_alt' => $testimonial->image_alt,
                 'order_index' => $testimonial->order_index,
             ])->values(),
@@ -59,8 +60,4 @@ class TestimonialController extends Controller
             ?? ($section->description[$fallbackLocale] ?? null);
     }
 
-    private function publicStorageUrl(string $path): string
-    {
-        return request()->getSchemeAndHttpHost() . '/storage/' . ltrim($path, '/');
-    }
 }

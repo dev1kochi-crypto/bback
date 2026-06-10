@@ -394,6 +394,7 @@ export function CinematicHero({ banners }: CinematicHeroProps) {
           {resolved.floatingImages.map((image, index) => (
             <div
               key={`${image}-${index}`}
+              data-hero-float={index}
               className="float-layer absolute z-20 hidden h-20 w-20 opacity-90 blur-[0.2px] lg:block"
               style={{
                 left: `${[0, 95, 80, 86, 9][index] ?? 80}%`,

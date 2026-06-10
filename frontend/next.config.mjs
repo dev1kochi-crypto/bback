@@ -36,6 +36,7 @@ function imageRemotePatterns() {
 const nextConfig = {
   images: {
     remotePatterns: imageRemotePatterns(),
+    minimumCacheTTL: 0,
   },
 };
 
