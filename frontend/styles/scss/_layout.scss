@@ -883,12 +883,274 @@ header {
   }
 }
 
-.home-about-showcase__burger {
-  @include min-max(1400, 1519) {
-    top: 108px !important;
-    right: -108px !important;
-    width: 655px !important;
-    height: 525px !important;
+#about.home-about-showcase {
+  @media (min-width: 1024px) and (max-width: 1679px) {
+    height: 540px !important;
+    overflow: hidden;
+
+    .home-about-showcase__desktop {
+      min-height: 0 !important;
+    }
+
+    .home-about-showcase__bottom-texture {
+      height: 96px !important;
+      bottom: -18px !important;
+    }
+
+    .home-about-showcase__pizza {
+      bottom: 32px !important;
+      left: -8px !important;
+      width: 272px !important;
+      height: 340px !important;
+    }
+
+    .home-about-showcase__fries {
+      top: 0 !important;
+      left: 4px !important;
+      width: 72px !important;
+      height: 176px !important;
+    }
+
+    .home-about-showcase__content {
+      top: 64px !important;
+      left: 30% !important;
+      max-width: 340px !important;
+
+      h2 {
+        font-size: 48px !important;
+        margin-top: 8px !important;
+        line-height: 0.9 !important;
+      }
+
+      h2 + div {
+        margin-top: 10px !important;
+        width: 176px !important;
+        margin-left: 86px !important;
+        height: 4px !important;
+      }
+
+      p:first-of-type {
+        font-size: 14px !important;
+      }
+
+      p:nth-of-type(2) {
+        margin-top: 18px !important;
+        font-size: 13.5px !important;
+        line-height: 1.6 !important;
+        max-width: 300px !important;
+      }
+
+      a {
+        margin-top: 18px !important;
+        height: 36px !important;
+        min-width: 96px !important;
+        font-size: 15px !important;
+        padding-inline: 14px !important;
+      }
+    }
+
+    .home-about-showcase__burger {
+      top: 28px !important;
+      right: -32px !important;
+      width: 375px !important;
+      height: 300px !important;
+    }
+
+    .home-about-showcase__brush {
+      top: 12px !important;
+      right: -42px !important;
+      width: 342px !important;
+      height: 356px !important;
+    }
+
+    .home-about-showcase__tomato {
+      right: 36% !important;
+      top: 8% !important;
+      width: 56px !important;
+      height: 50px !important;
+    }
+
+    .home-about-showcase__sketch-small {
+      width: 82px !important;
+      height: 52px !important;
+      top: 22% !important;
+      left: 20% !important;
+    }
+
+    .home-about-showcase__sketch-large {
+      width: 78px !important;
+      height: 56px !important;
+      bottom: 12% !important;
+      left: 41% !important;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-width: 1679px) and (max-height: 820px) {
+    height: 620px !important;
+
+    .home-about-showcase__pizza {
+      bottom: 36px !important;
+      left: 10px !important;
+      width: 318px !important;
+      height: 398px !important;
+    }
+
+    .home-about-showcase__fries {
+      top: 4px !important;
+      left: 20px !important;
+      width: 88px !important;
+      height: 214px !important;
+    }
+
+    .home-about-showcase__content {
+      top: 74px !important;
+      left: 30.5% !important;
+      max-width: 392px !important;
+
+      h2 {
+        font-size: 58px !important;
+      }
+
+      h2 + div {
+        margin-top: 14px !important;
+        width: 214px !important;
+        margin-left: 106px !important;
+      }
+
+      p:first-of-type {
+        font-size: 15.5px !important;
+      }
+
+      p:nth-of-type(2) {
+        font-size: 15px !important;
+        margin-top: 22px !important;
+        max-width: 372px !important;
+      }
+
+      a {
+        margin-top: 22px !important;
+        height: 40px !important;
+        min-width: 110px !important;
+        font-size: 17px !important;
+      }
+    }
+
+    .home-about-showcase__burger {
+      top: 30px !important;
+      right: -42px !important;
+      width: 440px !important;
+      height: 352px !important;
+    }
+
+    .home-about-showcase__brush {
+      top: 18px !important;
+      right: -54px !important;
+      width: 404px !important;
+      height: 420px !important;
+    }
+
+    .home-about-showcase__tomato {
+      right: 32.5% !important;
+      top: 9% !important;
+      width: 72px !important;
+      height: 64px !important;
+    }
+
+    .home-about-showcase__sketch-small {
+      width: 104px !important;
+      height: 68px !important;
+      top: 23% !important;
+      left: 20.5% !important;
+    }
+
+    .home-about-showcase__sketch-large {
+      width: 98px !important;
+      height: 72px !important;
+      bottom: 13% !important;
+      left: 41.5% !important;
+    }
+
+    .home-about-showcase__bottom-texture {
+      height: 108px !important;
+      bottom: -22px !important;
+    }
+  }
+}
+
+.that-wrap-section {
+  @media (min-width: 1024px) and (max-width: 1679px) and (max-height: 820px) {
+    padding-top: 56px !important;
+    padding-bottom: 56px !important;
+
+    .that-wrap-section__top-brush {
+      height: 108px !important;
+    }
+
+    .that-wrap-section__tomato {
+      top: 46px !important;
+      left: -4px !important;
+      width: 156px !important;
+    }
+
+    .that-wrap-section__pizza {
+      left: 5.5% !important;
+      top: auto !important;
+      bottom: 72px !important;
+      width: 252px !important;
+    }
+
+    .that-wrap-section__photo {
+      bottom: 56px !important;
+      right: -10px !important;
+      width: 700px !important;
+      height: 320px !important;
+    }
+
+    .that-wrap-section__content {
+      min-height: 480px !important;
+      align-items: flex-start !important;
+      justify-content: center !important;
+      padding-left: 5.5% !important;
+      padding-right: 42% !important;
+
+      > div {
+        max-width: 360px !important;
+        margin-inline: 0 !important;
+        text-align: left !important;
+
+        h2 {
+          font-size: 62px !important;
+
+          span {
+            font-size: 70px !important;
+          }
+        }
+
+        h2 + div {
+          margin-top: 1.35rem !important;
+          max-width: 280px !important;
+        }
+
+        p {
+          margin-top: 1.35rem !important;
+          max-width: 300px !important;
+          margin-inline: 0 !important;
+          font-size: 13.5px !important;
+        }
+
+        p + div {
+          margin-top: 0.85rem !important;
+          font-size: 34px !important;
+        }
+
+        a {
+          margin-top: 1.1rem !important;
+          height: 40px !important;
+          padding-inline: 1.2rem !important;
+          font-size: 12.5px !important;
+        }
+      }
+    }
   }
 }
 
@@ -933,6 +1195,81 @@ header {
     .home-burger-stack__stage-wrap {
       align-items: flex-start;
       justify-content: flex-start;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 820px) {
+    .home-burger-stack__content {
+      padding-top: 0 !important;
+      justify-content: center;
+    }
+
+    .home-burger-stack__stage-wrap {
+      height: 630px !important;
+      overflow: visible;
+    }
+
+    .nebula-burger-stage {
+      height: 600px;
+      width: clamp(340px, 30vw, 420px);
+      overflow: visible;
+    }
+
+    .burger-layer {
+      width: clamp(340px, 30vw, 420px);
+    }
+
+    .burger-layer-1 {
+      margin-top: 0 !important;
+    }
+
+    .burger-layer-2 {
+      top: 128px !important;
+    }
+
+    .burger-layer-3 {
+      top: 204px !important;
+    }
+
+    .burger-layer-4 {
+      top: 280px !important;
+    }
+
+    .burger-layer-5 {
+      top: 352px !important;
+    }
+
+    .burger-layer-6 {
+      top: 472px !important;
+    }
+
+    .callout-1 {
+      transform: translateY(58px);
+    }
+
+    .callout-2 {
+      transform: translateY(92px);
+    }
+
+    .callout-3 {
+      transform: translateY(178px);
+    }
+
+    .callout-4 {
+      transform: translateY(210px);
+    }
+
+    .callout-5 {
+      transform: translateY(282px);
+    }
+
+    .callout-6 {
+      transform: translateY(308px);
+    }
+
+    .bg-burger {
+      top: 52%;
+      width: 520px;
     }
   }
 }
