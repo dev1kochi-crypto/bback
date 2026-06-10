@@ -138,7 +138,6 @@ export function BurgerStackSection() {
     const ctx = gsap.context(() => {
       const items = gsap.utils.toArray<HTMLElement>('.nebula-layer');
       const isMobile = window.innerWidth < 1024;
-      const scrollDistance = isMobile ? 1280 : 2400;
 
       gsap.to('.nebula-float', {
         y: -18,
@@ -150,6 +149,53 @@ export function BurgerStackSection() {
         stagger: 0.22,
       });
 
+      if (isMobile) {
+        const mobileLabels = gsap.utils.toArray<HTMLElement>(
+          '.nebula-label-mobile:not(.nebula-label-mobile-1) .nebula-label-mobile-inner',
+        );
+
+        gsap.set(items, visibleLayerState());
+        gsap.set(mobileLabels, { opacity: 1, scale: 1 });
+
+        gsap.fromTo(
+          items,
+          { opacity: 0, y: 22, filter: 'blur(8px)' },
+          {
+            opacity: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            duration: 0.75,
+            stagger: 0.08,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: root,
+              start: 'top 72%',
+              once: true,
+            },
+          },
+        );
+
+        gsap.fromTo(
+          mobileLabels,
+          { opacity: 0, scale: 0.96 },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 0.45,
+            stagger: 0.05,
+            ease: 'power3.out',
+            scrollTrigger: {
+              trigger: root,
+              start: 'top 64%',
+              once: true,
+            },
+          },
+        );
+
+        return;
+      }
+
+      const scrollDistance = 2400;
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: root,
@@ -162,109 +208,47 @@ export function BurgerStackSection() {
         },
       });
 
-      if (isMobile) {
-        const mobileLabels = gsap.utils.toArray<HTMLElement>(
-          '.nebula-label-mobile:not(.nebula-label-mobile-1) .nebula-label-mobile-inner',
+      items.forEach((element, index) => {
+        const direction = element.dataset.from === 'left' ? -1 : 1;
+
+        timeline.fromTo(
+          element,
+          {
+            x: direction * (window.innerWidth * 0.7),
+            y: -60,
+            rotate: direction * 18,
+            opacity: 0,
+            scale: 0.88,
+            filter: 'blur(10px)',
+          },
+          {
+            x: 0,
+            y: 0,
+            rotate: 0,
+            opacity: 1,
+            scale: 1,
+            filter: 'blur(0px)',
+            ease: 'power3.out',
+            duration: 1,
+          },
+          index * 0.55,
         );
+      });
 
-        if (items[0]) {
-          gsap.set(items[0], visibleLayerState());
-        }
-
-        items.slice(1).forEach((element) => {
-          const direction = element.dataset.from === 'left' ? -1 : 1;
-          gsap.set(element, hiddenLayerState(direction, window.innerWidth));
-        });
-
-        gsap.set(mobileLabels, { opacity: 0, scale: 0.96 });
-
-        items.slice(1).forEach((element, index) => {
-          const direction = element.dataset.from === 'left' ? -1 : 1;
-          const layerId = String(index + 2);
-          const previousLayerId = String(index + 1);
-          const position = index * 0.55;
-
-          timeline.fromTo(
-            element,
-            hiddenLayerState(direction, window.innerWidth),
-            { ...visibleLayerState(), ease: 'power3.out', duration: 1 },
-            position,
-          );
-
-          timeline.to(
-            `.nebula-label-mobile-${previousLayerId} .nebula-label-mobile-inner`,
-            { opacity: 0, scale: 0.96, duration: 0.3, ease: 'power2.in' },
-            position,
-          );
-
-          timeline.fromTo(
-            `.nebula-label-mobile-${layerId} .nebula-label-mobile-inner`,
-            { opacity: 0, scale: 0.96 },
-            { opacity: 1, scale: 1, duration: 0.45, ease: 'power3.out' },
-            position + 0.05,
-          );
-        });
-
-        timeline
-          .to('.nebula-burger-stage', { scale: 1.04, ease: 'power2.inOut', duration: 1 }, '>-0.2')
-          .to('.nebula-burger-glow', { opacity: 0.55, scale: 1.2, ease: 'power2.out', duration: 1 }, '<');
-
-        if (mobileLabels.length) {
-          timeline.to(
-            mobileLabels,
-            {
-              opacity: 1,
-              scale: 1,
-              duration: 0.45,
-              stagger: 0.08,
-              ease: 'power3.out',
-            },
-            '>-0.05',
-          );
-        }
-      } else {
-        items.forEach((element, index) => {
-          const direction = element.dataset.from === 'left' ? -1 : 1;
-
-          timeline.fromTo(
-            element,
-            {
-              x: direction * (window.innerWidth * 0.7),
-              y: -60,
-              rotate: direction * 18,
-              opacity: 0,
-              scale: 0.88,
-              filter: 'blur(10px)',
-            },
-            {
-              x: 0,
-              y: 0,
-              rotate: 0,
-              opacity: 1,
-              scale: 1,
-              filter: 'blur(0px)',
-              ease: 'power3.out',
-              duration: 1,
-            },
-            index * 0.55,
-          );
-        });
-
-        timeline
-          .to('.nebula-burger-stage', { scale: 1.04, ease: 'power2.inOut', duration: 1 }, '>-0.2')
-          .to('.nebula-burger-glow', { opacity: 1, scale: 1.3, ease: 'power2.out', duration: 1 }, '<')
-          .from(
-            '.nebula-label',
-            {
-              opacity: 0,
-              x: (_, element) => ((element as HTMLElement).dataset.side === 'left' ? -90 : 90),
-              stagger: 0.1,
-              duration: 0.7,
-              ease: 'power3.out',
-            },
-            '<+0.2',
-          );
-      }
+      timeline
+        .to('.nebula-burger-stage', { scale: 1.04, ease: 'power2.inOut', duration: 1 }, '>-0.2')
+        .to('.nebula-burger-glow', { opacity: 1, scale: 1.3, ease: 'power2.out', duration: 1 }, '<')
+        .from(
+          '.nebula-label',
+          {
+            opacity: 0,
+            x: (_, element) => ((element as HTMLElement).dataset.side === 'left' ? -90 : 90),
+            stagger: 0.1,
+            duration: 0.7,
+            ease: 'power3.out',
+          },
+          '<+0.2',
+        );
     }, root);
 
     return () => ctx.revert();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\CmsKit\Metadata;
+use App\Support\PublicStorageUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 
@@ -28,7 +29,7 @@ class MetadataController extends Controller
             'meta_keywords' => $this->translatedValue($metadata, 'meta_keywords', $locale, $fallbackLocale),
             'og_title' => $this->translatedValue($metadata, 'og_title', $locale, $fallbackLocale),
             'og_description' => $this->translatedValue($metadata, 'og_description', $locale, $fallbackLocale),
-            'og_image' => $metadata->og_image ? $this->publicStorageUrl($metadata->og_image) : null,
+            'og_image' => PublicStorageUrl::fromModel($metadata->og_image, $metadata),
             'other_meta_tags' => $this->translatedValue($metadata, 'other_meta_tags', $locale, $fallbackLocale),
         ]);
     }
@@ -44,8 +45,4 @@ class MetadataController extends Controller
         return $value[$locale] ?? ($value[$fallbackLocale] ?? null);
     }
 
-    private function publicStorageUrl(string $path): string
-    {
-        return request()->getSchemeAndHttpHost() . '/storage/' . ltrim($path, '/');
-    }
 }

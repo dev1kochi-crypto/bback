@@ -19,7 +19,7 @@ import {
   defaultSitePayload,
   defaultTestimonialsPayload,
 } from '@/lib/api';
-import { REVALIDATE_SECONDS } from '@/lib/cache';
+import { CMS_CACHE_ENABLED, REVALIDATE_SECONDS } from '@/lib/cache';
 
 const defaultContactPayload: ContactPayload = {
   site: defaultSitePayload,
@@ -38,14 +38,40 @@ const defaultOffersPayload: OffersPayload = {
   offers: [],
 };
 
-function cachedQuery<T>(key: string, fetcher: () => Promise<T>, fallback: T): () => Promise<T> {
-  return unstable_cache(async () => {
+async function withRetry<T>(fetcher: () => Promise<T>, attempts = 2): Promise<T> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
     try {
       return await fetcher();
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError;
+}
+
+function cachedQuery<T>(key: string, fetcher: () => Promise<T>, fallback: T): () => Promise<T> {
+  if (!CMS_CACHE_ENABLED) {
+    return async () => {
+      try {
+        return await fetcher();
+      } catch {
+        return fallback;
+      }
+    };
+  }
+
+  const cachedFetcher = unstable_cache(fetcher, [key], { revalidate: REVALIDATE_SECONDS, tags: [key, 'cms-data'] });
+
+  return async () => {
+    try {
+      return await cachedFetcher();
     } catch {
       return fallback;
     }
-  }, [key], { revalidate: REVALIDATE_SECONDS, tags: [key, 'cms-data'] });
+  };
 }
 
 const fetchSite = cachedQuery('api-site', async () => {
@@ -55,7 +81,7 @@ const fetchSite = cachedQuery('api-site', async () => {
 }, defaultSitePayload);
 
 const fetchBanners = cachedQuery('api-banners', async () => {
-  const response = await api.get<Banner[]>('/api/banners');
+  const response = await withRetry(() => api.get<Banner[]>('/api/banners'), 3);
 
   return response.data
     .filter((banner) => banner.status === 1)
@@ -115,17 +141,22 @@ export const getOrderProcess = cache(async () => fetchOrderProcess());
 export const getTestimonials = cache(async () => fetchTestimonials());
 
 export const getPageMetadata = cache(async (pageKey: string): Promise<PageMetadataPayload | null> => {
-  return unstable_cache(
-    async () => {
-      try {
-        const response = await api.get<PageMetadataPayload | null>(`/api/metadata/${pageKey}`);
+  const fetchMetadata = async () => {
+    try {
+      const response = await api.get<PageMetadataPayload | null>(`/api/metadata/${pageKey}`);
 
-        return response.data;
-      } catch {
-        return null;
-      }
-    },
-    ['api-metadata', pageKey],
-    { revalidate: REVALIDATE_SECONDS, tags: ['api-metadata', `api-metadata-${pageKey}`, 'cms-data'] },
-  )();
+      return response.data;
+    } catch {
+      return null;
+    }
+  };
+
+  if (!CMS_CACHE_ENABLED) {
+    return fetchMetadata();
+  }
+
+  return unstable_cache(fetchMetadata, ['api-metadata', pageKey], {
+    revalidate: REVALIDATE_SECONDS,
+    tags: ['api-metadata', `api-metadata-${pageKey}`, 'cms-data'],
+  })();
 });

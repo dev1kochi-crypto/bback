@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\CmsKit\OrderProcessItem;
 use App\Models\CmsKit\SectionLabel;
+use App\Support\PublicStorageUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 
@@ -34,13 +35,13 @@ class OrderProcessController extends Controller
                 'line_1' => $section->getTranslation('line_1'),
                 'title' => $section->getTranslation('title'),
                 'description' => $section->getTranslation('description'),
-                'image' => $this->publicStorageUrl($section->section_image),
+                'image' => PublicStorageUrl::fromModel($section->section_image, $section),
                 'image_alt' => $section->section_image_alt,
                 'display_home' => (bool) data_get($section->extra_fields, 'display_home', false),
             ],
             'items' => $items->map(fn (OrderProcessItem $item) => [
                 'id' => $item->id,
-                'icon' => $item->icon ? $this->publicStorageUrl($item->icon) : null,
+                'icon' => PublicStorageUrl::fromModel($item->icon, $item),
                 'icon_alt' => $item->icon_alt,
                 'title' => $item->getTranslation('title'),
                 'description' => $item->getTranslation('description'),
@@ -49,8 +50,4 @@ class OrderProcessController extends Controller
         ]);
     }
 
-    private function publicStorageUrl(string $path): string
-    {
-        return request()->getSchemeAndHttpHost() . '/storage/' . ltrim($path, '/');
-    }
 }

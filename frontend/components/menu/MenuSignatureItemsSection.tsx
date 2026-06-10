@@ -31,12 +31,12 @@ export function MenuSignatureItemsSection({ section, items }: MenuSignatureItems
         Signature Items
       </div>
 
-      <div className="relative z-10 mx-auto grid max-w-[1566px] items-start gap-5 lg:grid-cols-[minmax(230px,373px)_minmax(230px,373px)_minmax(420px,748px)] lg:items-end xl:gap-6">
+      <div className="relative z-10 mx-auto grid max-w-[1566px] items-start gap-5 md:grid-cols-2 md:gap-3 lg:grid-cols-[minmax(230px,373px)_minmax(230px,373px)_minmax(420px,748px)] lg:items-end lg:gap-5 xl:gap-6">
         {leadItems.map((item, index) => (
           <SignatureCard key={item.id} item={item} index={index} />
         ))}
 
-        <div className={`flex min-w-0 flex-col justify-start pt-3 lg:pl-0 ${leadItems.length === 1 ? 'lg:col-span-2' : ''}`}>
+        <div className={`flex min-w-0 flex-col justify-start pt-3 md:col-span-2 lg:col-span-1 lg:pl-0 ${leadItems.length === 1 ? 'lg:col-span-2' : ''}`}>
           <motion.div
             initial={prefersReducedMotion ? false : { opacity: 0, y: 28, filter: 'blur(8px)' }}
             whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -100,7 +100,7 @@ function SignatureCard({ item, light = false, index }: { item: MenuSignatureItem
           rotateX: { duration: 0.7, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] },
           filter: { duration: 0.7, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] },
         }}
-        className="group relative aspect-[373/493] w-full max-w-[373px] overflow-hidden rounded-[20px] bg-[#FFEAC4] shadow-[0_24px_70px_rgba(0,0,0,0.42)]"
+        className="group relative aspect-[373/493] w-full max-w-[373px] overflow-hidden rounded-[20px] bg-[#FFEAC4] shadow-[0_24px_70px_rgba(0,0,0,0.42)] md:max-w-none lg:max-w-[373px]"
         style={{ transformPerspective: 1000, transformStyle: 'preserve-3d' }}
       >
         {titleHtml ? (
@@ -150,7 +150,7 @@ function SignatureCard({ item, light = false, index }: { item: MenuSignatureItem
         rotateX: { duration: 0.7, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] },
         filter: { duration: 0.7, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] },
       }}
-      className={`group relative w-full max-w-[373px] overflow-hidden rounded-[20px] ${config.aspect} ${config.background} shadow-[0_24px_70px_rgba(0,0,0,0.42)]`}
+      className={`group relative w-full max-w-[373px] overflow-hidden rounded-[20px] md:max-w-none lg:max-w-[373px] ${config.aspect} ${config.background} shadow-[0_24px_70px_rgba(0,0,0,0.42)]`}
       style={{ transformPerspective: 1000, transformStyle: 'preserve-3d' }}
     >
       {titleHtml ? (

@@ -546,6 +546,10 @@ header {
 .banner-wrapper {
   margin-top: 70px;
 
+  @include min-max(768, 1023) {
+    margin-top: 0;
+  }
+
   @include max(767) {
     margin-top: 0;
   }
@@ -560,12 +564,27 @@ header {
 }
 
 .home-hero {
+  max-width: 100%;
+  overflow-x: clip;
+
+  @include min-max(768, 1023) {
+    min-height: 760px !important;
+  }
+
   @include max(767) {
     min-height: auto;
   }
 }
 
 .home-hero__shell {
+  max-width: 100%;
+  overflow-x: clip;
+
+  @include min-max(768, 1023) {
+    min-height: 760px !important;
+    padding: 5.25rem 2.25rem 2rem;
+  }
+
   @include max(767) {
     min-height: auto;
     padding: clamp(4.25rem, 12vw, 4.75rem) clamp(1rem, 4vw, 1.25rem) clamp(0.75rem, 3vw, 1rem);
@@ -573,6 +592,18 @@ header {
 }
 
 .home-hero__stage {
+  max-width: 100%;
+  overflow-x: clip;
+
+  @include min-max(768, 1023) {
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: auto;
+    align-items: center;
+    margin-top: 0;
+    padding-bottom: 0;
+  }
+
   @include max(767) {
     flex-direction: column;
     justify-content: flex-start;
@@ -584,6 +615,44 @@ header {
 }
 
 .home-hero__copy {
+  @include min-max(768, 1023) {
+    position: relative !important;
+    top: auto !important;
+    height: auto !important;
+    margin-top: 0.75rem;
+
+    .hero-copy-title {
+      position: relative !important;
+      top: auto !important;
+      padding-inline: 0 !important;
+      font-size: clamp(5.4rem, 12vw, 6.35rem) !important;
+      line-height: 0.92 !important;
+      letter-spacing: 0 !important;
+      text-shadow: 0 0.12rem 0 rgba(255, 255, 255, 0.25), 0 0.75rem 1.5rem rgba(0, 0, 0, 0.55);
+    }
+
+    .hero-outline-word,
+    .hero-light-word {
+      display: none !important;
+    }
+
+    .hero-main-word {
+      position: relative !important;
+      top: auto !important;
+    }
+
+    .hero-back-word {
+      position: absolute !important;
+      inset-inline: 0 !important;
+      top: 10.2rem !important;
+      padding-inline: 0 !important;
+      font-size: clamp(5.25rem, 11.5vw, 7rem) !important;
+      line-height: 0.9 !important;
+      color: rgba(255, 255, 255, 0.42);
+      opacity: 1;
+    }
+  }
+
   @include max(767) {
     position: relative !important;
     top: auto !important;
@@ -633,6 +702,18 @@ header {
 }
 
 .home-hero__food {
+  @include min-max(768, 1023) {
+    margin-top: 1.5rem !important;
+    transform: none !important;
+
+    .hero-food-scene {
+      width: min(74vw, 34rem) !important;
+      max-width: none !important;
+      translate: none !important;
+      aspect-ratio: 16 / 9 !important;
+    }
+  }
+
   @include max(767) {
     margin-top: 0.35rem !important;
     transform: none !important;
@@ -653,6 +734,12 @@ header {
 }
 
 .home-hero .hero-chrome {
+  @include min-max(768, 1023) {
+    gap: 0.8rem;
+    margin-top: 0.75rem;
+    padding-bottom: 0;
+  }
+
   @include max(767) {
     gap: 0.65rem;
     margin-top: 0.5rem;
@@ -662,6 +749,124 @@ header {
       min-width: min(100%, 11.75rem);
       justify-content: center;
       padding-inline: 1.25rem;
+    }
+  }
+}
+
+.home-hero .float-layer {
+  @include min-max(768, 1023) {
+    display: block !important;
+    opacity: 0.62 !important;
+  }
+}
+
+.home-hero .float-layer[class*="h-[360px]"] {
+  @include min-max(768, 1023) {
+    right: -1.75rem !important;
+    top: 32% !important;
+    height: 13rem !important;
+    width: 4.5rem !important;
+    opacity: 0.55 !important;
+  }
+}
+
+.home-hero .float-layer[class*="h-[280px]"] {
+  @include min-max(768, 1023) {
+    left: -1.5rem !important;
+    top: 55% !important;
+    height: 11rem !important;
+    width: 4.25rem !important;
+    opacity: 0.5 !important;
+  }
+}
+
+.home-hero .float-layer[class*="h-[148px]"] {
+  @include min-max(768, 1023) {
+    height: 5.5rem !important;
+    width: 6.25rem !important;
+    opacity: 0.55 !important;
+    filter: blur(2px) !important;
+  }
+}
+
+.home-hero .float-layer[class*="left-[8%]"] {
+  @include min-max(768, 1023) {
+    left: 4% !important;
+    top: 45% !important;
+  }
+}
+
+.home-hero .float-layer[class*="right-[6%]"] {
+  @include min-max(768, 1023) {
+    right: 3% !important;
+    top: 44% !important;
+  }
+}
+
+.home-hero .float-layer[class*="h-20"] {
+  @include min-max(768, 1023) {
+    height: 3.2rem !important;
+    width: 3.2rem !important;
+    opacity: 0.7 !important;
+  }
+}
+
+.home-hero [data-hero-float="0"] {
+  @include min-max(768, 1023) {
+    left: -1.5rem !important;
+    top: 25% !important;
+    height: 5.25rem !important;
+    width: 5.25rem !important;
+    filter: blur(2.5px) !important;
+  }
+}
+
+.home-hero [data-hero-float="1"] {
+  @include min-max(768, 1023) {
+    left: auto !important;
+    right: -1rem !important;
+    top: 30% !important;
+  }
+}
+
+.home-hero [data-hero-float="2"] {
+  @include min-max(768, 1023) {
+    left: auto !important;
+    right: 1.25rem !important;
+    top: 63% !important;
+  }
+}
+
+.home-hero [data-hero-float="3"] {
+  @include min-max(768, 1023) {
+    left: auto !important;
+    right: -1.4rem !important;
+    top: 71% !important;
+  }
+}
+
+.home-hero [data-hero-float="4"] {
+  @include min-max(768, 1023) {
+    left: -1rem !important;
+    top: 58% !important;
+    height: 5rem !important;
+    width: 5rem !important;
+    filter: blur(2.5px) !important;
+  }
+}
+
+.home-hero [class*="left-[10%]"][class*="h-80"] {
+  @include min-max(768, 1023) {
+    left: 15% !important;
+    top: 54% !important;
+    height: 11.5rem !important;
+    width: 11.5rem !important;
+    padding: 1.55rem !important;
+
+    p {
+      max-width: 7.5rem;
+      font-size: 0.92rem;
+      line-height: 1.08;
     }
   }
 }
@@ -688,6 +893,30 @@ header {
 }
 
 .home-burger-stack {
+  @include min-max(768, 1023) {
+    height: auto;
+    min-height: 620px;
+
+    .home-burger-stack__content {
+      height: auto;
+      min-height: 620px;
+      justify-content: flex-start;
+      padding-top: 2.75rem;
+      padding-bottom: 2.5rem;
+    }
+
+    .home-burger-stack__stage-wrap {
+      height: 540px;
+      min-height: 540px;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .home-burger-stack__stage-wrap > .pointer-events-none.hidden {
+      display: block;
+    }
+  }
+
   @include max(767) {
     height: auto;
     min-height: 0;
@@ -697,7 +926,7 @@ header {
       height: auto;
       min-height: 0;
       justify-content: flex-start;
-      padding-top: clamp(4.5rem, 12vw, 5rem);
+      padding-top: clamp(1.75rem, 6vw, 2.5rem);
       padding-bottom: 0;
     }
 
@@ -714,8 +943,13 @@ header {
   }
 
   @include max(767) {
-    margin-top: -3rem;
-    padding-top: 2.75rem !important;
+    margin-top: -1.25rem;
+    padding-top: 3.25rem !important;
+  }
+
+  @include min-max(768, 1023) {
+    margin-top: 0;
+    padding-top: 4rem !important;
   }
 }
 
@@ -829,6 +1063,16 @@ header {
     transform: none;
   }
 
+  @include min-max(768, 1023) {
+    position: relative;
+    top: auto;
+    left: auto;
+    height: 520px;
+    width: min(72vw, 520px);
+    margin-inline: auto;
+    transform: none;
+  }
+
   @media (min-width: 768px) {
     width: clamp(480px, 36vw, 570px);
   }
@@ -853,6 +1097,10 @@ header {
     margin: 0 !important;
   }
 
+  @include min-max(768, 1023) {
+    width: clamp(440px, 62vw, 520px);
+  }
+
   @media (min-width: 768px) {
     width: clamp(480px, 29.688vw, 570px);
   }
@@ -862,6 +1110,11 @@ header {
   top: 0px;
   z-index: 10;
   margin-top: -10px;
+
+  @include min-max(768, 1023) {
+    top: 18px !important;
+    margin-top: 0 !important;
+  }
 
   @include max(991) {
     top: 19%;
@@ -877,6 +1130,10 @@ header {
 
   z-index: 11;
   margin-top: 0px;
+
+  @include min-max(768, 1023) {
+    top: 112px !important;
+  }
 
   @include max(991) {
     top: 36%;
@@ -914,6 +1171,10 @@ header {
 .burger-layer-3 {
   z-index: 12;
 
+  @include min-max(768, 1023) {
+    top: 178px !important;
+  }
+
   @include max(991) {
     top: 44%;
   }
@@ -949,6 +1210,10 @@ header {
 
 .burger-layer-4 {
   z-index: 13;
+
+  @include min-max(768, 1023) {
+    top: 246px !important;
+  }
 
   @include max(991) {
     top: 53%;
@@ -986,6 +1251,10 @@ header {
 .burger-layer-5 {
   z-index: 14;
 
+  @include min-max(768, 1023) {
+    top: 318px !important;
+  }
+
   @include max(991) {
     top: 60%;
   }
@@ -1020,6 +1289,10 @@ header {
 }
 
 .burger-layer-6 {
+  @include min-max(768, 1023) {
+    top: 410px !important;
+  }
+
   @include max(991) {
     top: 75%;
   }
@@ -1086,6 +1359,14 @@ header {
   padding: 16px 24px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 16px 40px rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(8px);
+
+  @include min-max(768, 1023) {
+    gap: 6px;
+    min-width: 0;
+    max-width: 150px;
+    padding: 7px 10px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 10px 22px rgba(0, 0, 0, 0.35);
+  }
 }
 
 .callout-icon {
@@ -1093,6 +1374,11 @@ header {
   display: flex;
   align-items: center;
   justify-content: center;
+
+  @include min-max(768, 1023) {
+    transform: scale(0.62);
+    transform-origin: center;
+  }
 }
 
 .callout-text {
@@ -1101,10 +1387,22 @@ header {
   line-height: 1;
   color: #fff;
   white-space: nowrap;
+
+  @include min-max(768, 1023) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 10px;
+    line-height: 1.05;
+  }
 }
 
 .callout-line {
   position: relative;
+
+  @include min-max(768, 1023) {
+    display: block;
+    opacity: 0.62;
+  }
 
   span {
     position: absolute;
@@ -1168,6 +1466,17 @@ header {
   right: calc(50% + 40px);
   transform: translateY(60px);
 
+  @include min-max(768, 1023) {
+    right: auto;
+    left: 2%;
+    transform: translateY(82px);
+
+    .callout-line {
+      width: 78px;
+      height: 50px;
+    }
+  }
+
 
   .callout-line {
     width: 240px;
@@ -1178,6 +1487,17 @@ header {
 .callout-2 {
   left: calc(50% + 160px);
   transform: translateY(95px);
+
+  @include min-max(768, 1023) {
+    left: auto;
+    right: 2%;
+    transform: translateY(142px);
+
+    .callout-line {
+      width: 82px;
+      height: 48px;
+    }
+  }
 
   @include min(992) {
     top: 12px;
@@ -1215,6 +1535,17 @@ header {
   right: calc(50% + 180px);
   transform: translateY(190px);
 
+  @include min-max(768, 1023) {
+    right: auto;
+    left: 2%;
+    transform: translateY(204px);
+
+    .callout-line {
+      width: 84px;
+      height: 46px;
+    }
+  }
+
   @include min(992) {
     top: 20px;
   }
@@ -1248,6 +1579,17 @@ header {
 .callout-4 {
   left: calc(50% + 170px);
   transform: translateY(220px);
+
+  @include min-max(768, 1023) {
+    left: auto;
+    right: 2%;
+    transform: translateY(270px);
+
+    .callout-line {
+      width: 84px;
+      height: 46px;
+    }
+  }
 
   @include min(992) {
     top: 35px;
@@ -1283,6 +1625,17 @@ header {
   right: calc(50% + 190px);
   transform: translateY(290px);
 
+  @include min-max(768, 1023) {
+    right: auto;
+    left: 2%;
+    transform: translateY(340px);
+
+    .callout-line {
+      width: 78px;
+      height: 46px;
+    }
+  }
+
   @include min(992) {
     top: 80px;
   }
@@ -1316,6 +1669,17 @@ header {
 .callout-6 {
   left: calc(50% + 160px);
   transform: translateY(280px);
+
+  @include min-max(768, 1023) {
+    left: auto;
+    right: 2%;
+    transform: translateY(424px);
+
+    .callout-line {
+      width: 72px;
+      height: 50px;
+    }
+  }
 
   @include min(992) {
     top: 120px;
@@ -1364,5 +1728,10 @@ header {
 @include max(575) {
   .cta-home {
     padding-top: 0px;
+  }
+
+  .food-menu {
+    top: 52px;
+    padding-top: 6px;
   }
 }

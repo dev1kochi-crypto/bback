@@ -106,20 +106,8 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
   const [spicyOnly, setSpicyOnly] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
-  const [isMobileViewport, setIsMobileViewport] = useState(() => {
-    if (typeof window === 'undefined') {
-      return false;
-    }
-
-    return window.matchMedia('(max-width: 639px)').matches;
-  });
-  const [homePageSize, setHomePageSize] = useState(() => {
-    if (typeof window === 'undefined') {
-      return 4;
-    }
-
-    return window.matchMedia('(max-width: 1023px)').matches ? 1 : 4;
-  });
+  const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [homePageSize, setHomePageSize] = useState(4);
   const [homePage, setHomePage] = useState(0);
   const [visibleCount, setVisibleCount] = useState(16);
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -186,13 +174,22 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
   }, []);
 
   useEffect(() => {
-    const query = window.matchMedia('(max-width: 1023px)');
-    const syncHomePageSize = () => setHomePageSize(query.matches ? 1 : 4);
+    const syncHomePageSize = () => {
+      const width = window.innerWidth;
+
+      if (width >= 1024) {
+        setHomePageSize(4);
+      } else if (width >= 768) {
+        setHomePageSize(2);
+      } else {
+        setHomePageSize(1);
+      }
+    };
 
     syncHomePageSize();
-    query.addEventListener('change', syncHomePageSize);
+    window.addEventListener('resize', syncHomePageSize);
 
-    return () => query.removeEventListener('change', syncHomePageSize);
+    return () => window.removeEventListener('resize', syncHomePageSize);
   }, []);
 
   const goToHomePage = (page: number) => {
@@ -605,7 +602,7 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
             <motion.div
               className={
                 variant === 'home'
-                  ? 'mt-9 flex flex-wrap items-stretch justify-center gap-5 lg:mt-12 lg:gap-6'
+                  ? 'mx-auto mt-9 md:grid md:max-w-[min(100%,640px)] md:grid-cols-2 md:justify-items-stretch md:gap-x-3 md:gap-y-5 md:px-1 lg:mt-12 lg:flex lg:max-w-none lg:flex-wrap lg:items-stretch lg:justify-center lg:gap-6'
                   : 'mx-auto mt-10 grid max-w-[1280px] justify-items-center gap-x-7 gap-y-9 max-sm:mt-6 max-sm:gap-y-3 max-sm:px-4 sm:grid-cols-2 lg:grid-cols-4'
               }
               initial={false}

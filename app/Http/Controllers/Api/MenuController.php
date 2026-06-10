@@ -6,6 +6,7 @@ use App\Models\CmsKit\MenuCategory;
 use App\Models\CmsKit\MenuItem;
 use App\Models\CmsKit\MenuSignatureItem;
 use App\Models\CmsKit\SectionLabel;
+use App\Support\PublicStorageUrl;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
 
@@ -73,7 +74,7 @@ class MenuController extends Controller
             'categories' => $categories->map(fn (MenuCategory $category) => [
                 'id' => $category->id,
                 'name' => $category->getTranslation('name'),
-                'icon' => $category->icon ? $this->publicStorageUrl($category->icon) : null,
+                'icon' => PublicStorageUrl::fromModel($category->icon, $category),
                 'icon_alt' => $category->getTranslation('icon_alt') ?? $category->icon_alt,
                 'sort_order' => $category->sort_order,
             ])->values(),
@@ -81,7 +82,7 @@ class MenuController extends Controller
                 'id' => $item->id,
                 'category_id' => $item->menu_category_id,
                 'category_name' => $item->category?->getTranslation('name'),
-                'image' => $item->image ? $this->publicStorageUrl($item->image) : null,
+                'image' => PublicStorageUrl::fromModel($item->image, $item),
                 'image_alt' => $item->getTranslation('image_alt') ?? $item->image_alt,
                 'name' => $item->getTranslation('name'),
                 'description' => $item->getTranslation('description'),
@@ -116,14 +117,17 @@ class MenuController extends Controller
         return $items->map(fn (MenuSignatureItem $item) => [
             'id' => $item->id,
             'menu_item_id' => $item->menu_item_id,
-            'image' => ($item->image ?: $item->menuItem?->image) ? $this->publicStorageUrl($item->image ?: $item->menuItem->image) : null,
+            'image' => PublicStorageUrl::make(
+                $item->image ?: $item->menuItem?->image,
+                $item->image ? $item->updated_at : $item->menuItem?->updated_at,
+            ),
             'image_alt' => $item->getTranslation('image_alt') ?? $item->image_alt ?? $item->menuItem?->getTranslation('image_alt') ?? $item->menuItem?->image_alt,
             'title' => $item->getTranslation('title') ?? $item->menuItem?->getTranslation('name'),
             'menu_item' => $item->menuItem ? [
                 'id' => $item->menuItem->id,
                 'category_id' => $item->menuItem->menu_category_id,
                 'category_name' => $item->menuItem->category?->getTranslation('name'),
-                'image' => $item->menuItem->image ? $this->publicStorageUrl($item->menuItem->image) : null,
+                'image' => PublicStorageUrl::fromModel($item->menuItem->image, $item->menuItem),
                 'image_alt' => $item->menuItem->getTranslation('image_alt') ?? $item->menuItem->image_alt,
                 'name' => $item->menuItem->getTranslation('name'),
                 'description' => $item->menuItem->getTranslation('description'),
@@ -138,8 +142,4 @@ class MenuController extends Controller
         ])->values();
     }
 
-    private function publicStorageUrl(string $path): string
-    {
-        return request()->getSchemeAndHttpHost() . '/storage/' . ltrim($path, '/');
-    }
 }

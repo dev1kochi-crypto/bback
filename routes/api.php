@@ -16,17 +16,20 @@ use App\Http\Controllers\Api\SiteController;
 use App\Http\Controllers\Api\TestimonialController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/site', SiteController::class);
-Route::get('/banners', BannerController::class);
-Route::get('/about-us', AboutUsController::class);
-Route::get('/contact', [ContactController::class, 'show']);
+Route::middleware('cms.no-cache')->group(function (): void {
+    Route::get('/site', SiteController::class);
+    Route::get('/banners', BannerController::class);
+    Route::get('/about-us', AboutUsController::class);
+    Route::get('/contact', [ContactController::class, 'show']);
+    Route::get('/offers', OfferController::class);
+    Route::get('/menus', MenuController::class);
+    Route::get('/order-process', OrderProcessController::class);
+    Route::get('/testimonials', TestimonialController::class);
+    Route::get('/metadata/{pageKey}', [MetadataController::class, 'show']);
+});
+
 Route::post('/contact/enquiries', [ContactController::class, 'store']);
 Route::post('/newsletter-signups', [NewsletterController::class, 'store']);
-Route::get('/offers', OfferController::class);
-Route::get('/menus', MenuController::class);
-Route::get('/order-process', OrderProcessController::class);
-Route::get('/testimonials', TestimonialController::class);
-Route::get('/metadata/{pageKey}', [MetadataController::class, 'show']);
 Route::get('/location/reverse-geocode', [LocationController::class, 'reverseGeocode']);
 
 Route::prefix('auth')->group(function (): void {
