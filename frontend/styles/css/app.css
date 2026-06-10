@@ -1867,6 +1867,60 @@ header .right div {
   height: 140px;
 }
 
+@media (min-width: 1600px) and (max-width: 1799px) {
+  .home-burger-stack__stage-wrap {
+    max-width: 1260px;
+    margin-inline: auto;
+  }
+  .callout-1 {
+    right: calc(50% + 40px);
+    left: auto;
+  }
+  .callout-2 {
+    left: calc(50% + 40px);
+    right: auto;
+  }
+  .callout-3 {
+    right: calc(50% + 180px);
+    left: auto;
+  }
+  .callout-4 {
+    left: calc(50% + 170px);
+    right: auto;
+  }
+  .callout-5 {
+    right: calc(50% + 190px);
+    left: auto;
+  }
+  .callout-6 {
+    left: calc(50% + 160px);
+    right: auto;
+  }
+  .callout-1 .callout-line {
+    width: 240px;
+    height: 120px;
+  }
+  .callout-2 .callout-line {
+    width: 220px;
+    height: 80px;
+  }
+  .callout-3 .callout-line {
+    width: 180px;
+    height: 60px;
+  }
+  .callout-4 .callout-line {
+    width: 160px;
+    height: 60px;
+  }
+  .callout-5 .callout-line {
+    width: 120px;
+    height: 60px;
+  }
+  .callout-6 .callout-line {
+    width: 100px;
+    height: 140px;
+  }
+}
 .oder-btn:hover img {
   filter: invert(1);
 }
