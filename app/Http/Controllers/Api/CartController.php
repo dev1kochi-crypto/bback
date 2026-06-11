@@ -263,22 +263,7 @@ class CartController extends Controller
     private function sendGuestCheckoutOtp(array $data): JsonResponse
     {
         $phone = $this->normalizePhoneNumber($data['phone']);
-        $userByEmail = User::query()->where('email', $data['email'])->first();
-        $userByPhone = User::query()->where('phone', $phone)->first();
-
-        if ($userByEmail && $userByPhone && $userByEmail->isNot($userByPhone)) {
-            throw ValidationException::withMessages([
-                'phone' => 'This phone number is linked to a different account.',
-            ]);
-        }
-
-        if ($userByEmail && $userByEmail->phone && $userByEmail->phone !== $phone) {
-            throw ValidationException::withMessages([
-                'email' => 'This email address is linked to a different phone number.',
-            ]);
-        }
-
-        $user = $userByPhone ?? $userByEmail;
+        $user = User::query()->where('phone', $phone)->first();
 
         if (empty($data['items'])) {
             throw ValidationException::withMessages(['cart' => 'Cart is empty.']);
@@ -287,6 +272,7 @@ class CartController extends Controller
         $otp = $this->generatePhoneOtp();
         $user ??= User::create([
             'name' => $data['name'],
+            'email' => strtolower(trim((string) $data['email'])),
             'phone' => $phone,
             'password' => Str::random(40),
         ]);
@@ -324,18 +310,7 @@ class CartController extends Controller
         $updates = [];
         $email = strtolower(trim((string) ($data['email'] ?? '')));
 
-        if ($email !== '') {
-            $emailOwner = User::query()
-                ->where('email', $email)
-                ->whereKeyNot($user->id)
-                ->first();
-
-            if ($emailOwner) {
-                throw ValidationException::withMessages([
-                    'email' => 'This email address is already linked to another account.',
-                ]);
-            }
-
+        if ($email !== '' && blank($user->email)) {
             $updates['email'] = $email;
         }
 
@@ -343,7 +318,7 @@ class CartController extends Controller
             $updates['name'] = $data['name'];
         }
 
-        if (! empty($data['phone'])) {
+        if (! empty($data['phone']) && blank($user->phone)) {
             $updates['phone'] = $this->normalizePhoneNumber($data['phone']);
         }
 
@@ -392,8 +367,8 @@ class CartController extends Controller
     {
         $address = $user->customerAddresses()->create([
             'name' => $data['name'],
-            'email' => $data['email'],
-            'phone' => $data['phone'],
+            'email' => strtolower(trim((string) $data['email'])),
+            'phone' => $this->normalizePhoneNumber($data['phone']),
             'city' => $data['city'] ?? null,
             'postal_code' => $data['postal_code'] ?? null,
             'address_line_1' => $data['address_line_1'],

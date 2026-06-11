@@ -46,8 +46,7 @@ class AuthController extends Controller
         ]);
 
         $phone = $this->normalizePhoneNumber($data['phone']);
-        $user = User::query()->where('phone', $phone)->first()
-            ?? User::query()->whereHas('customerAddresses', fn ($query) => $query->where('phone', $data['phone'])->orWhere('phone', $phone))->first();
+        $user = User::query()->where('phone', $phone)->first();
 
         $user ??= User::query()->create([
             'name' => 'Customer',

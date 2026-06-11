@@ -56,14 +56,15 @@ class LocationController extends Controller
         $response = Http::get('https://maps.googleapis.com/maps/api/geocode/json', [
             'latlng' => "{$latitude},{$longitude}",
             'key' => config('services.google_maps.key'),
-            'result_type' => 'street_address|premise|subpremise|route|sublocality|postal_code',
         ]);
 
         if ($response->failed()) {
             return [];
         }
 
-        $result = collect($response->json('results', []))->first();
+        $result = collect($response->json('results', []))
+            ->sortBy(fn (array $result): int => $this->googleResultRank($result))
+            ->first();
 
         if (! $result) {
             return [];
@@ -76,6 +77,11 @@ class LocationController extends Controller
             return $match['long_name'] ?? null;
         };
 
+        $building = collect([
+            $component('subpremise'),
+            $component('premise'),
+        ])->filter()->unique()->implode(', ');
+
         $street = collect([
             $component('street_number'),
             $component('route'),
@@ -83,13 +89,35 @@ class LocationController extends Controller
             $component('sublocality_level_1'),
         ])->filter()->unique()->implode(', ');
 
+        $city = $component('locality') ?? $component('postal_town') ?? $component('administrative_area_level_3') ?? $component('administrative_area_level_2');
+        $addressLine1 = collect([$building, $street])->filter()->unique()->implode(', ') ?: ($result['formatted_address'] ?? null);
+
         return [
-            'city' => $component('locality') ?? $component('administrative_area_level_3') ?? $component('administrative_area_level_2'),
+            'city' => $city,
             'postal_code' => $component('postal_code'),
-            'address_line_1' => $street ?: ($result['formatted_address'] ?? null),
+            'address_line_1' => $addressLine1,
+            'address_line_2' => null,
             'formatted_address' => $result['formatted_address'] ?? null,
             'provider' => 'google',
         ];
+    }
+
+    private function googleResultRank(array $result): int
+    {
+        $types = $result['types'] ?? [];
+        $locationType = $result['geometry']['location_type'] ?? null;
+
+        if (in_array($locationType, ['ROOFTOP', 'RANGE_INTERPOLATED'], true)) {
+            return 0;
+        }
+
+        foreach (['street_address', 'premise', 'subpremise', 'point_of_interest', 'route', 'sublocality', 'postal_code'] as $rank => $type) {
+            if (in_array($type, $types, true)) {
+                return $rank + 1;
+            }
+        }
+
+        return 99;
     }
 
     private function reverseGeocodeWithMapbox(float $latitude, float $longitude, string $token): array
@@ -97,7 +125,6 @@ class LocationController extends Controller
         $response = Http::get("https://api.mapbox.com/geocoding/v5/mapbox.places/{$longitude},{$latitude}.json", [
             'access_token' => $token,
             'types' => 'address,poi,neighborhood,locality,place,postcode,district',
-            'country' => 'in',
             'limit' => 5,
         ]);
 
@@ -131,6 +158,7 @@ class LocationController extends Controller
             'city' => $contextValue('place') ?? $contextValue('district') ?? $locality,
             'postal_code' => $contextValue('postcode') ?? (in_array('postcode', $feature['place_type'] ?? [], true) ? ($feature['text'] ?? null) : null),
             'address_line_1' => $street ?: ($feature['place_name'] ?? null),
+            'address_line_2' => null,
             'formatted_address' => $feature['place_name'] ?? null,
             'provider' => 'mapbox',
         ];
@@ -179,6 +207,7 @@ class LocationController extends Controller
             'city' => $address['city'] ?? $address['town'] ?? $address['village'] ?? $address['municipality'] ?? $address['county'] ?? null,
             'postal_code' => $address['postcode'] ?? null,
             'address_line_1' => $street ?: ($response->json('display_name') ?: null),
+            'address_line_2' => null,
             'formatted_address' => $response->json('display_name'),
             'provider' => 'openstreetmap',
         ];
