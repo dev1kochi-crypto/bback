@@ -281,6 +281,7 @@ export async function reverseGeocodeLocation(payload: { latitude: number; longit
   city?: string | null;
   postal_code?: string | null;
   address_line_1?: string | null;
+  address_line_2?: string | null;
   formatted_address?: string | null;
   provider?: string | null;
 }> {

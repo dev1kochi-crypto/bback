@@ -1,11 +1,11 @@
 import { getCustomerAddresses } from '@/lib/api';
-import { addressToCheckoutForm, readCheckoutDraft, writeCheckoutDraft } from '@/lib/checkoutStorage';
+import { addressToCheckoutForm, clearCheckoutDraft, readCheckoutDraft, writeCheckoutDraft } from '@/lib/checkoutStorage';
 
 export async function resolveCheckoutHref(token: string | null): Promise<string> {
   if (!token) {
-    const draft = readCheckoutDraft();
+    clearCheckoutDraft();
 
-    return draft?.form.address_line_1?.trim() ? '/checkout/review' : '/checkout';
+    return '/checkout';
   }
 
   try {
