@@ -162,11 +162,11 @@
                 <div class="col-lg-3 col-md-6">
                     <div class="d-flex flex-wrap align-items-center gap-4 h-100 pt-4">
                         <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" name="spicy" id="itemSpicy" {{ old('spicy', $item?->spicy ?? false) ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" name="spicy" value="1" id="itemSpicy" {{ old('spicy', $item?->spicy ?? false) ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold" for="itemSpicy">Spicy</label>
                         </div>
                         <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" name="status" id="itemStatus" {{ old('status', $item?->status ?? true) ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" name="status" value="1" id="itemStatus" {{ old('status', $item?->status ?? true) ? 'checked' : '' }}>
                             <label class="form-check-label fw-bold" for="itemStatus">Active Status</label>
                         </div>
                     </div>
