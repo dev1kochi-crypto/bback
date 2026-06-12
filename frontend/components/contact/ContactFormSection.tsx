@@ -55,9 +55,9 @@ export function ContactFormSection({ contact }: ContactFormSectionProps) {
     <section className="border-t border-[#2c2c2c] bg-[#050505] px-6 py-[70px] text-white sm:px-10 sm:py-[88px] lg:px-16">
       <div className="mx-auto grid max-w-[1568px] gap-14 lg:grid-cols-[minmax(0,776px)_minmax(480px,714px)] lg:items-start lg:justify-between">
         <div data-section-motion>
-          <h2 data-reveal className="font-display text-[36px] font-medium leading-none tracking-[0.04em] text-white sm:text-[40px]">Get In Touch</h2>
+          <h2 data-reveal className="font-display text-[36px] font-medium leading-none tracking-[0.04em] text-white sm:text-[40px]">Connect With Us</h2>
           <p data-reveal className="mt-5 max-w-[660px] font-display text-[18px] font-normal leading-relaxed text-white/58">
-            Have a question about our menu, catering, or reservations? Send us a message and our team will get back to you shortly.
+            Have a question about our menu or reservations? We’re always happy to help. Send us a message, and our team will get back to you shortly.          
           </p>
 
           <form data-motion-form className="mt-[46px] space-y-6 font-display" onSubmit={handleSubmit}>

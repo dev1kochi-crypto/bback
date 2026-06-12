@@ -8,15 +8,16 @@ import { ThatWrapSection } from '@/components/home/ThatWrapSection';
 import { MenuSignatureItemsSection } from '@/components/menu/MenuSignatureItemsSection';
 import { MenuShowcaseSection } from '@/components/menu/MenuShowcaseSection';
 import { defaultAboutPayload, defaultMenuPayload, defaultOrderProcessPayload, defaultTestimonialsPayload } from '@/lib/api';
-import { getAboutUs, getBanners, getMenus, getOrderProcess, getTestimonials } from '@/lib/api.server';
+import { getAboutUs, getBanners, getMenus, getOrderProcess, getSite, getTestimonials } from '@/lib/api.server';
 
 export async function HomePageContent() {
-  const [banners, aboutPayload, menuPayload, orderProcessPayload, testimonialsPayload] = await Promise.all([
+  const [banners, aboutPayload, menuPayload, orderProcessPayload, testimonialsPayload, sitePayload] = await Promise.all([
     getBanners().catch(() => []),
     getAboutUs().catch(() => defaultAboutPayload),
     getMenus().catch(() => defaultMenuPayload),
     getOrderProcess().catch(() => defaultOrderProcessPayload),
     getTestimonials().catch(() => defaultTestimonialsPayload),
+    getSite(),
   ]);
 
   return (
@@ -29,7 +30,7 @@ export async function HomePageContent() {
       <OrderProcessSection payload={orderProcessPayload} />
       <HomeWhyChooseUsSection section={aboutPayload.why_choose_us} />
       <HomeTestimonialsSection payload={testimonialsPayload} />
-      <ThatWrapSection />
+      <ThatWrapSection site={sitePayload} />
     </main>
   );
 }
