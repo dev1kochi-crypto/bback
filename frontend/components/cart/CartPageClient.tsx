@@ -2,6 +2,7 @@
 
 import { useCart } from '@/components/cart/CartProvider';
 import { CommerceItem, CommercePage, CommercePanel, CommerceStagger } from '@/components/motion/CommerceMotion';
+import { hasMenuItemImage, menuItemImageSrc } from '@/lib/assets';
 import { resolveCheckoutHref } from '@/lib/checkoutRoute';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -74,8 +75,15 @@ export function CartPageClient() {
                   onChange={(event) => toggleItemSelected(item.menu_item_id, event.target.checked)}
                   className="absolute right-3 top-3 accent-ember sm:static"
                 />
-                <div className="relative h-[58px] w-[64px] sm:h-[70px] sm:w-[80px]">
-                  {item.image ? <Image src={item.image} alt={item.name} fill sizes="80px" className="object-contain" /> : null}
+                <div className={`relative h-[58px] w-[64px] overflow-hidden rounded-[6px] sm:h-[70px] sm:w-[80px] ${hasMenuItemImage(item.image) ? '' : 'bg-[#14181b]'}`}>
+                  <Image
+                    src={menuItemImageSrc(item.image)}
+                    alt={item.name}
+                    fill
+                    sizes="80px"
+                    className={`object-contain ${hasMenuItemImage(item.image) ? '' : 'p-1 drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]'}`}
+                    unoptimized
+                  />
                 </div>
                 <div className="min-w-0 pr-7 sm:pr-0">
                   <h2 className="font-display text-[17px] font-semibold leading-tight sm:text-[20px]">{item.name}</h2>

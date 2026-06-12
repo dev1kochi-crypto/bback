@@ -3,6 +3,7 @@
 import { CheckoutSummary } from '@/components/cart/CheckoutSummary';
 import { useCart } from '@/components/cart/CartProvider';
 import { CommerceItem, CommercePage, CommercePanel, CommerceSection, CommerceStagger } from '@/components/motion/CommerceMotion';
+import { hasMenuItemImage, menuItemImageSrc } from '@/lib/assets';
 import { submitCheckout, verifyCheckoutOtp } from '@/lib/api';
 import {
   clearCheckoutDraft,
@@ -181,12 +182,15 @@ export function CheckoutReviewClient() {
             <CommerceStagger className="mt-4 space-y-3">
               {selectedItems.map((item) => (
                 <CommerceItem key={item.menu_item_id} className="relative grid grid-cols-[64px_minmax(0,1fr)] items-center gap-x-3 gap-y-2.5 border-b border-white/8 pb-3 sm:grid-cols-[72px_1fr_120px_90px] sm:gap-4 sm:pb-4">
-                  <div className="relative h-[58px] w-[64px] sm:h-[72px] sm:w-[72px]">
-                    {item.image ? (
-                      <Image src={item.image} alt={item.name} fill sizes="72px" className="object-contain" />
-                    ) : (
-                      <div className="grid h-full w-full place-items-center rounded-full bg-white/[0.06] font-display text-[18px] text-ember">B</div>
-                    )}
+                  <div className={`relative h-[58px] w-[64px] overflow-hidden rounded-[6px] sm:h-[72px] sm:w-[72px] ${hasMenuItemImage(item.image) ? '' : 'bg-[#14181b]'}`}>
+                    <Image
+                      src={menuItemImageSrc(item.image)}
+                      alt={item.name}
+                      fill
+                      sizes="72px"
+                      className={`object-contain ${hasMenuItemImage(item.image) ? '' : 'p-1 drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]'}`}
+                      unoptimized
+                    />
                   </div>
                   <div className="min-w-0">
                     <p className="font-display text-[17px] font-medium leading-tight text-white sm:text-[18px]">{item.name}</p>

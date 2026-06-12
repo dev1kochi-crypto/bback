@@ -2,6 +2,7 @@
 
 import { useCart } from '@/components/cart/CartProvider';
 import { CommerceDrawer, CommerceItem, CommerceOverlay, CommerceStagger } from '@/components/motion/CommerceMotion';
+import { hasMenuItemImage, menuItemImageSrc } from '@/lib/assets';
 import { resolveCheckoutHref } from '@/lib/checkoutRoute';
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
@@ -50,8 +51,15 @@ export function CartDrawer() {
             <CommerceStagger className="space-y-3">
               {cart.items.map((item) => (
                 <CommerceItem key={item.menu_item_id} className="grid grid-cols-[70px_minmax(0,1fr)_auto] items-start gap-4 rounded-[8px] border border-black/10 px-4 py-4">
-                  <div className="relative h-[70px] w-[70px] shrink-0">
-                    {item.image ? <Image src={item.image} alt={item.name} fill sizes="70px" className="object-contain" unoptimized /> : null}
+                  <div className={`relative h-[70px] w-[70px] shrink-0 overflow-hidden rounded-[6px] ${hasMenuItemImage(item.image) ? '' : 'bg-[#14181b]'}`}>
+                    <Image
+                      src={menuItemImageSrc(item.image)}
+                      alt={item.name}
+                      fill
+                      sizes="70px"
+                      className={`object-contain ${hasMenuItemImage(item.image) ? '' : 'p-1 drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]'}`}
+                      unoptimized
+                    />
                   </div>
 
                   <div className="min-w-0 pt-0.5">
@@ -147,12 +155,15 @@ export function CartDrawer() {
               <span>Item added to your cart</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="relative h-12 w-14 shrink-0 overflow-hidden rounded-[4px] bg-black/5">
-                {toast.image ? (
-                  <Image src={toast.image} alt="" fill sizes="56px" className="object-contain" unoptimized />
-                ) : (
-                  <div className="grid h-full w-full place-items-center font-display text-[16px] text-ember">B</div>
-                )}
+              <div className={`relative h-12 w-14 shrink-0 overflow-hidden rounded-[4px] ${hasMenuItemImage(toast.image) ? 'bg-black/5' : 'bg-[#14181b]'}`}>
+                <Image
+                  src={menuItemImageSrc(toast.image)}
+                  alt=""
+                  fill
+                  sizes="56px"
+                  className={`object-contain ${hasMenuItemImage(toast.image) ? '' : 'p-0.5 drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]'}`}
+                  unoptimized
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-display text-[18px] font-semibold leading-none">{toast.name}</p>

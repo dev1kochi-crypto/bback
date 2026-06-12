@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 270" fill="none" aria-hidden="true">
+  <text x="180" y="38" text-anchor="middle" fill="#ffffff" font-family="system-ui, -apple-system, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="0.14em">PHOTOS</text>
+  <text x="180" y="58" text-anchor="middle" fill="#ffffff" font-family="system-ui, -apple-system, Segoe UI, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="0.14em">COMING SOON</text>
+
+  <g stroke="#ffffff" stroke-opacity="0.9" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- burger -->
+    <path d="M58 214c0-11 9-20 20-20h44c11 0 20 9 20 20" />
+    <path d="M52 214h96" />
+    <path d="M62 194c7-9 15-14 25-14s18 5 25 14" />
+    <path d="M68 222c5 7 13 12 22 12s17-5 22-12" />
+    <path d="M74 230h72" />
+    <ellipse cx="100" cy="238" rx="36" ry="9" />
+
+    <!-- fries -->
+    <path d="M148 242V176c0-6 5-11 11-11h32c6 0 11 5 11 11v66" />
+    <path d="M142 242h56" />
+    <path d="M158 172v58M172 166v64M186 172v58M200 178v52" />
+
+    <!-- drink -->
+    <path d="M224 242V162c0-8 6-14 13-14h28c7 0 13 6 13 14v80" />
+    <path d="M216 242h68" />
+    <path d="M252 148h22l7 13H245l7-13z" />
+    <path d="M280 162c7 4 11 11 11 20" />
+    <path d="M293 178v18" />
+  </g>
+</svg>

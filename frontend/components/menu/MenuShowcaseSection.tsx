@@ -3,6 +3,8 @@
 import type { MenuPayload, MenuItem } from '@/types/menu';
 import { useCart } from '@/components/cart/CartProvider';
 import { menuCategoryMatches } from '@/lib/api';
+import { MenuPhotoPlaceholder } from '@/components/menu/MenuPhotoPlaceholder';
+import { hasMenuItemImage } from '@/lib/assets';
 import { safeBreakHtml } from '@/lib/cmsText';
 import { Stars } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
@@ -718,6 +720,7 @@ function MenuCard({ item, variant, index, disableRevealMotion = false }: { item:
   const router = useRouter();
   const floatDelay = (index % 4) * 0.35;
   const hasOfferPrice = Boolean(item.offer_price);
+  const hasImage = hasMenuItemImage(item.image);
 
   return (
     <motion.article
@@ -765,9 +768,17 @@ function MenuCard({ item, variant, index, disableRevealMotion = false }: { item:
             aria-hidden="true"
             unoptimized
           />
-          {item.image ? (
-            <Image src={item.image} alt={item.image_alt || item.name || 'Menu item'} fill sizes="246px" className="-translate-y-[6px] scale-[1.1] object-contain drop-shadow-[0_14px_18px_rgba(0,0,0,0.22)]" />
-          ) : null}
+          {hasImage ? (
+            <Image
+              src={item.image!}
+              alt={item.image_alt || item.name || 'Menu item'}
+              fill
+              sizes="246px"
+              className="-translate-y-[6px] scale-[1.1] object-contain drop-shadow-[0_14px_18px_rgba(0,0,0,0.22)]"
+            />
+          ) : (
+            <MenuPhotoPlaceholder size="card" />
+          )}
         </motion.div>
         <div className="-mt-[2px]">
           <h3 className="font-display text-[27px] font-black leading-[0.95] tracking-normal">{item.name}</h3>
@@ -818,10 +829,11 @@ function MenuListingMobileCard({ item }: { item: MenuItem }) {
   const { addItem } = useCart();
   const router = useRouter();
   const hasOfferPrice = Boolean(item.offer_price);
+  const hasImage = hasMenuItemImage(item.image);
 
   return (
     <article className="group relative flex w-full items-stretch gap-3 overflow-hidden rounded-[14px] border border-white/12 bg-[#0d1012] p-3 text-white shadow-[0_8px_24px_rgba(0,0,0,0.35)] outline-none transition-[background-color,border-color] duration-300 active:border-transparent active:bg-[#f68b24]">
-      <div className="relative h-[88px] w-[88px] shrink-0 rounded-[10px] bg-[#14181b]">
+      <div className="relative h-[88px] w-[88px] shrink-0 overflow-hidden rounded-[10px] bg-[#14181b]">
         <Image
           src="/app/images/menu-card-brush.png"
           alt=""
@@ -831,9 +843,17 @@ function MenuListingMobileCard({ item }: { item: MenuItem }) {
           aria-hidden="true"
           unoptimized
         />
-        {item.image ? (
-          <Image src={item.image} alt={item.image_alt || item.name || 'Menu item'} fill sizes="88px" className="scale-[1.05] object-contain object-center drop-shadow-[0_8px_12px_rgba(0,0,0,0.22)]" />
-        ) : null}
+        {hasImage ? (
+          <Image
+            src={item.image!}
+            alt={item.image_alt || item.name || 'Menu item'}
+            fill
+            sizes="88px"
+            className="scale-[1.05] object-contain object-center drop-shadow-[0_8px_12px_rgba(0,0,0,0.22)]"
+          />
+        ) : (
+          <MenuPhotoPlaceholder size="thumb" />
+        )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col justify-between">
         <div>
