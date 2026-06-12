@@ -5,4 +5,14 @@ export const siteAssets = {
   contactDirectionsIcon: '/app/images/carbon_location.png',
   contactMailIcon: '/app/images/iconoir_mail.png',
   menuIcon: '/app/images/gg_menu-hotdog.png',
+  productPhotoComingSoon: '/app/images/product-photo-coming-soon.svg',
 } as const;
+
+export function menuItemImageSrc(image: string | null | undefined): string {
+  const trimmed = image?.trim();
+  return trimmed ? trimmed : siteAssets.productPhotoComingSoon;
+}
+
+export function hasMenuItemImage(image: string | null | undefined): boolean {
+  return Boolean(image?.trim());
+}
