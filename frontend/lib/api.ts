@@ -5,7 +5,7 @@ import type { AuthResponse, AuthUser, MessageResponse, VerifyOtpResponse } from 
 import type { CartPayload, CheckoutInput, CheckoutOtpResponse, CustomerAddress } from '@/types/cart';
 import type { ContactEnquiryInput, ContactPayload } from '@/types/contact';
 import type { PageMetadataPayload } from '@/types/metadata';
-import type { MenuPayload } from '@/types/menu';
+import type { MenuItem, MenuPayload } from '@/types/menu';
 import type { OrderDetail, OrderSummary } from '@/types/order';
 import type { OrderProcessPayload } from '@/types/orderProcess';
 import type { OffersPayload } from '@/types/offer';
@@ -64,6 +64,57 @@ export const defaultMenuPayload: MenuPayload = {
   signature_items: [],
 };
 
+function toMenuId(value: unknown): number | null {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+
+  const parsed = Number(value);
+
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function normalizeMenuItem(item: MenuItem): MenuItem {
+  return {
+    ...item,
+    id: Number(item.id),
+    category_id: toMenuId(item.category_id),
+    sort_order: Number(item.sort_order ?? 0),
+    spicy: Boolean(item.spicy),
+  };
+}
+
+export function normalizeMenuPayload(payload: MenuPayload): MenuPayload {
+  return {
+    ...payload,
+    categories: (payload.categories ?? []).map((category) => ({
+      ...category,
+      id: Number(category.id),
+      sort_order: Number(category.sort_order ?? 0),
+    })),
+    items: (payload.items ?? []).map((item) => normalizeMenuItem(item)),
+    signature_items: (payload.signature_items ?? []).map((item) => ({
+      ...item,
+      id: Number(item.id),
+      menu_item_id: toMenuId(item.menu_item_id),
+      sort_order: Number(item.sort_order ?? 0),
+      menu_item: item.menu_item ? normalizeMenuItem(item.menu_item) : null,
+    })),
+  };
+}
+
+export function menuCategoryMatches(itemCategoryId: number | null, activeCategory: number | 'all'): boolean {
+  if (activeCategory === 'all') {
+    return true;
+  }
+
+  if (itemCategoryId === null) {
+    return false;
+  }
+
+  return Number(itemCategoryId) === Number(activeCategory);
+}
+
 export const defaultOrderProcessPayload: OrderProcessPayload = {
   section: null,
   items: [],
@@ -117,7 +168,7 @@ export async function getOffers(): Promise<OffersPayload> {
 export async function getMenus(): Promise<MenuPayload> {
   const response = await api.get<MenuPayload>('/api/menus');
 
-  return response.data;
+  return normalizeMenuPayload(response.data);
 }
 
 export async function getOrderProcess(): Promise<OrderProcessPayload> {

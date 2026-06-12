@@ -2,6 +2,7 @@
 
 import type { MenuPayload, MenuItem } from '@/types/menu';
 import { useCart } from '@/components/cart/CartProvider';
+import { menuCategoryMatches } from '@/lib/api';
 import { safeBreakHtml } from '@/lib/cmsText';
 import { Stars } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
@@ -12,6 +13,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { Group } from 'three';
+
+function isSelectedCategory(categoryId: number, activeCategory: number | 'all'): boolean {
+  return activeCategory !== 'all' && Number(categoryId) === Number(activeCategory);
+}
 
 const CategoryIcon = ({ name }: { name: string }) => {
   const n = name.toLowerCase();
@@ -131,12 +136,12 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
   const visibleCategories = useMemo(() => menu.categories.slice(0, 5), [menu.categories]);
   const activeCategoryLabel = activeCategory === 'all'
     ? 'All Categories'
-    : menu.categories.find((category) => category.id === activeCategory)?.name || 'All Categories';
-  const activeExtraFilterCount = (foodFilter === 'all' ? 0 : 1) + (spicyOnly ? 1 : 0) + (activeCategory !== 'all' && !visibleCategories.some((category) => category.id === activeCategory) ? 1 : 0);
+    : menu.categories.find((category) => isSelectedCategory(category.id, activeCategory))?.name || 'All Categories';
+  const activeExtraFilterCount = (foodFilter === 'all' ? 0 : 1) + (spicyOnly ? 1 : 0) + (activeCategory !== 'all' && !visibleCategories.some((category) => isSelectedCategory(category.id, activeCategory)) ? 1 : 0);
 
   const filteredItems = useMemo(() => {
     return menu.items.filter((item) => {
-      const matchesCategory = activeCategory === 'all' || item.category_id === activeCategory;
+      const matchesCategory = menuCategoryMatches(item.category_id, activeCategory);
       const matchesFoodType = foodFilter === 'all' || item.food_type === foodFilter;
       const matchesSpicy = !spicyOnly || item.spicy;
 
@@ -399,7 +404,7 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
                     key={category.id}
                     type="button"
                     onClick={() => { setActiveCategory(category.id); setIsDropdownOpen(false); }}
-                    className={`flex w-full items-center gap-3 rounded-full px-4 py-3 font-display text-[14px] transition ${activeCategory === category.id ? 'bg-ember text-white' : 'text-white/70 hover:bg-[#222] hover:text-white'}`}
+                    className={`flex w-full items-center gap-3 rounded-full px-4 py-3 font-display text-[14px] transition ${isSelectedCategory(category.id, activeCategory) ? 'bg-ember text-white' : 'text-white/70 hover:bg-[#222] hover:text-white'}`}
                   >
                     <CategoryIcon name={category.name || ''} />
                     {category.name}
@@ -435,7 +440,7 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
                 key={category.id}
                 type="button"
                 onClick={() => setActiveCategory(category.id)}
-                className={activeCategory === category.id ? categoryActiveClass : categoryClass}
+                className={isSelectedCategory(category.id, activeCategory) ? categoryActiveClass : categoryClass}
                 whileHover={prefersReducedMotion ? undefined : { y: -2, scale: 1.04 }}
                 whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
               >
@@ -505,7 +510,7 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
                         key={category.id}
                         type="button"
                         onClick={() => setActiveCategory(category.id)}
-                        className={`flex h-11 items-center gap-3 rounded-full px-4 font-display text-[14px] transition ${activeCategory === category.id ? 'bg-ember text-white' : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'}`}
+                        className={`flex h-11 items-center gap-3 rounded-full px-4 font-display text-[14px] transition ${isSelectedCategory(category.id, activeCategory) ? 'bg-ember text-white' : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'}`}
                       >
                         <CategoryIcon name={category.name || ''} />
                         {category.name}

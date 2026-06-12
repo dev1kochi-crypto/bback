@@ -18,6 +18,7 @@ import {
   defaultOrderProcessPayload,
   defaultSitePayload,
   defaultTestimonialsPayload,
+  normalizeMenuPayload,
 } from '@/lib/api';
 import { CMS_CACHE_ENABLED, REVALIDATE_SECONDS } from '@/lib/cache';
 
@@ -109,7 +110,7 @@ const fetchOffers = cachedQuery('api-offers', async () => {
 const fetchMenus = cachedQuery('api-menus', async () => {
   const response = await api.get<MenuPayload>('/api/menus');
 
-  return response.data;
+  return normalizeMenuPayload(response.data);
 }, defaultMenuPayload);
 
 const fetchOrderProcess = cachedQuery('api-order-process', async () => {
