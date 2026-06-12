@@ -2,6 +2,7 @@
 
 import type { MenuPayload, MenuItem } from '@/types/menu';
 import { useCart } from '@/components/cart/CartProvider';
+import { safeBreakHtml } from '@/lib/cmsText';
 import { Stars } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
@@ -345,9 +346,10 @@ export function MenuShowcaseSection({ menu, variant = 'home' }: MenuShowcaseSect
           </h2>
           <div className="mx-auto mt-5 h-[10px] w-[170px] translate-x-[64px] bg-[url('/app/images/Vector-2.png')] bg-contain bg-center bg-no-repeat max-sm:translate-x-0" />
           {description ? (
-            <p className="mx-auto mt-5 max-w-[860px] text-[14px] leading-[1.65] text-[#9b9b9b] sm:mt-7 sm:text-[17px]">
-              {description}
-            </p>
+            <p
+              className="mx-auto mt-5 max-w-[860px] text-[14px] leading-[1.65] text-[#9b9b9b] sm:mt-7 sm:text-[17px]"
+              dangerouslySetInnerHTML={{ __html: safeBreakHtml(description) }}
+            />
           ) : null}
           {variant === 'home' && menu.section?.button_text && menu.section?.button_url ? (
             <Link
@@ -769,7 +771,12 @@ function MenuCard({ item, variant, index, disableRevealMotion = false }: { item:
             <MenuAttributeBadge type={item.food_type} />
             {item.spicy ? <SpicyBadge /> : null}
           </div>
-          {item.description ? <p className="mt-[17px] line-clamp-3 max-w-[222px] text-[12px] font-semibold leading-[1.42] text-white/60 transition group-hover:text-black/85 group-focus-within:text-black/85">{item.description}</p> : null}
+          {item.description ? (
+            <p
+              className="mt-[17px] line-clamp-3 max-w-[222px] text-[12px] font-semibold leading-[1.42] text-white/60 transition group-hover:text-black/85 group-focus-within:text-black/85"
+              dangerouslySetInnerHTML={{ __html: safeBreakHtml(item.description) }}
+            />
+          ) : null}
         </div>
         <div className="mt-auto flex items-center gap-[8px] pt-[20px]">
           <button
@@ -846,9 +853,10 @@ function MenuListingMobileCard({ item }: { item: MenuItem }) {
             </div>
           </div>
           {item.description ? (
-            <p className="mt-2 line-clamp-2 text-[11px] font-semibold leading-[1.35] text-white/60">
-              {item.description}
-            </p>
+            <p
+              className="mt-2 line-clamp-2 text-[11px] font-semibold leading-[1.35] text-white/60"
+              dangerouslySetInnerHTML={{ __html: safeBreakHtml(item.description) }}
+            />
           ) : null}
         </div>
         <div className="mt-2.5 flex items-center gap-2">

@@ -45,6 +45,7 @@
                             <div class="col-12">
                             <label class="form-label fw-bold">Description{{ $showLanguageUi ? ' (' . strtoupper($lang->code) . ')' : '' }}</label>
                             <textarea name="translations[{{ $lang->code }}][description]" class="form-control" rows="3">{{ $trans['description'] ?? $item?->description }}</textarea>
+                            <small class="text-muted d-block mt-1">Use <code>&lt;br&gt;</code> to add a line break on the Home and Menus sections.</small>
                             </div>
                         </div>
                     </div>

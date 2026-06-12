@@ -2,6 +2,7 @@
 
 import type { MenuSignatureItem, MenuSignatureSection } from '@/types/menu';
 import { useCart } from '@/components/cart/CartProvider';
+import { plainBreakText, safeBreakHtml } from '@/lib/cmsText';
 import { motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -52,9 +53,10 @@ export function MenuSignatureItemsSection({ section, items }: MenuSignatureItems
               </>
             ) : null}
             {section.short_description ? (
-              <p className={`${section.line_2 ? 'mt-8' : ''} max-w-[748px] font-display text-[20px] font-light leading-normal tracking-[0.8px] text-[#DEDEDE]`}>
-                {section.short_description}
-              </p>
+              <p
+                className={`${section.line_2 ? 'mt-8' : ''} max-w-[748px] font-display text-[20px] font-light leading-normal tracking-[0.8px] text-[#DEDEDE]`}
+                dangerouslySetInnerHTML={{ __html: safeBreakHtml(section.short_description) }}
+              />
             ) : null}
           </motion.div>
 
@@ -238,27 +240,9 @@ function signatureCardConfig(index: number) {
 }
 
 function signatureTitleHtml(title: string): string {
-  const normalized = title.replace(/&lt;\s*br\s*\/?\s*&gt;/gi, '<br>');
-
-  return normalized
-    .split(/<\s*br\s*\/?\s*>/gi)
-    .map(escapeHtml)
-    .join('<br />');
+  return safeBreakHtml(title);
 }
 
 function plainSignatureTitle(title: string): string {
-  return title
-    .replace(/&lt;\s*br\s*\/?\s*&gt;/gi, ' ')
-    .replace(/<\s*br\s*\/?\s*>/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+  return plainBreakText(title);
 }
