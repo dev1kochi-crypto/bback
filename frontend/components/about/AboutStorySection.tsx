@@ -4,7 +4,7 @@ import { absoluteAssetUrl } from '@/lib/api';
 import type { AboutUsContent } from '@/types/about';
 import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import Image from 'next/image';
-import { useRef, useState } from 'react';
+import { useRef, useState, type SyntheticEvent } from 'react';
 
 interface AboutStorySectionProps {
   about: AboutUsContent | null;
@@ -15,6 +15,7 @@ const titleUnderline = absoluteAssetUrl('/app/images/Vector-2.png') ?? '/app/ima
 
 export function AboutStorySection({ about }: AboutStorySectionProps) {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [videoAspectRatio, setVideoAspectRatio] = useState<number | null>(null);
   const sectionRef = useRef<HTMLElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start end', 'end start'] });
@@ -26,6 +27,25 @@ export function AboutStorySection({ about }: AboutStorySectionProps) {
   const mediaImage = about?.video_thumbnail || fallbackMediaImage;
   const description = about?.long_description || about?.short_description;
   const embedSrc = getPlayableVideoUrl(videoSrc);
+  const isDirectVideo = Boolean(
+    embedSrc && (about?.video_type === 'upload' || isDirectVideoUrl(embedSrc)),
+  );
+
+  const handleVideoMetadata = (event: SyntheticEvent<HTMLVideoElement>) => {
+    const { videoWidth, videoHeight } = event.currentTarget;
+    if (videoWidth > 0 && videoHeight > 0) {
+      setVideoAspectRatio(videoWidth / videoHeight);
+    }
+  };
+
+  const handlePlay = () => {
+    if (!videoSrc) {
+      return;
+    }
+
+    setVideoAspectRatio(null);
+    setIsPlaying(true);
+  };
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden bg-[#071011] px-6 pb-[52px] pt-[78px] text-white sm:px-10 lg:px-16 lg:pb-[64px] lg:pt-[88px]">
@@ -83,13 +103,22 @@ export function AboutStorySection({ about }: AboutStorySectionProps) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.25 }}
           transition={{ duration: 0.75, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto mt-[86px] aspect-[616/367] max-w-[1320px] overflow-hidden bg-[#151515] shadow-[0_26px_70px_rgba(0,0,0,0.45)]"
-          style={prefersReducedMotion ? undefined : { y: mediaY, transformPerspective: 1200 }}
-          whileHover={prefersReducedMotion ? undefined : { rotateX: 1.5, scale: 1.008 }}
+          className="relative mx-auto mt-[86px] max-w-[1320px] overflow-hidden bg-[#151515] shadow-[0_26px_70px_rgba(0,0,0,0.45)]"
+          style={{
+            aspectRatio: isPlaying && isDirectVideo && videoAspectRatio ? videoAspectRatio : 16 / 9,
+            ...(prefersReducedMotion ? {} : { y: mediaY, transformPerspective: 1200 }),
+          }}
+          whileHover={prefersReducedMotion || isPlaying ? undefined : { rotateX: 1.5, scale: 1.008 }}
         >
           {isPlaying && embedSrc ? (
-            about?.video_type === 'upload' || isDirectVideoUrl(embedSrc) ? (
-              <video controls autoPlay playsInline className="h-full w-full object-cover">
+            isDirectVideo ? (
+              <video
+                controls
+                autoPlay
+                playsInline
+                onLoadedMetadata={handleVideoMetadata}
+                className={`h-full w-full ${videoAspectRatio ? 'object-cover' : 'object-contain'}`}
+              >
                 <source src={embedSrc} />
               </video>
             ) : (
@@ -109,7 +138,7 @@ export function AboutStorySection({ about }: AboutStorySectionProps) {
                 type="button"
                 aria-label="Play about video"
                 disabled={!videoSrc}
-                onClick={() => videoSrc && setIsPlaying(true)}
+                onClick={handlePlay}
                 className="absolute left-1/2 top-1/2 grid h-[86px] w-[86px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-[#645b5d]/85 text-white shadow-[0_18px_45px_rgba(0,0,0,0.4)] transition duration-300 enabled:hover:scale-105 enabled:hover:bg-[#72686a] disabled:cursor-default"
               >
                 <span className="ml-1 h-0 w-0 border-y-[15px] border-l-[22px] border-y-transparent border-l-white" />
