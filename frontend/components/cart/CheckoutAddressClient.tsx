@@ -430,16 +430,6 @@ export function CheckoutAddressClient() {
             </div>
           ) : null}
 
-          <label className="mt-6 block">
-            <span className="mb-2 block font-body text-[13px] font-bold text-white">Order Notes</span>
-            <textarea
-              value={form.notes}
-              onChange={(event) => setValue('notes', event.target.value)}
-              rows={4}
-              className="w-full border border-white/12 bg-[#111] px-4 py-3 font-body text-[14px] outline-none focus:border-ember"
-            />
-          </label>
-
           {message ? <p className="mt-5 font-body text-[14px] font-semibold text-amber-300">{message}</p> : null}
 
           <button type="submit" disabled={!selectedItems.length} className="mt-8 h-12 w-full bg-ember px-8 font-display text-[14px] font-medium uppercase text-white disabled:opacity-45 sm:w-auto">
