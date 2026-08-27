@@ -11,6 +11,7 @@ import {
   formatAddressSummary,
   readCheckoutDraft,
   readReorderNotice,
+  writeCheckoutDraft,
   type CheckoutDraft,
 } from '@/lib/checkoutStorage';
 import axios from 'axios';
@@ -29,6 +30,26 @@ export function CheckoutReviewClient() {
   const [isVerifyingCheckoutOtp, setIsVerifyingCheckoutOtp] = useState(false);
   const [otp, setOtp] = useState('');
   const selectedItems = cart.items.filter((item) => item.selected !== false);
+
+  function updateOrderNotes(notes: string) {
+    setDraft((current) => {
+      if (!current) {
+        return current;
+      }
+
+      const nextDraft = {
+        ...current,
+        form: {
+          ...current.form,
+          notes,
+        },
+      };
+
+      writeCheckoutDraft(nextDraft);
+
+      return nextDraft;
+    });
+  }
 
   useEffect(() => {
     const storedDraft = readCheckoutDraft();
@@ -239,12 +260,17 @@ export function CheckoutReviewClient() {
             </div>
           </CommerceSection>
 
-          {draft.form.notes ? (
-            <CommerceSection className="mt-8 border-t border-white/10 pt-6" delay={0.16}>
-              <h2 className="font-display text-[20px] font-medium text-white">Order Notes</h2>
-              <p className="mt-4 border border-white/12 bg-[#111] p-4 font-body text-[13px] leading-[1.7] text-white/72">{draft.form.notes}</p>
-            </CommerceSection>
-          ) : null}
+          <CommerceSection className="mt-8 border-t border-white/10 pt-6" delay={0.16}>
+            <label className="block">
+              <span className="mb-2 block font-display text-[20px] font-medium text-white">Order Notes</span>
+              <textarea
+                value={draft.form.notes}
+                onChange={(event) => updateOrderNotes(event.target.value)}
+                rows={4}
+                className="w-full border border-white/12 bg-[#111] px-4 py-3 font-body text-[14px] leading-[1.7] text-white outline-none placeholder:text-white/35 focus:border-ember"
+              />
+            </label>
+          </CommerceSection>
 
           {isVerifyingCheckoutOtp ? (
             <div className="mt-8 max-w-[420px]">
