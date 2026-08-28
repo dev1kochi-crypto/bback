@@ -11,7 +11,7 @@ interface MetadataFallback {
 export async function buildPageMetadata(pageKey: string, fallback: MetadataFallback): Promise<Metadata> {
   try {
     const pageMetadata = await getPageMetadata(pageKey);
-    const fallbackCanonical = absoluteCurrentUrl(fallback.canonicalPath ?? pagePathFromKey(pageKey));
+    const fallbackCanonical = await absoluteCurrentUrl(fallback.canonicalPath ?? pagePathFromKey(pageKey));
 
     if (!pageMetadata) {
       return withFallbackCanonical(fallback, fallbackCanonical);
@@ -40,7 +40,7 @@ export async function buildPageMetadata(pageKey: string, fallback: MetadataFallb
       other: parseMetaTags(pageMetadata.other_meta_tags),
     };
   } catch {
-    return withFallbackCanonical(fallback, absoluteCurrentUrl(fallback.canonicalPath ?? pagePathFromKey(pageKey)));
+    return withFallbackCanonical(fallback, await absoluteCurrentUrl(fallback.canonicalPath ?? pagePathFromKey(pageKey)));
   }
 }
 
@@ -56,7 +56,7 @@ function pagePathFromKey(pageKey: string): string {
   return pageKey === 'home' ? '/' : `/${pageKey}`;
 }
 
-function absoluteCurrentUrl(path: string): string | null {
+async function absoluteCurrentUrl(path: string): Promise<string | null> {
   const configuredOrigin = process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL;
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
 
@@ -64,7 +64,7 @@ function absoluteCurrentUrl(path: string): string | null {
     return new URL(normalizedPath, configuredOrigin).toString();
   }
 
-  const requestHeaders = headers();
+  const requestHeaders = await headers();
   const host = requestHeaders.get('x-forwarded-host') || requestHeaders.get('host');
 
   if (!host) {

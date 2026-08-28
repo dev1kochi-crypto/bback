@@ -4,7 +4,6 @@ import { Suspense } from 'react';
 import { CartDrawer } from '@/components/cart/CartDrawer';
 import { CartProvider } from '@/components/cart/CartProvider';
 import { getSite } from '@/lib/api.server';
-import { REVALIDATE_SECONDS } from '@/lib/cache';
 import '@/styles/css/app.css';
 
 const oswald = Oswald({
@@ -24,7 +23,7 @@ export const metadata: Metadata = {
   description: 'B.back restaurant website.',
 };
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 10;
 
 export default function RootLayout({
   children,

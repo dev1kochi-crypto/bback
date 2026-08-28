@@ -1,10 +1,9 @@
 import { HomePageContent } from '@/components/home/HomePageContent';
 import { SiteShell } from '@/components/layout/SiteShell';
 import { buildPageMetadata } from '@/lib/pageMetadata';
-import { REVALIDATE_SECONDS } from '@/lib/cache';
 import { Suspense } from 'react';
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 10;
 
 export async function generateMetadata() {
   return buildPageMetadata('home', {

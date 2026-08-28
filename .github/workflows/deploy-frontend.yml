@@ -1,0 +1,71 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+  workflow_dispatch: {}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm install --include=dev
+
+      - name: Write production env file
+        working-directory: frontend
+        run: |
+          cat > .env.production <<EOF
+          NEXT_PUBLIC_API_BASE_URL=${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+          NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+          REVALIDATE_SECRET=${{ secrets.FRONTEND_REVALIDATE_SECRET }}
+          CMS_REVALIDATE_SECONDS=10
+          EOF
+
+      - name: Build (standalone output)
+        working-directory: frontend
+        run: npm run build
+
+      - name: Assemble deploy artifact
+        working-directory: frontend
+        run: |
+          mkdir -p deploy
+          cp -r .next/standalone/. deploy/
+          mkdir -p deploy/.next
+          cp -r .next/static deploy/.next/static
+          cp -r public deploy/public
+
+      - name: Deploy to cPanel via rsync
+        uses: burnett01/rsync-deployments@7.0.2
+        with:
+          switches: -avz --delete
+          path: frontend/deploy/
+          remote_path: ${{ secrets.CPANEL_APP_PATH }}
+          remote_host: ${{ secrets.CPANEL_SSH_HOST }}
+          remote_port: ${{ secrets.CPANEL_SSH_PORT }}
+          remote_user: ${{ secrets.CPANEL_SSH_USER }}
+          remote_key: ${{ secrets.CPANEL_SSH_KEY }}
+
+      - name: Restart Passenger app
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.CPANEL_SSH_HOST }}
+          port: ${{ secrets.CPANEL_SSH_PORT }}
+          username: ${{ secrets.CPANEL_SSH_USER }}
+          key: ${{ secrets.CPANEL_SSH_KEY }}
+          script: |
+            mkdir -p ${{ secrets.CPANEL_APP_PATH }}/tmp
+            touch ${{ secrets.CPANEL_APP_PATH }}/tmp/restart.txt

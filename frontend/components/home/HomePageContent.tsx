@@ -6,7 +6,7 @@ import { HomeWhyChooseUsSection } from '@/components/home/HomeWhyChooseUsSection
 import { OrderProcessSection } from '@/components/home/OrderProcessSection';
 import { ThatWrapSection } from '@/components/home/ThatWrapSection';
 import { MenuSignatureItemsSection } from '@/components/menu/MenuSignatureItemsSection';
-import { MenuShowcaseSection } from '@/components/menu/MenuShowcaseSection';
+import { MenuShowcaseSectionDynamic } from '@/components/menu/MenuShowcaseSectionDynamic';
 import { defaultAboutPayload, defaultMenuPayload, defaultOrderProcessPayload, defaultTestimonialsPayload } from '@/lib/api';
 import { getAboutUs, getBanners, getMenus, getOrderProcess, getSite, getTestimonials } from '@/lib/api.server';
 
@@ -25,7 +25,7 @@ export async function HomePageContent() {
       <CinematicHero banners={banners} />
       <HomeAboutShowcase about={aboutPayload.about} />
       <BurgerStackSection />
-      <MenuShowcaseSection menu={menuPayload} />
+      <MenuShowcaseSectionDynamic menu={menuPayload} />
       <MenuSignatureItemsSection section={menuPayload.signature_section} items={menuPayload.signature_items} />
       <OrderProcessSection payload={orderProcessPayload} />
       <HomeWhyChooseUsSection section={aboutPayload.why_choose_us} />

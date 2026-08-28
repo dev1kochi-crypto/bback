@@ -1,10 +1,9 @@
 import { SiteShell } from '@/components/layout/SiteShell';
-import { MenuShowcaseSection } from '@/components/menu/MenuShowcaseSection';
+import { MenuShowcaseSectionDynamic } from '@/components/menu/MenuShowcaseSectionDynamic';
 import { getMenus } from '@/lib/api.server';
 import { buildPageMetadata } from '@/lib/pageMetadata';
-import { REVALIDATE_SECONDS } from '@/lib/cache';
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 10;
 
 export async function generateMetadata() {
   return buildPageMetadata('menu', {
@@ -20,7 +19,7 @@ export default async function MenuPage() {
   return (
     <SiteShell activeNavUrl="/menu" pageBanner={{ title: 'Our Menu' }}>
       <main className="bg-[#050505]">
-        <MenuShowcaseSection menu={menuPayload} variant="listing" />
+        <MenuShowcaseSectionDynamic menu={menuPayload} variant="listing" />
       </main>
     </SiteShell>
   );

@@ -1,0 +1,71 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'frontend/**'
+  workflow_dispatch: {}
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, json, bcmath, fileinfo, pdo, pdo_mysql, tokenizer, openssl, curl, zip
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build Laravel's own Vite assets
+        run: |
+          npm install
+          npm run build
+
+      - name: Deploy to cPanel via rsync
+        uses: burnett01/rsync-deployments@7.0.2
+        with:
+          switches: >-
+            -avz
+            --exclude=.git/
+            --exclude=.github/
+            --exclude=frontend/
+            --exclude=node_modules/
+            --exclude=tests/
+            --exclude=.env
+            --exclude=.env.example
+            --exclude=storage/
+            --exclude=bootstrap/cache/
+            --exclude=public/storage
+          path: ./
+          remote_path: ${{ secrets.CPANEL_LARAVEL_PATH }}
+          remote_host: ${{ secrets.CPANEL_SSH_HOST }}
+          remote_port: ${{ secrets.CPANEL_SSH_PORT }}
+          remote_user: ${{ secrets.CPANEL_SSH_USER }}
+          remote_key: ${{ secrets.CPANEL_SSH_KEY }}
+
+      - name: Run post-deploy Artisan commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.CPANEL_SSH_HOST }}
+          port: ${{ secrets.CPANEL_SSH_PORT }}
+          username: ${{ secrets.CPANEL_SSH_USER }}
+          key: ${{ secrets.CPANEL_SSH_KEY }}
+          script: |
+            cd ${{ secrets.CPANEL_LARAVEL_PATH }}
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            # php artisan migrate --force

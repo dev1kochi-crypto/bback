@@ -1,13 +1,12 @@
 import { ContactFormSection } from '@/components/contact/ContactFormSection';
 import { ContactInfoSection } from '@/components/contact/ContactInfoSection';
 import { ContactAmbientLayer, ContactMotionEnhancer } from '@/components/contact/ContactMotionEnhancer';
-import { ContactThreeScene } from '@/components/contact/ContactThreeScene';
+import { ContactThreeSceneDynamic } from '@/components/contact/ContactThreeSceneDynamic';
 import { SiteShell } from '@/components/layout/SiteShell';
 import { getContact } from '@/lib/api.server';
 import { buildPageMetadata } from '@/lib/pageMetadata';
-import { REVALIDATE_SECONDS } from '@/lib/cache';
 
-export const revalidate = REVALIDATE_SECONDS;
+export const revalidate = 10;
 
 export async function generateMetadata() {
   return buildPageMetadata('contact', {
@@ -25,7 +24,7 @@ export default async function ContactPage() {
       <main className="relative overflow-hidden bg-[#050505]">
         <ContactAmbientLayer />
         <div className="absolute inset-x-0 top-0 h-[680px] opacity-35 blur-[0.2px]">
-          <ContactThreeScene />
+          <ContactThreeSceneDynamic />
         </div>
         <div className="relative z-10">
           <ContactInfoSection contact={payload.contact} />

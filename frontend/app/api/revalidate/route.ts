@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     : ['cms-data'];
 
   for (const tag of tags) {
-    revalidateTag(tag);
+    revalidateTag(tag, { expire: 0 });
   }
 
   for (const path of REVALIDATE_PATHS) {
