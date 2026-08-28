@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Keep Laravel private files and folders from being served directly.
+    RewriteRule ^(\.env|\.git|artisan|composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml|vite\.config\.js) - [F,L]
+    RewriteRule ^(app|bootstrap|config|database|lang|resources|routes|storage|tests|vendor)(/|$) - [F,L]
+
+    # Route app requests through Laravel's public directory.
+    RewriteRule ^(?!public/)(.*)$ public/$1 [L]
+</IfModule>
